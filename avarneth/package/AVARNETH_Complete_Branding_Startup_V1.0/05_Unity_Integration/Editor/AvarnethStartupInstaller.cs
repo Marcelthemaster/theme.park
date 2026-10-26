@@ -1505,11 +1505,11 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
         // ------------------------------------------------------------------ icons
 
-        /// <summary>AVARNETH icon textures in &lt;root&gt;/Icons named AVE_Icon_&lt;size&gt;.png, keyed by size.</summary>
+        /// <summary>AVARNETH icon textures directly in &lt;root&gt;/Icons named AVE_Icon_&lt;size&gt;.png, keyed by size.</summary>
         internal static SortedDictionary<int, string> FindIconFiles(InstallRoot root)
         {
             var result = new SortedDictionary<int, string>();
-            foreach (string path in CollectPngs(root, IconFolder))
+            foreach (string path in CollectContractPngs(root, IconFolder))
             {
                 string file = FileName(path);
                 if (!file.StartsWith(IconPrefix, StringComparison.Ordinal)) continue;
@@ -1543,13 +1543,79 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             return slash > 0 ? assetPath.Substring(0, slash) : null;
         }
 
-        internal static string JoinLimited(IList<string> lines)
+        /// <summary>Single-line version of <paramref name="text"/>, cut to <paramref name="maxChars"/> with "...".</summary>
+        internal static string Shorten(string text, int maxChars)
+        {
+            if (string.IsNullOrEmpty(text)) return string.Empty;
+            string single = text.Replace("\r", string.Empty).Replace('\n', ' ');
+            if (single.Length <= maxChars) return single;
+            int cut = Math.Max(0, maxChars - 3);
+            if (cut > 0 && char.IsHighSurrogate(single[cut - 1])) cut--;
+            return single.Substring(0, cut) + "...";
+        }
+
+        /// <summary>
+        /// "- line" list that fits into <paramref name="maxChars"/>: each line is shortened to one line of at most
+        /// 100 characters, and the lines that do not fit are summarised as "... and N more (see Console)".
+        /// </summary>
+        internal static string JoinLimited(IList<string> lines, int maxChars)
         {
             var sb = new StringBuilder();
-            int count = Math.Min(lines.Count, DialogListLimit);
-            for (int i = 0; i < count; i++) sb.AppendLine("- " + lines[i]);
-            if (lines.Count > count) sb.AppendLine("- ... and " + (lines.Count - count) + " more (see Console)");
-            return sb.ToString().TrimEnd();
+            int shown = 0;
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = "- " + Shorten(lines[i], DialogLineMaxChars);
+                bool last = i == lines.Count - 1;
+                int needed = (sb.Length > 0 ? 1 : 0) + line.Length + (last ? 0 : 1 + DialogMoreLineReserve);
+                if (sb.Length + needed > maxChars) break;
+                if (sb.Length > 0) sb.Append('\n');
+                sb.Append(line);
+                shown++;
+            }
+
+            if (shown < lines.Count)
+            {
+                if (sb.Length > 0) sb.Append('\n');
+                sb.Append("- ... and " + (lines.Count - shown).ToString(CultureInfo.InvariantCulture) + " more (see Console)");
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary><paramref name="head"/> + as many list lines as fit + <paramref name="tail"/>, within <see cref="DialogMaxChars"/>.</summary>
+        internal static string ComposeListDialog(string head, IList<string> lines, string tail)
+        {
+            head = head ?? string.Empty;
+            tail = tail ?? string.Empty;
+            int budget = DialogMaxChars - head.Length - tail.Length;
+            return FitDialogMessage(head + JoinLimited(lines ?? Array.Empty<string>(), budget) + tail);
+        }
+
+        /// <summary>Last-resort cut to <see cref="DialogMaxChars"/> so Unity never truncates a dialog message itself.</summary>
+        internal static string FitDialogMessage(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return string.Empty;
+            if (message.Length <= DialogMaxChars) return message;
+            const string notice = "\n... (full text in the Console)";
+            int cut = DialogMaxChars - notice.Length;
+            if (char.IsHighSurrogate(message[cut - 1])) cut--;
+            return message.Substring(0, cut).TrimEnd() + notice;
+        }
+
+        /// <summary>EditorUtility.DisplayDialog with OK/Cancel; the message is kept within <see cref="DialogMaxChars"/>.</summary>
+        internal static bool Confirm(string title, string message, string ok, string cancel)
+        {
+            string fitted = FitDialogMessage(message);
+            if (fitted.Length != (message ?? string.Empty).Length) Debug.Log("[AVARNETH Startup] " + title + "\n" + message);
+            return EditorUtility.DisplayDialog(title, fitted, ok, cancel);
+        }
+
+        /// <summary>EditorUtility.DisplayDialog with one button; the message is kept within <see cref="DialogMaxChars"/>.</summary>
+        internal static void Alert(string title, string message, string ok = "OK")
+        {
+            string fitted = FitDialogMessage(message);
+            if (fitted.Length != (message ?? string.Empty).Length) Debug.Log("[AVARNETH Startup] " + title + "\n" + message);
+            EditorUtility.DisplayDialog(title, fitted, ok);
         }
     }
 
