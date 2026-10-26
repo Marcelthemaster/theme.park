@@ -19,26 +19,26 @@
     },
     {
       "index": 2,
-      "x": 6,
+      "x": 7,
       "y": 0,
-      "w": 3,
-      "h": 3,
+      "w": 1,
+      "h": 2,
       "source": "Particles/AVE_Particle_02.png"
     },
     {
       "index": 3,
-      "x": 9,
+      "x": 10,
       "y": 0,
-      "w": 2,
-      "h": 2,
+      "w": 1,
+      "h": 3,
       "source": "Particles/AVE_Particle_03.png"
     },
     {
       "index": 4,
-      "x": 12,
-      "y": 0,
-      "w": 3,
-      "h": 3,
+      "x": 13,
+      "y": 1,
+      "w": 1,
+      "h": 1,
       "source": "Particles/AVE_Particle_04.png"
     },
     {
@@ -46,16 +46,8 @@
       "x": 16,
       "y": 0,
       "w": 1,
-      "h": 3,
+      "h": 2,
       "source": "Particles/AVE_Particle_05.png"
-    },
-    {
-      "index": 6,
-      "x": 19,
-      "y": 1,
-      "w": 1,
-      "h": 1,
-      "source": "Particles/AVE_Particle_06.png"
     }
   ],
   "note": "Exact sprite rects (sprites have different sizes). Particle tracks: Animation_Timeline.json"

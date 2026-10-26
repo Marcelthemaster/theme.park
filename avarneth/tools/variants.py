@@ -21,13 +21,16 @@ EXTRA = {k: [_hex(c) for c in v] for k, v in EXTRA.items()}
 THEMES = {
     'Magic_And_Iron': {},
     'Classic_Fantasy': {'iron': ('royal', 0), 'stone': ('warmstone', 0)},
-    'Dark_Fantasy': {'gold': ('silver', 0), 'ember': ('crimson', 0), 'stone': ('stone', -1), 'iron': ('iron', -1)},
+    'Dark_Fantasy': {'gold': ('silver', 1), 'ember': ('crimson', 0), 'stone': ('stone', -1), 'iron': ('iron', -1)},
 }
 
+# material treatment per direction: depth of the dark wordmark extrusion (art px)
+EXTRUSION = {'Magic_And_Iron': 2, 'Classic_Fantasy': 3, 'Dark_Fantasy': 4}
+
 DESCRIPTIONS = {
-    'Magic_And_Iron': 'Production standard - magic iron / forge fantasy: dark iron, aged gold, ember glow, arcane blue accent.',
-    'Classic_Fantasy': 'Classic fantasy MMORPG - heraldic royal-blue steel with bright gold, warm stone.',
-    'Dark_Fantasy': 'Dark monumental fantasy - blackened silver metal, crimson embers, deeper stone.',
+    'Magic_And_Iron': 'Produktionsstandard – magische Eisen-/Schmiede-Fantasy: dunkles Eisen, Altgold, Glut, arkanes Blau; schlanke 2-px-Extrusion.',
+    'Classic_Fantasy': 'Klassische Fantasy – heraldisches Königsblau mit hellem Gold und warmem Stein; 3-px-Extrusion in Blau.',
+    'Dark_Fantasy': 'Dunkle, monumentale Fantasy – geschwärztes Silber, karmesinrote Glut, tieferer Stein; schwere 4-px-Extrusion.',
 }
 
 

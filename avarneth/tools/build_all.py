@@ -70,9 +70,9 @@ def pad_canvas(c, pad=4):
 
 
 # ---------------------------------------------------------------------------
-def brand_assets():
+def brand_assets(ext_depth=2):
     emb = emblem_mod.build(1.0, 'full')
-    wm = wordmark_mod.build()
+    wm = wordmark_mod.build(ext_depth=ext_depth)
     sub = brand.build_subtitle()
     sub_plain = brand.build_subtitle(with_flourish=False)
     pres = brand.build_presents_line()
@@ -116,9 +116,9 @@ def card(c: Canvas, scale, label, bg=(14, 15, 21)):
 
 
 def stage_variants():
-    assets = brand_assets()
     cards = []
     for theme in ('Classic_Fantasy', 'Dark_Fantasy', 'Magic_And_Iron'):
+        assets = brand_assets(variants.EXTRUSION[theme])
         d = P('02_Logo_Variants', theme)
         for n in ('AVARNETH_Emblem', 'AVARNETH_Logo', 'AVARNETH_Complete_Logo', 'AVARNETH_Publisher_Presentation'):
             arr = variants.recolor(assets[n].a, theme)
@@ -130,12 +130,14 @@ def stage_variants():
         cd = card(cc, 3, label)
         save(cd, os.path.join(d, f'Preview_Card_{theme}.png'))
         with open(os.path.join(d, 'DESIGN_NOTE.txt'), 'w') as f:
-            f.write(variants.DESCRIPTIONS[theme] + '\n\nSame geometry as the production standard; '
-                    'materials are swapped by exact palette remapping (see 07_Documentation/BRAND_GUIDELINES.md).\n')
+            f.write(variants.DESCRIPTIONS[theme] + '\n\nGleiche Geometrie wie der Produktionsstandard (dieselbe Markenidentität); '
+                    'Material/Farbe per exaktem Paletten-Remapping und eigene Extrusionstiefe '
+                    '(siehe 07_Documentation/BRAND_GUIDELINES.md, Abschnitt 8).\n')
         cards.append(cd)
     H = max(c.shape[0] for c in cards)
     W = sum(c.shape[1] for c in cards)
     ov = np.zeros((H, W, 4), np.uint8)
+    ov[..., :3] = (14, 15, 21)
     ov[..., 3] = 255
     x = 0
     for c in cards:
@@ -149,14 +151,15 @@ def stage_icons():
     d = P('03_Windows_Icons')
     for s in (16, 24, 32, 48, 64, 128, 256, 512):
         save(ic[s].a, os.path.join(d, f'AVARNETH_{s}.png'))
-    save(ic[1024].a, os.path.join(d, 'Extra', 'AVARNETH_1024.png'))
+    for s in (20, 30, 36, 40, 60, 72, 80, 96, 1024):
+        save(ic[s].a, os.path.join(d, 'Extra', f'AVARNETH_{s}.png'))
     icons_mod.write_ico(os.path.join(d, 'AVARNETH.ico'), ic)
-    # Unity copies (PlayerSettings icon slots)
-    for s in (16, 24, 32, 48, 64, 128, 256, 512, 1024):
+    # Unity copies (PlayerSettings icon slots - the helper picks exact sizes)
+    for s in sorted(ic):
         save(ic[s].a, P('05_Unity_Integration', 'Importable_Assets', 'Icons', f'AVE_Icon_{s}.png'))
-    # pixel maps of the hand-specified sizes (editable source)
+    # pixel maps of the per-size drawings (editable source)
     src = mkdir(P('01_Brand_Identity', 'Source_Files', 'pixelmaps'))
-    for s in (16, 24, 32):
+    for s in icons_small.SIZES + (48, 64):
         with open(os.path.join(src, f'AVARNETH_Icon_{s}.pixelmap.txt'), 'w') as f:
             f.write(f'# AVARNETH icon {s}x{s} - palette cell codes (see palette/AVARNETH_Palette.txt), .. = transparent\n')
             f.write(pxmap.to_map(ic[s].a) + '\n')
@@ -338,8 +341,8 @@ def contact_sheet(tl, arr, path):
 
 def icon_preview(path):
     ic = icons_mod.build_all()
-    sizes = (16, 24, 32, 48, 64, 128, 256)
-    W, H = 1280, 760
+    sizes = (16, 20, 24, 30, 32, 36, 40, 48, 64, 128, 256)
+    W, H = 1500, 760
     out = np.zeros((H, W, 4), np.uint8)
     out[..., 3] = 255
     out[:H // 2, :, :3] = (16, 17, 24)        # dark (taskbar-like)
@@ -352,7 +355,7 @@ def icon_preview(path):
             lab = styled(text_mask(STEEL7, f'{s}', tracking=1), ('iron', 7) if half == 0 else ('iron', 2),
                          edge=('iron', 0) if half == 0 else ('iron', 8), shadow=('iron', 1) if half == 0 else ('iron', 7), pad=1)
             alpha_over(out, lab.a, x, base + 262)
-            x += s + 28
+            x += s + 22
         # zoomed small sizes for inspection
         zx = W - 3 * (32 * 4 + 16) - 8
         for s in (16, 24, 32):

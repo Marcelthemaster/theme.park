@@ -11,6 +11,11 @@ import numpy as np
 from pix import alpha_over
 
 
+def f32(v):
+    """Unity stores timeline values and the timeline time as float32; mirror that exactly."""
+    return float(np.float32(v))
+
+
 def ease(name, u):
     u = min(1.0, max(0.0, u))
     if name == 'inCubic':
@@ -31,6 +36,9 @@ def snap(v):
 
 
 def eval_keys(keys, t):
+    t = f32(t)
+    keys = [{'t': f32(k['t']), 'alpha': f32(k['alpha']), 'dx': f32(k['dx']), 'dy': f32(k['dy']), 'ease': k.get('ease', 'linear')}
+            for k in keys]
     if t <= keys[0]['t']:
         k = keys[0]
         return k['alpha'], k['dx'], k['dy']
@@ -53,6 +61,7 @@ def flipbook_index(t, start, end, n, after):
     """>=0 frame index, -1 static sprite, -2 hidden."""
     if n == 0:
         return -1
+    t, start, end = f32(t), f32(start), f32(end)
     if t < start:
         return -2
     if t < end:
@@ -66,6 +75,8 @@ def flipbook_index(t, start, end, n, after):
 
 
 def eval_particle(p, t):
+    t = f32(t)
+    p = {k: (v if k == 'sprite' else f32(v)) for k, v in p.items()}
     if not (p['t0'] <= t < p['t0'] + p['life']):
         return None
     tau = t - p['t0']
@@ -103,8 +114,17 @@ def render(timeline, sprite_arrays, t, base=None):
     def draw_layers(ls):
         for L in ls:
             vis, spr, idx, x, y, a = layer_state(L, t)
-            if vis:
-                alpha_over(out, sprite_arrays[spr], x, y, opacity=min(1.0, a))
+            if not vis:
+                continue
+            arr = sprite_arrays[spr]
+            if L.get('fullscreen'):
+                # stretched over the whole canvas (sprite is authored at canvas size)
+                if arr.shape[:2] != (H, W):
+                    from PIL import Image
+                    arr = np.array(Image.fromarray(arr).resize((W, H), Image.BILINEAR))
+                alpha_over(out, arr, 0, 0, opacity=min(1.0, a))
+            else:
+                alpha_over(out, arr, x, y, opacity=min(1.0, a))
 
     draw_layers(back)
     for p in timeline['particles']:
@@ -127,10 +147,11 @@ def csv_rows(timeline, fps):
     n = int(math.floor(timeline['duration'] * fps))
     for i in range(n + 1):
         t = i / fps
+        done = t >= timeline['duration']   # contract 3.3: finished overlay shows nothing
         for L in timeline['layers']:
             alpha, dx, dy = eval_keys(L['keys'], t)
             idx = flipbook_index(t, L['frameStart'], L['frameEnd'], len(L['frames']), L['afterFrames'])
-            vis = 1 if (alpha > 0.001 and idx != -2 and (idx != -1 or L['sprite'])) else 0
+            vis = 1 if (not done and alpha > 0.001 and idx != -2 and (idx != -1 or L['sprite'])) else 0
             rows.append(f"{i},L,{L['id']},{vis},{idx},{snap(L['x'] + dx)},{snap(L['y'] + dy)},{alpha:.4f}")
         for j, p in enumerate(timeline['particles']):
             st = eval_particle(p, t)
@@ -138,5 +159,5 @@ def csv_rows(timeline, fps):
                 rows.append(f"{i},P,{j},0,{p['sprite']},0,0,0.0000")
                 continue
             x, y, a = st
-            rows.append(f"{i},P,{j},{1 if a > 0.001 else 0},{p['sprite']},{snap(x)},{snap(y)},{a:.4f}")
+            rows.append(f"{i},P,{j},{1 if (a > 0.001 and not done) else 0},{p['sprite']},{snap(x)},{snap(y)},{a:.4f}")
     return rows

@@ -114,8 +114,17 @@ def render(timeline, sprite_arrays, t, base=None):
     def draw_layers(ls):
         for L in ls:
             vis, spr, idx, x, y, a = layer_state(L, t)
-            if vis:
-                alpha_over(out, sprite_arrays[spr], x, y, opacity=min(1.0, a))
+            if not vis:
+                continue
+            arr = sprite_arrays[spr]
+            if L.get('fullscreen'):
+                # stretched over the whole canvas (sprite is authored at canvas size)
+                if arr.shape[:2] != (H, W):
+                    from PIL import Image
+                    arr = np.array(Image.fromarray(arr).resize((W, H), Image.BILINEAR))
+                alpha_over(out, arr, 0, 0, opacity=min(1.0, a))
+            else:
+                alpha_over(out, arr, x, y, opacity=min(1.0, a))
 
     draw_layers(back)
     for p in timeline['particles']:

@@ -185,7 +185,7 @@ def frame(t, login_alpha=1.0):
             out[int(y) + 1, (x + 1) % W] = cc
     if login_alpha > 0:
         p = _CACHE['panel']
-        alpha_over(out, p.a, 165, 140, opacity=login_alpha)
+        alpha_over(out, p.a, 14, 92, opacity=login_alpha)
     wm = _CACHE['wm']
     alpha_over(out, wm.a, 4, H - wm.h - 3)
     return out

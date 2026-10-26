@@ -2,9 +2,10 @@
 // Copyright (c) Eckertengineering. All rights reserved.
 //
 // Menu: Tools > AVARNETH > Startup
-// The installer only touches files inside the located importable asset root, the generated prefab and,
-// on explicit request with confirmation, the active scene (never saved automatically) and the Standalone /
-// default icons and splash screen flags of the Player Settings.
+// The installer only touches the contract files inside the located importable asset root (AVE_*.png directly in
+// Layers/, Frames/, Particles/, the PNGs named in Animation_Timeline.json and Icons/AVE_Icon_<size>.png; import
+// settings only after a confirmation), the generated prefab and, on explicit request with confirmation, the active
+// scene (never saved automatically) and the Standalone / default icons and splash screen flags of the Player Settings.
 
 using System;
 using System.Collections.Generic;
@@ -152,6 +153,8 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         internal const string ArtRootName = "ArtRoot";
         internal const string ParticlesContainerName = "Particles";
         internal const string IconPrefix = "AVE_Icon_";
+        internal const string ContractFilePrefix = "AVE_";
+        internal const string StandardRootName = "Importable_Assets";
         internal const int DefaultSortingOrder = 1000;
         internal const int ParticleOrderSplit = 100;
         internal const float SpritePixelsPerUnit = 100f;
@@ -161,7 +164,13 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         internal const string IconFolder = "Icons";
 
         private const string OverrideKeyPrefix = "Eckertengineering.Avarneth.Startup.TimelineGuid.";
-        private const int DialogListLimit = 15;
+
+        // In 6000.6 EditorUtility.DisplayDialog cuts messages longer than 512 characters and logs them again
+        // (Editor/Mono/EditorDialog.cs:142-147, LimitMessageLength). Every dialog message stays below this budget;
+        // the full text always goes to the Console.
+        internal const int DialogMaxChars = 500;
+        private const int DialogLineMaxChars = 100;
+        private const int DialogMoreLineReserve = 36;
 
         // ------------------------------------------------------------------ menu items
 
@@ -230,8 +239,17 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             }
         }
 
-        /// <summary>All TextAssets named Animation_Timeline(.json) whose "schema" matches the contract.</summary>
+        /// <summary>All TextAssets named Animation_Timeline(.json) whose "schema" matches the contract and whose folder is a usable root.</summary>
         internal static List<string> FindTimelineCandidates()
+        {
+            return FindTimelineCandidates(null);
+        }
+
+        /// <summary>
+        /// Like <see cref="FindTimelineCandidates()"/>; contract timelines in an unusable folder (Assets/ itself, or
+        /// outside Assets/, e.g. Packages/) are added to <paramref name="rejected"/> instead.
+        /// </summary>
+        internal static List<string> FindTimelineCandidates(List<string> rejected)
         {
             var result = new List<string>();
             foreach (string guid in AssetDatabase.FindAssets(TimelineAssetName + " t:TextAsset"))
@@ -240,12 +258,32 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                 if (string.IsNullOrEmpty(path) || result.Contains(path)) continue;
                 if (!string.Equals(FileName(path), TimelineAssetName + ".json", StringComparison.OrdinalIgnoreCase)) continue;
                 var text = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
-                if (text != null && IsContractTimeline(text)) result.Add(path);
+                if (text == null || !IsContractTimeline(text)) continue;
+                if (IsAllowedRootFolder(ParentPath(path))) result.Add(path);
+                else if (rejected != null && !rejected.Contains(path)) rejected.Add(path);
             }
 
             result.Sort(StringComparer.Ordinal);
+            rejected?.Sort(StringComparer.Ordinal);
             return result;
         }
+
+        /// <summary>
+        /// The importable asset root must be a subfolder of Assets/: never Assets/ itself (the import settings step
+        /// would then work on Assets/Layers, Assets/Particles, ...) and never a read-only package folder.
+        /// </summary>
+        internal static bool IsAllowedRootFolder(string folder)
+        {
+            return !string.IsNullOrEmpty(folder) && folder.StartsWith("Assets/", StringComparison.Ordinal) && folder.Length > "Assets/".Length;
+        }
+
+        /// <summary>True when the root folder has the name used by the package (Importable_Assets).</summary>
+        internal static bool HasStandardRootName(InstallRoot root)
+        {
+            return root != null && string.Equals(FileName(root.RootFolder), StandardRootName, StringComparison.Ordinal);
+        }
+
+        private const string RootLocationHint = "The folder that contains Animation_Timeline.json must be a subfolder of Assets/, e.g. Assets/AVARNETH/Startup/Importable_Assets/.";
 
         internal static bool IsContractTimeline(TextAsset text)
         {
@@ -290,18 +328,26 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
             if (chosen == null)
             {
-                List<string> candidates = FindTimelineCandidates();
+                var rejected = new List<string>();
+                List<string> candidates = FindTimelineCandidates(rejected);
                 if (candidates.Count == 0)
                 {
+                    if (rejected.Count > 0)
+                    {
+                        error = ComposeListDialog("Animation_Timeline.json was only found in an unusable folder:\n", rejected,
+                            "\n\n" + RootLocationHint);
+                        return false;
+                    }
+
                     error = "No TextAsset named '" + TimelineAssetName + "' with schema '" + AvarnethStartupMath.TimelineSchema +
-                            "' was found in the project.\n\nCopy the 05_Unity_Integration folder (including Importable_Assets) into Assets/ and let Unity import it.";
+                            "' was found in the project.\n\nCopy the 05_Unity_Integration folder (including Importable_Assets) into a subfolder of Assets/ and let Unity import it.";
                     return false;
                 }
 
                 if (candidates.Count > 1)
                 {
-                    error = "Several AVARNETH timelines were found:\n\n" + JoinLimited(candidates) +
-                            "\n\nChoose the one to use in Tools > AVARNETH > Startup > Installer...";
+                    error = ComposeListDialog("Several AVARNETH timelines were found:\n", candidates,
+                        "\n\nChoose the one to use in Tools > AVARNETH > Startup > Installer...");
                     needsChoice = true;
                     return false;
                 }
@@ -311,7 +357,8 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
             root = CreateRoot(chosen);
             if (root != null) return true;
-            error = "The timeline asset path could not be resolved.";
+            error = "The timeline '" + AssetDatabase.GetAssetPath(chosen) + "' cannot be used. " + RootLocationHint;
+            needsChoice = TimelineOverride != null;
             return false;
         }
 
@@ -321,9 +368,8 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             if (string.IsNullOrEmpty(path)) return null;
 
             string rootFolder = ParentPath(path);
-            if (string.IsNullOrEmpty(rootFolder)) return null;
-            string parent = ParentPath(rootFolder);
-            if (string.IsNullOrEmpty(parent)) parent = rootFolder;
+            if (!IsAllowedRootFolder(rootFolder)) return null;
+            string parent = ParentPath(rootFolder); // at least "Assets"
 
             return new InstallRoot
             {
@@ -341,12 +387,12 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             Debug.LogError("[AVARNETH Startup] " + error);
             if (offerWindow)
             {
-                if (EditorUtility.DisplayDialog(DialogTitle, error, "Open Installer", "Close"))
+                if (Confirm(DialogTitle, error, "Open Installer", "Close"))
                     AvarnethStartupInstallerWindow.Open();
             }
             else
             {
-                EditorUtility.DisplayDialog(DialogTitle, error, "OK");
+                Alert(DialogTitle, error);
             }
         }
 
@@ -497,6 +543,16 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             }
         }
 
+        /// <summary>Same rules as <see cref="CheckRelativePath"/>: relative, forward slashes, no empty, "." or ".." segment.</summary>
+        internal static bool IsSafeRelativePath(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return false;
+            if (path.IndexOf('\\') >= 0 || path.IndexOf(':') >= 0 || path.StartsWith("/", StringComparison.Ordinal)) return false;
+            foreach (string segment in path.Split('/'))
+                if (segment.Length == 0 || segment == "." || segment == "..") return false;
+            return true;
+        }
+
         internal static IEnumerable<string> ReferencedSpritePaths(TimelineJson data)
         {
             foreach (LayerJson layer in data.layers)
@@ -530,7 +586,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                         {
                             importer.GetSourceTextureWidthAndHeight(out int w, out int h);
                             Rect r = sprite.rect;
-                            if (Mathf.RoundToInt(r.width) != w || Mathf.RoundToInt(r.height) != h)
+                            if (AvarnethStartupMath.Snap(r.width) != w || AvarnethStartupMath.Snap(r.height) != h)
                                 result.Warnings.Add(relative + ": sprite is " + r.width + "x" + r.height + " but the source PNG is " + w + "x" + h + " (check Max Size / Sprite Mode).");
                         }
                         catch (InvalidOperationException)
@@ -569,8 +625,11 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
         // ------------------------------------------------------------------ import settings
 
-        /// <summary>PNG asset paths below <c>root/sub</c> (only inside the located root).</summary>
-        internal static List<string> CollectPngs(InstallRoot root, string sub)
+        /// <summary>
+        /// Contract PNGs directly in <c>root/sub</c>: files named AVE_*.png, no subfolders (FindAssets with a folder
+        /// list also searches subfolders, see 6000.6 AssetDatabaseSearching.cs:26-36), nothing outside the root.
+        /// </summary>
+        internal static List<string> CollectContractPngs(InstallRoot root, string sub)
         {
             var result = new List<string>();
             string folder = root.RootFolder + "/" + sub;
@@ -580,12 +639,58 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 if (string.IsNullOrEmpty(path) || result.Contains(path)) continue;
-                if (!path.StartsWith(folder + "/", StringComparison.Ordinal)) continue;
-                if (!path.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) continue;
+                if (!string.Equals(ParentPath(path), folder, StringComparison.Ordinal)) continue;
+                string file = FileName(path);
+                if (!file.StartsWith(ContractFilePrefix, StringComparison.Ordinal)) continue;
+                if (!file.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) continue;
                 result.Add(path);
             }
 
             result.Sort(StringComparer.Ordinal);
+            return result;
+        }
+
+        /// <summary>
+        /// Sprite PNGs the contract names: AVE_*.png directly in Layers/, Frames/, Particles/ plus every PNG in those
+        /// folders that <paramref name="data"/> references (pass null when the timeline is invalid).
+        /// </summary>
+        internal static List<string> CollectSpritePngs(InstallRoot root, TimelineJson data)
+        {
+            var set = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (string sub in SpriteFolders)
+                set.UnionWith(CollectContractPngs(root, sub));
+
+            if (data != null)
+            {
+                foreach (string relative in ReferencedSpritePaths(data))
+                {
+                    if (!IsSafeRelativePath(relative) || !relative.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) continue;
+                    int slash = relative.IndexOf('/');
+                    if (slash <= 0 || Array.IndexOf(SpriteFolders, relative.Substring(0, slash)) < 0) continue;
+                    string assetPath = root.RootFolder + "/" + relative;
+                    if (AssetImporter.GetAtPath(assetPath) != null) set.Add(assetPath);
+                }
+            }
+
+            return new List<string>(set);
+        }
+
+        /// <summary>Icon PNGs the contract names: Icons/AVE_Icon_&lt;size&gt;.png.</summary>
+        internal static List<string> CollectIconPngs(InstallRoot root)
+        {
+            return new List<string>(FindIconFiles(root).Values);
+        }
+
+        internal static string RelativeToRoot(InstallRoot root, string assetPath)
+        {
+            string prefix = root.RootFolder + "/";
+            return assetPath.StartsWith(prefix, StringComparison.Ordinal) ? assetPath.Substring(prefix.Length) : assetPath;
+        }
+
+        internal static List<string> RelativeToRoot(InstallRoot root, IEnumerable<string> assetPaths)
+        {
+            var result = new List<string>();
+            foreach (string path in assetPaths) result.Add(RelativeToRoot(root, path));
             return result;
         }
 
@@ -626,7 +731,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         private static void CheckStandaloneOverride(TextureImporter ti, List<string> problems)
         {
             TextureImporterPlatformSettings standalone = ti.GetPlatformTextureSettings("Standalone");
-            if (standalone != null && standalone.overridden) problems.Add("has a 'PC, Mac & Linux Standalone' override");
+            if (standalone != null && standalone.overridden) problems.Add("has a Standalone platform override");
         }
 
         private static bool ApplySpriteSettings(TextureImporter ti)
@@ -683,65 +788,96 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             ti.SetPlatformTextureSettings(standalone);
         }
 
-        /// <summary>Applies the contract import settings to all PNGs in Layers/, Frames/, Particles/ and Icons/ of the root.</summary>
+        /// <summary>
+        /// Applies the contract import settings to the contract files of the root only (see <see cref="CollectSpritePngs"/>
+        /// and <see cref="CollectIconPngs"/>). When <paramref name="interactive"/> is true, nothing is changed before the
+        /// user confirmed a dialog that names the root and the number of files that will change.
+        /// </summary>
         internal static void ConfigureImportSettings(InstallRoot root, bool interactive)
         {
-            var spritePaths = new List<string>();
             var missingFolders = new List<string>();
             foreach (string sub in SpriteFolders)
-            {
                 if (!AssetDatabase.IsValidFolder(root.RootFolder + "/" + sub)) missingFolders.Add(sub + "/");
-                spritePaths.AddRange(CollectPngs(root, sub));
-            }
-
-            List<string> iconPaths = CollectPngs(root, IconFolder);
             if (!AssetDatabase.IsValidFolder(root.RootFolder + "/" + IconFolder)) missingFolders.Add(IconFolder + "/");
 
-            int changed = 0;
+            ParsedTimeline parsed = ParseTimeline(root);
+            List<string> spritePaths = CollectSpritePngs(root, parsed.IsValid ? parsed.Data : null);
+            List<string> iconPaths = CollectIconPngs(root);
+
+            // Determine what would change before touching anything.
+            var spriteChanges = new List<string>();
+            var iconChanges = new List<string>();
             var failed = new List<string>();
-
-            AssetDatabase.StartAssetEditing();
-            try
+            var problems = new List<string>();
+            foreach (string path in spritePaths)
             {
-                foreach (string path in spritePaths)
-                {
-                    if (!(AssetImporter.GetAtPath(path) is TextureImporter ti))
-                    {
-                        failed.Add(path);
-                        continue;
-                    }
-
-                    if (!ApplySpriteSettings(ti)) continue;
-                    ti.SaveAndReimport();
-                    changed++;
-                }
-
-                foreach (string path in iconPaths)
-                {
-                    if (!(AssetImporter.GetAtPath(path) is TextureImporter ti))
-                    {
-                        failed.Add(path);
-                        continue;
-                    }
-
-                    if (!ApplyIconSettings(ti)) continue;
-                    ti.SaveAndReimport();
-                    changed++;
-                }
-            }
-            finally
-            {
-                AssetDatabase.StopAssetEditing();
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) { failed.Add(path); continue; }
+                problems.Clear();
+                CheckSpriteSettings(ti, problems);
+                if (problems.Count > 0) spriteChanges.Add(path);
             }
 
-            var report = new StringBuilder();
-            report.AppendLine("Root: " + root.RootFolder);
-            report.AppendLine("Sprite PNGs: " + spritePaths.Count + ", icon PNGs: " + iconPaths.Count + ", reimported: " + changed + ".");
-            if (missingFolders.Count > 0) report.AppendLine("Missing folders: " + string.Join(", ", missingFolders));
-            if (failed.Count > 0) report.AppendLine("No TextureImporter for:\n" + JoinLimited(failed));
+            foreach (string path in iconPaths)
+            {
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) { failed.Add(path); continue; }
+                problems.Clear();
+                CheckIconSettings(ti, problems);
+                if (problems.Count > 0) iconChanges.Add(path);
+            }
 
-            Debug.Log("[AVARNETH Startup] Configure Sprite Import Settings\n" + report);
-            if (interactive) EditorUtility.DisplayDialog(DialogTitle, report.ToString(), "OK");
+            int planned = spriteChanges.Count + iconChanges.Count;
+            if (planned > 0 && interactive)
+            {
+                string confirm =
+                    "Apply the AVARNETH import settings to " + planned + " texture(s) in\n" + root.RootFolder + "?\n\n" +
+                    "Sprites (Layers, Frames, Particles): " + spriteChanges.Count + " of " + spritePaths.Count + "\n" +
+                    "Icons (Icons/AVE_Icon_<size>.png): " + iconChanges.Count + " of " + iconPaths.Count + "\n\n" +
+                    "Only AVE_*.png files directly in these folders and the PNGs named in Animation_Timeline.json are changed. " +
+                    "Edit > Undo cannot revert import settings." +
+                    (HasStandardRootName(root) ? string.Empty : "\n\nNote: this folder is not named " + StandardRootName + ".");
+                if (!Confirm(DialogTitle, confirm, "Apply", "Cancel")) return;
+            }
+
+            int changed = 0;
+            if (planned > 0)
+            {
+                AssetDatabase.StartAssetEditing();
+                try
+                {
+                    foreach (string path in spriteChanges)
+                    {
+                        if (!(AssetImporter.GetAtPath(path) is TextureImporter ti) || !ApplySpriteSettings(ti)) continue;
+                        ti.SaveAndReimport();
+                        changed++;
+                    }
+
+                    foreach (string path in iconChanges)
+                    {
+                        if (!(AssetImporter.GetAtPath(path) is TextureImporter ti) || !ApplyIconSettings(ti)) continue;
+                        ti.SaveAndReimport();
+                        changed++;
+                    }
+                }
+                finally
+                {
+                    AssetDatabase.StopAssetEditing();
+                }
+            }
+
+            string summary = "Root: " + root.RootFolder + "\n" +
+                             "Sprite PNGs: " + spritePaths.Count + ", icon PNGs: " + iconPaths.Count + ", reimported: " + changed + "." +
+                             (missingFolders.Count > 0 ? "\nMissing folders: " + string.Join(", ", missingFolders) : string.Empty) +
+                             (parsed.IsValid ? string.Empty : "\nAnimation_Timeline.json is invalid; only AVE_*.png files were considered.");
+
+            var log = new StringBuilder("[AVARNETH Startup] Configure Sprite Import Settings\n" + summary);
+            foreach (string path in spriteChanges) log.Append("\n  reimported (sprite): " + path);
+            foreach (string path in iconChanges) log.Append("\n  reimported (icon): " + path);
+            foreach (string path in failed) log.Append("\n  no TextureImporter: " + path);
+            Debug.Log(log.ToString());
+
+            if (!interactive) return;
+            if (failed.Count > 0) Alert(DialogTitle, ComposeListDialog(summary + "\n\nNo TextureImporter for:\n", RelativeToRoot(root, failed), string.Empty));
+            else Alert(DialogTitle, summary);
         }
 
         // ------------------------------------------------------------------ prefab
@@ -752,13 +888,13 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             ParsedTimeline parsed = ParseTimeline(root);
             if (!parsed.IsValid)
             {
-                return Abort(interactive, "Animation_Timeline.json is invalid. The prefab was not written.\n\n" + JoinLimited(parsed.Errors));
+                return Abort(interactive, "Animation_Timeline.json is invalid. The prefab was not written.\n\n", parsed.Errors);
             }
 
             ResolvedSprites sprites = ResolveSprites(root, parsed.Data);
             if (sprites.Missing.Count > 0)
             {
-                return Abort(interactive, sprites.Missing.Count + " sprite(s) are missing. The prefab was not written.\n\n" + JoinLimited(sprites.Missing));
+                return Abort(interactive, sprites.Missing.Count + " sprite(s) are missing. The prefab was not written.\n\n", sprites.Missing);
             }
 
             GameObject existing = AssetDatabase.LoadAssetAtPath<GameObject>(root.PrefabPath);
@@ -824,40 +960,38 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             GameObject asset = AssetDatabase.LoadAssetAtPath<GameObject>(root.PrefabPath);
             if (asset != null) EditorGUIUtility.PingObject(asset);
 
-            var warnings = new List<string>(parsed.Warnings);
-            warnings.AddRange(sprites.Warnings);
-            int wrongImports = CountWrongSpriteImports(root);
+            var warnings = new List<string>();
+            int wrongImports = CountWrongSpriteImports(root, parsed.Data);
             if (wrongImports > 0) warnings.Add(wrongImports + " texture(s) differ from the contract import settings - run Configure Sprite Import Settings.");
+            warnings.AddRange(parsed.Warnings);
+            warnings.AddRange(sprites.Warnings);
 
             string message = (existing != null ? "Updated " : "Created ") + root.PrefabPath + "\n" +
                              parsed.Data.layers.Length + " layer(s), " + parsed.Data.particles.Length + " particle(s).";
-            if (warnings.Count > 0) message += "\n\nWarnings:\n" + JoinLimited(warnings);
+            string head = message + (warnings.Count > 0 ? "\n\nWarnings:\n" : string.Empty);
 
-            Debug.Log("[AVARNETH Startup] " + message);
-            if (interactive) EditorUtility.DisplayDialog(DialogTitle, message, "OK");
+            Debug.Log("[AVARNETH Startup] " + head + string.Join("\n", warnings));
+            if (interactive) Alert(DialogTitle, warnings.Count > 0 ? ComposeListDialog(head, warnings, string.Empty) : message);
             return true;
         }
 
-        private static bool Abort(bool interactive, string message)
+        private static bool Abort(bool interactive, string message, IList<string> lines = null)
         {
-            Debug.LogError("[AVARNETH Startup] " + message);
-            if (interactive) EditorUtility.DisplayDialog(DialogTitle, message, "OK");
+            Debug.LogError("[AVARNETH Startup] " + message + (lines != null ? string.Join("\n", lines) : string.Empty));
+            if (interactive) Alert(DialogTitle, lines != null ? ComposeListDialog(message, lines, string.Empty) : message);
             return false;
         }
 
-        private static int CountWrongSpriteImports(InstallRoot root)
+        private static int CountWrongSpriteImports(InstallRoot root, TimelineJson data)
         {
             int count = 0;
             var problems = new List<string>();
-            foreach (string sub in SpriteFolders)
+            foreach (string path in CollectSpritePngs(root, data))
             {
-                foreach (string path in CollectPngs(root, sub))
-                {
-                    if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
-                    problems.Clear();
-                    CheckSpriteSettings(ti, problems);
-                    if (problems.Count > 0) count++;
-                }
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
+                problems.Clear();
+                CheckSpriteSettings(ti, problems);
+                if (problems.Count > 0) count++;
             }
 
             return count;
@@ -899,10 +1033,12 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
             GetOrAdd<GraphicRaycaster>(root);
 
+            // Saved switched off; Play() enables it (and its raycast target) only while the overlay plays.
             Image blocker = GetOrAdd<Image>(root);
             blocker.sprite = null;
             blocker.color = new Color(0f, 0f, 0f, 0f);
-            blocker.raycastTarget = true;
+            blocker.raycastTarget = false;
+            blocker.enabled = false;
             blocker.canvasRenderer.cullTransparentMesh = false;
 
             AvarnethStartupAnimation animation = GetOrAdd<AvarnethStartupAnimation>(root);
@@ -1019,7 +1155,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
                 Sprite sprite = particleSpriteList[p.sprite];
                 Image image = CreateImage("P" + i.ToString("000", CultureInfo.InvariantCulture), particleContainer, sprite, uiLayer);
-                AvarnethStartupMath.ParticleTopLeft(p.x, p.y, Mathf.RoundToInt(sprite.rect.width), Mathf.RoundToInt(sprite.rect.height), out int left, out int top);
+                AvarnethStartupMath.ParticleTopLeft(p.x, p.y, AvarnethStartupMath.Snap(sprite.rect.width), AvarnethStartupMath.Snap(sprite.rect.height), out int left, out int top);
                 image.rectTransform.anchoredPosition = new Vector2(left, -top);
                 particleImages[i] = image;
             }
@@ -1027,8 +1163,11 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             animation.SetTimelineData(data.duration, new Vector2Int(canvasWidth, canvasHeight), bounds, artRoot,
                 bindings.ToArray(), particleData, particleImages, particleSpriteList, blocker);
 
-            // Store the t = 0 state so the saved prefab matches the first rendered frame.
+            // Evaluating t = 0 validates every binding. The prefab is then saved neutral (all Images and the blocker
+            // off), so an overlay that is disabled or never started cannot cover the login; Play() applies t = 0
+            // before the first frame is rendered.
             if (!animation.EvaluateAt(0f)) return "The generated bindings are incomplete (see Console).";
+            animation.ClearPreview();
             return null;
         }
 
@@ -1098,10 +1237,15 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             return result;
         }
 
+        /// <summary>
+        /// True when a loaded scene contains an enabled EventSystem on an active GameObject. Uses the serialized
+        /// state: Behaviour.isActiveAndEnabled is the native IsAddedToManager (6000.6 Behaviour.bindings.cs:20-24),
+        /// which is not a reliable "will be active at runtime" signal in Edit Mode.
+        /// </summary>
         internal static bool HasActiveEventSystem()
         {
             foreach (EventSystem es in FindInLoadedScenes<EventSystem>())
-                if (es.isActiveAndEnabled) return true;
+                if (es.enabled && es.gameObject.activeInHierarchy) return true;
             return false;
         }
 
@@ -1109,7 +1253,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                EditorUtility.DisplayDialog(DialogTitle, "Exit Play Mode before adding the overlay.", "OK");
+                Alert(DialogTitle, "Exit Play Mode before adding the overlay.");
                 return;
             }
 
@@ -1118,9 +1262,9 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             {
                 AvarnethStartupAnimation first = existing[0];
                 EditorGUIUtility.PingObject(first);
-                EditorUtility.DisplayDialog(DialogTitle,
-                    "An AVARNETH startup overlay already exists in the loaded scenes:\n\n" + first.gameObject.scene.name + ": " + HierarchyPath(first.transform) +
-                    "\n\nNothing was changed.", "OK");
+                Alert(DialogTitle,
+                    "An AVARNETH startup overlay already exists in the loaded scenes:\n\n" + first.gameObject.scene.name + ": " + Shorten(HierarchyPath(first.transform), 200) +
+                    "\n\nNothing was changed.");
                 return;
             }
 
@@ -1129,7 +1273,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(root.PrefabPath);
             if (prefab == null || prefab.GetComponent<AvarnethStartupAnimation>() == null)
             {
-                if (!EditorUtility.DisplayDialog(DialogTitle, "The startup prefab '" + root.PrefabPath + "' does not exist yet.\n\nCreate it now?", "Create Prefab", "Cancel"))
+                if (!Confirm(DialogTitle, "The startup prefab '" + root.PrefabPath + "' does not exist yet.\n\nCreate it now?", "Create Prefab", "Cancel"))
                     return;
                 if (!CreateOrUpdatePrefab(root, true)) return;
                 prefab = AssetDatabase.LoadAssetAtPath<GameObject>(root.PrefabPath);
@@ -1139,7 +1283,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             Scene scene = SceneManager.GetActiveScene();
             if (!scene.IsValid() || !scene.isLoaded)
             {
-                EditorUtility.DisplayDialog(DialogTitle, "There is no open scene. Open the existing bootstrap / login scene first.", "OK");
+                Alert(DialogTitle, "There is no open scene. Open the existing bootstrap / login scene first.");
                 return;
             }
 
@@ -1148,7 +1292,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             CanvasGroup selectedGroup = selected != null && !EditorUtility.IsPersistent(selected) ? selected.GetComponent<CanvasGroup>() : null;
 
             string sceneLabel = string.IsNullOrEmpty(scene.name) ? "(untitled)" : scene.name;
-            if (!EditorUtility.DisplayDialog(DialogTitle,
+            if (!Confirm(DialogTitle,
                     "Add an instance of\n" + root.PrefabPath + "\nto the active scene '" + sceneLabel + "'?\n\n" +
                     "Only the overlay object is added. The scene is marked as modified but NOT saved.",
                     "Add Overlay", "Cancel"))
@@ -1160,7 +1304,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             var instance = PrefabUtility.InstantiatePrefab(prefab, scene) as GameObject;
             if (instance == null)
             {
-                EditorUtility.DisplayDialog(DialogTitle, "The prefab could not be instantiated.", "OK");
+                Alert(DialogTitle, "The prefab could not be instantiated.");
                 return;
             }
 
@@ -1169,15 +1313,17 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
             if (selectedGroup != null && animation != null)
             {
+                string groupName = Shorten(selected.name, 80);
                 if (selectedGroup.gameObject.scene != scene)
                 {
-                    EditorUtility.DisplayDialog(DialogTitle,
-                        "The selected CanvasGroup '" + selected.name + "' is in another scene. Cross-scene references are not supported; assign the Login Canvas Group manually.", "OK");
+                    Alert(DialogTitle,
+                        "The selected CanvasGroup '" + groupName + "' is in another scene. Cross-scene references are not supported; assign the Login Canvas Group manually.");
                 }
-                else if (EditorUtility.DisplayDialog(DialogTitle,
-                             "The selected GameObject '" + selected.name + "' has a CanvasGroup.\n\n" +
+                else if (Confirm(DialogTitle,
+                             "The selected GameObject '" + groupName + "' has a CanvasGroup.\n\n" +
                              "Assign it as Login Canvas Group? While the overlay plays, Interactable and Blocks Raycasts are switched off; " +
-                             "the original values are always restored afterwards.\n\nUse a CanvasGroup that your login code does not change itself.",
+                             "the original values are restored afterwards (a value your code switched on meanwhile is kept).\n\n" +
+                             "Use a CanvasGroup that your login code does not change itself.",
                              "Assign", "Don't Assign"))
                 {
                     var so = new SerializedObject(animation);
@@ -1197,10 +1343,10 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
             if (animation != null && animation.SkipOnClick && !HasActiveEventSystem())
             {
-                EditorUtility.DisplayDialog(DialogTitle,
+                Alert(DialogTitle,
                     "Skip On Click is enabled, but no active EventSystem was found in the loaded scenes.\n\n" +
                     "Clicks can only skip the overlay when an EventSystem exists at runtime. If your bootstrap creates one at runtime this is fine; " +
-                    "no EventSystem is created automatically.", "OK");
+                    "no EventSystem is created automatically.");
             }
         }
 

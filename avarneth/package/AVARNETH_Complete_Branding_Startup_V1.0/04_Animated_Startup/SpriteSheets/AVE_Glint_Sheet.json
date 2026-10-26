@@ -79,12 +79,12 @@
     }
   ],
   "layerId": "glint",
-  "timelineStart": 1.58,
-  "timelineEnd": 1.82,
+  "timelineStart": 1.5833,
+  "timelineEnd": 1.75,
   "afterFrames": "hide",
   "positionArtPx": [
     231,
-    67
+    69
   ],
   "note": "Frames are evenly distributed over [timelineStart, timelineEnd) - see Animation_Timeline.json."
 }

@@ -1,7 +1,12 @@
-"""Windows icon set: 16/24/32 hand-specified, 48/64 procedural (reduced detail),
-128/256/512/1024 as exact integer nearest-neighbour upscales of the 64 master.
-Writes a multi-resolution .ico (16-128 as 32-bit BMP/DIB with AND mask, 256 as
-PNG) with a self-contained writer so no resampling ever touches the pixels.
+"""Windows icon set (revision 2).
+
+* 16/20/24/30/32/36/40 px: reduced emblem drawn per size on the pixel grid (icons_small).
+* 48/64 px: the emblem master in its 'icon' variant (brighter plate and right side).
+* Every other size is an exact integer nearest-neighbour multiple of one of those:
+  60 = 20x3, 72 = 24x3, 80 = 40x2, 96 = 48x2, 128 = 64x2, 256 = 64x4, 512 = 64x8, 1024 = 64x16.
+  So Windows never has to resample (125 %/150 % display scaling asks for 20/30/36/40/60/72 px).
+* The .ico is written by our own writer (16-128 as 32-bit DIB + AND mask, 256 as PNG),
+  so no resampling ever touches the pixels.
 """
 from __future__ import annotations
 
@@ -15,6 +20,9 @@ import emblem
 import icons_small
 from pix import Canvas, alpha_over
 
+ICO_SIZES = (16, 20, 24, 30, 32, 36, 40, 48, 60, 64, 72, 80, 96, 128, 256)
+DERIVED = {60: (20, 3), 72: (24, 3), 80: (40, 2), 96: (48, 2), 128: (64, 2), 256: (64, 4), 512: (64, 8), 1024: (64, 16)}
+
 
 def _center(c: Canvas, size):
     out = Canvas(size, size)
@@ -24,13 +32,13 @@ def _center(c: Canvas, size):
 
 def build_all():
     icons = {}
-    for s in (16, 24, 32):
+    for s in icons_small.SIZES:
         icons[s] = icons_small.build(s)
-    icons[48] = _center(emblem.build(0.667, 'medium'), 48)
-    icons[64] = _center(emblem.build(0.889, 'medium'), 64)
-    for s, k in ((128, 2), (256, 4), (512, 8), (1024, 16)):
+    icons[48] = _center(emblem.build(0.667, 'icon'), 48)
+    icons[64] = _center(emblem.build(0.889, 'icon'), 64)
+    for s, (src, k) in DERIVED.items():
         c = Canvas(s, s)
-        c.a = np.repeat(np.repeat(icons[64].a, k, 0), k, 1)
+        c.a = np.repeat(np.repeat(icons[src].a, k, 0), k, 1)
         icons[s] = c
     return icons
 
@@ -41,7 +49,6 @@ def _dib(arr):
     row_bytes = ((w + 31) // 32) * 4
     mask = bytearray()
     for y in range(h - 1, -1, -1):
-        bits = 0
         row = bytearray(row_bytes)
         for x in range(w):
             if arr[y, x, 3] == 0:
@@ -51,7 +58,7 @@ def _dib(arr):
     return header + bgra + bytes(mask)
 
 
-def write_ico(path, icons, sizes=(16, 24, 32, 48, 64, 128, 256)):
+def write_ico(path, icons, sizes=ICO_SIZES):
     blobs = []
     for s in sizes:
         arr = icons[s].a

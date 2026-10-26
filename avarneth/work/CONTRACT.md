@@ -93,6 +93,15 @@ for reference / other tools.)
     `"sprite"`: show `sprite` (static); `"hide"`: hidden.
   * When `frames` is empty the layer always shows `sprite`.
 
+### 3.1b Full-screen layers (revision 2)
+
+* Optional layer field `"fullscreen": true` (missing = false). Such a layer is NOT placed on the
+  pixel grid: its sprite is stretched over the whole screen (Unity: child of the overlay Canvas root,
+  outside ArtRoot, anchors (0,0)-(1,1), offsets 0, drawn before ArtRoot), `x/y/dx/dy` are ignored,
+  only `alpha(t)` applies. Used for the backdrop veil so it always covers 16:9, 16:10 and 21:9 screens.
+* Its texture is a smooth gradient (no pixel art) and is imported with **Bilinear** filtering.
+* Preview renderer: drawn stretched to the full 480x270 canvas (the sprite is 480x270).
+
 ### 3.2 Particles (baked, deterministic — identical in preview and Unity)
 
 * Active while `t0 <= t < t0 + life`. Local `τ = t − t0`, `u = τ / life`.

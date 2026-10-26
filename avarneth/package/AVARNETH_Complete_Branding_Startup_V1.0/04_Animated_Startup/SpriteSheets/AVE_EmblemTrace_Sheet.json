@@ -2,9 +2,9 @@
   "image": "AVE_EmblemTrace_Sheet.png",
   "frameWidth": 67,
   "frameHeight": 76,
-  "frameCount": 14,
+  "frameCount": 16,
   "columns": 7,
-  "rows": 2,
+  "rows": 3,
   "origin": "top-left, y down",
   "frames": [
     {
@@ -104,11 +104,25 @@
       "y": 76,
       "w": 67,
       "h": 76
+    },
+    {
+      "index": 14,
+      "x": 0,
+      "y": 152,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 15,
+      "x": 67,
+      "y": 152,
+      "w": 67,
+      "h": 76
     }
   ],
   "layerId": "emblemTrace",
   "timelineStart": 0.0,
-  "timelineEnd": 0.34,
+  "timelineEnd": 0.2667,
   "afterFrames": "hide",
   "positionArtPx": [
     206,

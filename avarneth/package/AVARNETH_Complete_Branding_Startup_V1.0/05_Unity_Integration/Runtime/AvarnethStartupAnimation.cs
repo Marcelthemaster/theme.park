@@ -49,6 +49,7 @@ namespace Eckertengineering.Avarneth.Branding
     /// Plays the AVARNETH startup branding overlay (about 2 s) on top of an existing login scene.
     /// It only drives its own UI Images and, optionally, the interactable/blocksRaycasts/alpha values of one
     /// login CanvasGroup, which are always restored. It never waits for, delays or replaces any login logic.
+    /// Until <see cref="Play"/> runs, and whenever the component is disabled, nothing is drawn and no input is blocked.
     /// </summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Eckertengineering/AVARNETH Startup Animation")]
@@ -168,6 +169,7 @@ namespace Eckertengineering.Avarneth.Branding
         private bool _savedInteractable;
         private bool _savedBlocksRaycasts;
         private float _savedAlpha;
+        private bool _alphaModified;
 
         // ------------------------------------------------------------------ public API
 
@@ -288,7 +290,8 @@ namespace Eckertengineering.Avarneth.Branding
         public Image RaycastBlocker => raycastBlocker;
 
         /// <summary>
-        /// (Re)starts the animation from t = 0. Activates this GameObject if it was deactivated.
+        /// (Re)starts the animation from t = 0. Activates this GameObject if it was deactivated; when a parent is
+        /// inactive the overlay finishes immediately instead (error logged, completion raised).
         /// Play Mode only; use <see cref="EvaluateAt"/> for edit-mode previews.
         /// </summary>
         public void Play()
@@ -301,11 +304,21 @@ namespace Eckertengineering.Avarneth.Branding
 
             _state = PlayState.Playing;
             _completedRaised = false;
+            _errorLogged = false;
             _elapsed = 0.0;
             _playFrame = Time.frameCount;
 
             if (!gameObject.activeSelf) gameObject.SetActive(true);
             enabled = true;
+
+            if (!gameObject.activeInHierarchy)
+            {
+                // A parent is inactive: Update would never run, so the overlay could never finish and the login
+                // would stay locked. Finish cleanly instead (nothing is shown, completion is raised).
+                LogErrorOnce("Play() was called while a parent GameObject is inactive.", true);
+                Finish();
+                return;
+            }
 
             if (!PrepareBindings(out string error))
             {
@@ -355,6 +368,17 @@ namespace Eckertengineering.Avarneth.Branding
         }
 
         /// <summary>
+        /// Hides all layer and particle Images and, unless playing, switches the raycast blocker off: the neutral
+        /// state the generated prefab is saved in. Editor helper (e.g. after <see cref="EvaluateAt"/>); does not
+        /// change the play state, does not touch the login CanvasGroup and never raises completion.
+        /// </summary>
+        public void ClearPreview()
+        {
+            HideAll();
+            if (_state != PlayState.Playing) ApplyInputBlocking(false);
+        }
+
+        /// <summary>
         /// Assigns the generated timeline data. Used by the editor installer when it builds the prefab;
         /// playback options (duration, input, login, events) are left unchanged.
         /// </summary>
@@ -400,7 +424,10 @@ namespace Eckertengineering.Avarneth.Branding
             // transparent geometry, so the blocker must not cull.
             if (raycastBlocker != null) raycastBlocker.canvasRenderer.cullTransparentMesh = false;
 
-            if (!playOnStart)
+            // Start neutral (nothing drawn, no input blocked) until Play() runs - also when this component is
+            // disabled before Start(). Play() applies t = 0 before the first frame is rendered, so nothing pops.
+            // Skipped when Play() was already called (e.g. from another script's Awake before this one).
+            if (_state != PlayState.Playing)
             {
                 HideAll();
                 ApplyInputBlocking(false);
@@ -421,6 +448,9 @@ namespace Eckertengineering.Avarneth.Branding
 
         private void OnDisable()
         {
+            // Disabling the component instead of calling Skip() must not leave art or the blocker over the login.
+            // When it is enabled again while playing, the next Update re-applies the current frame.
+            HideAll();
             ApplyInputBlocking(false);
             RestoreLogin();
         }
@@ -721,8 +751,8 @@ namespace Eckertengineering.Avarneth.Branding
                 image.raycastTarget = false;
                 if (image.sprite != sprite) image.sprite = sprite;
                 Rect r = sprite.rect;
-                int w = Mathf.RoundToInt(r.width);
-                int h = Mathf.RoundToInt(r.height);
+                int w = AvarnethStartupMath.Snap(r.width);   // contract snap floor(v + 0.5), feeds floor(w / 2)
+                int h = AvarnethStartupMath.Snap(r.height);
                 rect.sizeDelta = new Vector2(w, h);
                 _particleRt[i] = new ParticleRuntime { rect = rect, width = w, height = h };
             }
@@ -788,22 +818,36 @@ namespace Eckertengineering.Avarneth.Branding
                 _savedInteractable = group.interactable;
                 _savedBlocksRaycasts = group.blocksRaycasts;
                 _savedAlpha = group.alpha;
+                _alphaModified = false;
                 _loginLocked = true;
             }
 
             if (_lockedGroup == null) return;
             _lockedGroup.interactable = false;
             _lockedGroup.blocksRaycasts = false;
-            if (revealLoginDuringFadeOut) _lockedGroup.alpha = 0f;
+            if (revealLoginDuringFadeOut)
+            {
+                _lockedGroup.alpha = 0f;
+                _alphaModified = true;
+            }
         }
 
         private void UpdateLoginReveal()
         {
             if (!_loginLocked || !revealLoginDuringFadeOut || _lockedGroup == null) return;
             float a = (float)(_savedAlpha * AvarnethStartupMath.RevealFactor(_elapsed, Duration, revealSeconds));
-            if (_lockedGroup.alpha != a) _lockedGroup.alpha = a;
+            if (_lockedGroup.alpha != a)
+            {
+                _lockedGroup.alpha = a;
+                _alphaModified = true;
+            }
         }
 
+        /// <summary>
+        /// Restores what the overlay changed on the login CanvasGroup (idempotent). interactable / blocksRaycasts
+        /// are restored while they still hold the value the overlay wrote (false); a value the login code switched
+        /// on meanwhile is kept. alpha is restored only when the overlay wrote it (Reveal Login During Fade Out).
+        /// </summary>
         private void RestoreLogin()
         {
             if (!_loginLocked) return;
@@ -811,11 +855,13 @@ namespace Eckertengineering.Avarneth.Branding
 
             CanvasGroup group = _lockedGroup;
             _lockedGroup = null;
+            bool alphaModified = _alphaModified;
+            _alphaModified = false;
             if (group == null) return;
 
-            group.interactable = _savedInteractable;
-            group.blocksRaycasts = _savedBlocksRaycasts;
-            group.alpha = _savedAlpha;
+            if (!group.interactable) group.interactable = _savedInteractable;
+            if (!group.blocksRaycasts) group.blocksRaycasts = _savedBlocksRaycasts;
+            if (alphaModified) group.alpha = _savedAlpha;
         }
 
         private void LogErrorOnce(string error, bool skipping)

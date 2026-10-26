@@ -33,7 +33,7 @@ plattformspezifischer Override gesetzt ist. Unity skaliert es auf alle benötigt
 verfügbare AVARNETH-Icon-Datei verwenden.
 
 **Hinweis zur `.ico`-Datei:** Das Icon der gebauten `.exe` erzeugt Unity beim Build selbst aus den oben
-zugewiesenen Icon-Texturen. Die mitgelieferte `AVARNETH.ico` ist für Desktop-Verknüpfungen, Installer und
+zugewiesenen Icon-Texturen. Die mitgelieferte `03_Windows_Icons/AVARNETH.ico` ist für Desktop-Verknüpfungen, Installer und
 Launcher gedacht und wird von Unity nicht verwendet.
 
 ## 2. Splash Image

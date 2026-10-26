@@ -20,42 +20,51 @@ werden; der Untertitel ist separat ein- und ausblendbar.
 
 ## 2. Konzept – „Das Glut-Tor“
 
-* **Schild:** geschmiedeter Wappenschild – Außenrahmen aus dunklem Eisen, Innenrand aus Altgold mit Nieten.
-* **Gipfel = Buchstabe A:** Der Berg der Festung durchbricht den Schildrand nach oben. Seine goldenen
-  Flanken bilden zugleich das **A** von AVARNETH; der goldene Querbalken ist der Sturz über dem Tor.
-* **Monumentales Tor mit Glutkern:** Das Tor im Fels glüht von innen (Fallgitter, Glutverlauf) – „Embers“.
-* **Arkanes Fenster:** ein kleines blaues Rautenfenster als einziger kühler Magie-Akzent.
-* **Mauern & Türme:** Bergfestung mit Zinnen vor dunklem Eisenhimmel mit aufsteigenden Glutfunken – „Veil of Embers“.
-* **Glutstein:** in der Schildspitze, gefasst in Gold – das Siegel der Marke.
+* **Schild:** geschmiedeter Wappenschild – Außenrahmen aus dunklem Eisen, Innenrand aus Altgold mit Nieten,
+  das Feld eine genietete Eisenplatte mit Plattenfuge und dezent eingeprägtem Gebirgsrelief.
+* **Das A als Festung:** Zwei goldene Flanken bilden das **A** von AVARNETH; ihr Gipfel durchbricht den
+  Schildrand nach oben. Im oberen Innenraum steht ein **Bergfried mit Zinnen und zwei arkanen Lanzettfenstern**
+  (der einzige kühle Magie-Akzent), der goldene Querbalken ist der **Sturz** über dem Tor.
+* **Monumentales Tor:** im Quadermauerwerk unter dem Sturz – ein **eisernes Fallgitter vor glühender Glut**
+  (sauberer 4-stufiger Glutverlauf, kein Dithering).
+* **Glutstein:** klein und bündig in die Schildspitze gesetzt – das Siegel der Marke.
 
 Industrielle Fantasy (Schmiede, Eisen, Nieten, Glut) ohne Science-Fiction-Anmutung; keine Neonfarben.
+Licht kommt immer von oben links; alle Flächen sind regionsweise monoton schattiert (kein Pixelrauschen).
 
 ## 3. Logo-Varianten
 
 | Variante | Datei (1080p-Export ×4) | nativ (1×) | ×4 |
 |---|---|---|---|
-| A – Hauptlogo (Wortmarke) | `01_Brand_Identity/AVARNETH_Logo.png` | 236×51 | 944×204 |
-| A – Hauptlogo mit optionalem Wappen | `01_Brand_Identity/AVARNETH_Logo_With_Emblem.png` | 236×127 | 944×508 |
-| B – Vollständiger Titel mit Wappen | `01_Brand_Identity/AVARNETH_Complete_Logo.png` | 236×145 | 944×580 |
-| C – Publisher-Präsentation | `01_Brand_Identity/AVARNETH_Publisher_Presentation.png` | 236×166 | 944×664 |
+| A – Hauptlogo (Wortmarke) | `01_Brand_Identity/AVARNETH_Logo.png` | 223×48 | 892×192 |
+| A – Hauptlogo mit optionalem Wappen | `01_Brand_Identity/AVARNETH_Logo_With_Emblem.png` | 223×124 | 892×496 |
+| B – Vollständiger Titel mit Wappen | `01_Brand_Identity/AVARNETH_Complete_Logo.png` | 223×142 | 892×568 |
+| C – Publisher-Präsentation | `01_Brand_Identity/AVARNETH_Publisher_Presentation.png` | 223×161 | 892×644 |
 | D – Wappen / Emblem | `01_Brand_Identity/AVARNETH_Emblem.png` | 71×80 | 284×320 |
-| Untertitel (mit Glut-Ornamenten) | `01_Brand_Identity/AVARNETH_VeilOfEmbers.png` | 198×22 | 792×88 |
-| Untertitel (ohne Ornamente) | `01_Brand_Identity/AVARNETH_VeilOfEmbers_Plain.png` | 136×22 | 544×88 |
-| Publisher-Zeile | `01_Brand_Identity/Eckertengineering_Presents.png` | 186×20 | 744×80 |
-| Publisher-Kennung | `01_Brand_Identity/Eckertengineering.png` | 125×20 | 500×80 |
+| Untertitel (mit Glut-Ornamenten) | `01_Brand_Identity/AVARNETH_VeilOfEmbers.png` | 193×22 | 772×88 |
+| Untertitel (ohne Ornamente) | `01_Brand_Identity/AVARNETH_VeilOfEmbers_Plain.png` | 135×22 | 540×88 |
+| Publisher-Zeile | `01_Brand_Identity/Eckertengineering_Presents.png` | 123×18 | 492×72 |
+| Publisher-Kennung | `01_Brand_Identity/Eckertengineering.png` | 99×18 | 396×72 |
 
 * `Source_Files/native_1x/` = Pixel-Master (1 Kunst-Pixel = 1 Bildpixel), `exports_2x/`, `exports_8x/` für andere Zielgrößen.
-* Die Wortmarke ist **keine Schrift**: alle Buchstaben sind eigens konstruiert (3:1-Diagonalen, Sporn-Serifen,
-  Turmspitzen-A, facettierte Gold-Oberfläche mit 1-px-Fase, 3-px-Eisen-Extrusion, glühende Unterkante).
-* Untertitel und Publisher-Zeile verwenden eigene, handgezeichnete Pixel-Versalien (9 px bzw. 7 px Versalhöhe).
+* Die Wortmarke ist **keine Schrift**: alle Buchstaben sind eigens konstruiert (3:1-Diagonalen bei A/V, 2:1 bei N/R,
+  spitze Sporn-Serifen, Turmspitzen-A als Echo des Wappens). A, V, T und H sind pixelgenau spiegelsymmetrisch;
+  die Abstände sind optisch ausgeglichen (mittlerer Buchstabenabstand ≈ 7 Kunst-Pixel). Oberfläche: gemeißelte
+  Gold-Facetten, Kantenfarben nach echter Kantennormale (durchgehende Lichtkante links, Schattenkante rechts),
+  2-px-Extrusion aus dunklem Eisen, 1-px-Kontur.
+* Untertitel: eigene 9-px-Kapitälchen in der Konstruktionslogik der Wortmarke, eine Tonstufe ruhiger als AVARNETH,
+  flankiert von einer geschmiedeten Linie mit Glut-Raute.
+* Publisher: eigene 5-px-Versalien mit 1-px-Strich in einem einzigen flachen Stahlton – bewusst zurückhaltend.
 
 ## 4. Schutzzone und Mindestgrößen
 
+![Konstruktion und Schutzzone](images/AVARNETH_Construction_ClearSpace.png)
+
 * **Maßeinheit X** = Versalhöhe der Wortmarke = 32 Kunst-Pixel (1×).
 * **Schutzzone:** mindestens ½ X (16 Kunst-Pixel) rund um jede Logo-Variante frei von anderen Elementen.
-* **Wortmarke:** nie kleiner als nativ 1× (236×51 px). Für kleinere Flächen das Wappen bzw. die Icons verwenden.
-* **Wappen:** nativ 71×80 px; ≥ 48 px Kantenlänge → vereinfachtes Wappen (`03_Windows_Icons/AVARNETH_48/64.png`),
-  darunter ausschließlich die von Hand gesetzten Icons 32 / 24 / 16 px.
+* **Wortmarke:** nie kleiner als nativ 1× (223×48 px). Für kleinere Flächen das Wappen bzw. die Icons verwenden.
+* **Wappen:** nativ 71×80 px; für 48/64 px die Icon-Fassung (`03_Windows_Icons/AVARNETH_48/64.png`),
+  darunter ausschließlich die pro Größe gezeichneten Kleinst-Fassungen (40, 36, 32, 30, 24, 20, 16 px).
 * **Untertitel** nie ohne Wortmarke als Spieltitel verwenden; immer unterhalb und kleiner als AVARNETH.
 
 ## 5. Farben
@@ -98,18 +107,26 @@ Lichtrichtung in allen Assets: **oben links**. Konturen: `iron0` (#07070b). Kein
 Alle drei Richtungen teilen exakt dieselbe Geometrie; nur die Materialien wechseln (exaktes Paletten-Remapping,
 jedes Pixel bleibt eine Palettenfarbe). Übersicht: `02_Logo_Variants/Variants_Overview.png`.
 
+![Designrichtungen](../02_Logo_Variants/Variants_Overview.png)
+
 | Richtung | Ordner | Charakter |
 |---|---|---|
-| **Magic & Iron (Produktionsstandard)** | `02_Logo_Variants/Magic_And_Iron/` | Production standard - magic iron / forge fantasy: dark iron, aged gold, ember glow, arcane blue accent. |
-| Classic Fantasy | `02_Logo_Variants/Classic_Fantasy/` | Classic fantasy MMORPG - heraldic royal-blue steel with bright gold, warm stone. |
-| Dark Fantasy | `02_Logo_Variants/Dark_Fantasy/` | Dark monumental fantasy - blackened silver metal, crimson embers, deeper stone. |
+| **Magic & Iron (Produktionsstandard)** | `02_Logo_Variants/Magic_And_Iron/` | Produktionsstandard – magische Eisen-/Schmiede-Fantasy: dunkles Eisen, Altgold, Glut, arkanes Blau; schlanke 2-px-Extrusion. |
+| Classic Fantasy | `02_Logo_Variants/Classic_Fantasy/` | Klassische Fantasy – heraldisches Königsblau mit hellem Gold und warmem Stein; 3-px-Extrusion in Blau. |
+| Dark Fantasy | `02_Logo_Variants/Dark_Fantasy/` | Dunkle, monumentale Fantasy – geschwärztes Silber, karmesinrote Glut, tieferer Stein; schwere 4-px-Extrusion. |
 
 **Produktionsstandard ist „Magic & Iron“** – er ist vollständig animiert, als Unity-Assets exportiert und in allen
 Vorschauen verwendet. Die beiden anderen Richtungen liegen als statische Alternativen vor.
 
 ## 9. Windows-Icon
 
-`03_Windows_Icons/AVARNETH.ico` enthält 16, 24, 32, 48, 64, 128 und 256 px (16–128 als 32-bit-DIB mit Alpha und
-AND-Maske, 256 als PNG). 16/24/32 px sind von Hand gesetzt (vereinfachter Schild, A-Gipfel, glühendes Tor),
-48/64 px eine reduzierte Wappen-Fassung, 128/256/512 (und `Extra/AVARNETH_1024.png`) exakte Ganzzahl-Vergrößerungen
-des 64-px-Masters.
+`03_Windows_Icons/AVARNETH.ico` enthält **15 Größen**: 16, 20, 24, 30, 32, 36, 40, 48, 60, 64, 72, 80, 96, 128, 256 px
+(bis 128 als 32-bit-DIB mit Alpha und AND-Maske, 256 als PNG). Damit muss Windows auch bei 125 %/150 %-Skalierung
+(20/30/36/40/60/72 px) nicht weichzeichnen.
+
+* 16, 20, 24, 30, 32, 36, 40 px: pro Größe auf dem Pixelraster gezeichnete Kleinst-Fassung – ein geschlossener Schild
+  mit mittelgrauer Eisenplatte (bleibt auf dunkler Taskleiste sichtbar), beide A-Schenkel klar golden, dunkler
+  Innenraum mit arkanem Fenster, Tor mit Glutkern; keine Funken, kein Anhänger.
+* 48/64 px: Icon-Fassung des Wappens (hellere Platte und rechte Seite).
+* Alle übrigen Größen sind exakte Ganzzahl-Vielfache: 60 = 20×3, 72 = 24×3, 80 = 40×2, 96 = 48×2, 128/256/512/1024 = 64×2/4/8/16.
+* PNG-Einzeldateien: 16/24/32/48/64/128/256/512 im Hauptordner, alle Zwischengrößen und 1024 in `Extra/`.
