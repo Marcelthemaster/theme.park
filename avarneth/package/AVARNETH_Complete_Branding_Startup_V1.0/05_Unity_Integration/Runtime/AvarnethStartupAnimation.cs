@@ -43,6 +43,11 @@ namespace Eckertengineering.Avarneth.Branding
         public int order;
         /// <summary>Animation keys sorted by time.</summary>
         public StartupKey[] keys;
+        /// <summary>
+        /// Full-screen layer (timeline field "fullscreen"): the Image is stretched over the whole overlay canvas,
+        /// outside the pixel-scaled art root; position and dx/dy are ignored, only alpha is animated.
+        /// </summary>
+        public bool fullscreen;
     }
 
     /// <summary>
@@ -74,6 +79,7 @@ namespace Eckertengineering.Avarneth.Branding
         private struct LayerRuntime
         {
             public RectTransform rect;
+            public bool fullscreen;
             public bool hasStaticSprite;
             public int frameCount;
             public bool valid;
@@ -578,6 +584,12 @@ namespace Eckertengineering.Avarneth.Branding
                     continue;
                 }
 
+                if (rt.fullscreen)
+                {
+                    SetLayerVisible(b.image, ref rt, sprite, 0, 0, Clamp01((float)alpha));
+                    continue;
+                }
+
                 int x = AvarnethStartupMath.Snap(b.position.x + dx);
                 int y = AvarnethStartupMath.Snap(b.position.y + dy);
                 SetLayerVisible(b.image, ref rt, sprite, x, y, Clamp01((float)alpha));
@@ -635,12 +647,16 @@ namespace Eckertengineering.Avarneth.Branding
             if (!rt.valid || !ReferenceEquals(rt.sprite, sprite))
             {
                 image.sprite = sprite;
-                Rect r = sprite.rect;
-                rt.rect.sizeDelta = new Vector2(r.width, r.height);
+                if (!rt.fullscreen)
+                {
+                    Rect r = sprite.rect;
+                    rt.rect.sizeDelta = new Vector2(r.width, r.height);
+                }
+
                 rt.sprite = sprite;
             }
 
-            if (!rt.valid || rt.x != x || rt.y != y)
+            if (!rt.fullscreen && (!rt.valid || rt.x != x || rt.y != y))
             {
                 rt.rect.anchoredPosition = new Vector2(x, -y);
                 rt.x = x;
@@ -732,11 +748,13 @@ namespace Eckertengineering.Avarneth.Branding
             {
                 StartupLayerBinding b = layers[i];
                 RectTransform rect = b.image.rectTransform;
-                SetTopLeftAnchors(rect);
+                if (b.fullscreen) SetStretchAnchors(rect);
+                else SetTopLeftAnchors(rect);
                 b.image.raycastTarget = false;
                 _layerRt[i] = new LayerRuntime
                 {
                     rect = rect,
+                    fullscreen = b.fullscreen,
                     hasStaticSprite = b.sprite != null,
                     frameCount = b.frames != null ? b.frames.Length : 0,
                 };
@@ -766,6 +784,14 @@ namespace Eckertengineering.Avarneth.Branding
             if (rect.anchorMin != topLeft) rect.anchorMin = topLeft;
             if (rect.anchorMax != topLeft) rect.anchorMax = topLeft;
             if (rect.pivot != topLeft) rect.pivot = topLeft;
+        }
+
+        private static void SetStretchAnchors(RectTransform rect)
+        {
+            if (rect.anchorMin != Vector2.zero) rect.anchorMin = Vector2.zero;
+            if (rect.anchorMax != Vector2.one) rect.anchorMax = Vector2.one;
+            if (rect.offsetMin != Vector2.zero) rect.offsetMin = Vector2.zero;
+            if (rect.offsetMax != Vector2.zero) rect.offsetMax = Vector2.zero;
         }
 
         private void UpdatePixelScale(bool force)

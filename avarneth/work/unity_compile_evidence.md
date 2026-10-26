@@ -3,6 +3,9 @@
 Date: 2026-10-26. Target: Unity **6000.6.0f1**, URP 2D, Windows x64.
 Machine: Linux, `dotnet --version` = 8.0.132. No Unity editor is available on this machine.
 
+> **Superseded in parts by section 7 (review round, 2026-10-26 ~17:10 UTC):** file hashes/line counts, the
+> `Mathf.RoundToInt` row (no longer used) and the selftest scale list for full bounds are updated there.
+
 ## 1. Delivered files
 
 Package (`/home/user/theme.park/avarneth/package/AVARNETH_Complete_Branding_Startup_V1.0/`):
@@ -362,3 +365,145 @@ uGUI (`com.unity.ugui`, not in the reference source) – verified only by compil
   values to the identical float32 values (JsonUtility parsing was not executed).
 - The licence statement about the splash screen (documentation) is based on search-engine excerpts of Unity pages
   that could not be fetched from this machine.
+
+## 7. Review round (13 reviewer findings)
+
+Every finding was re-checked against the code, `CONTRACT.md` and the 6000.6.0f1 source before deciding.
+Concurrent change found during this round: the art pipeline rebuilt `Animation_Timeline.json` and the layer PNGs at
+16:52:39 UTC (both copies identical, 18381 bytes). Now `contentBounds` = (126, 47, 227 × 168), 12 layers,
+24 particles; `AVE_Veil.png` edge alpha 64/255, centre 140. This round did **not** run the art pipeline.
+
+| # | Finding | Verdict | Verification / change |
+|---|---|---|---|
+| F1 | DisplayDialog truncates messages > 512 chars | **fixed** | Confirmed: `EditorUtility.DisplayDialog` (Editor/Mono/EditorUtility.cs:201-210) → `EditorDialog.Display*Dialog` → `LimitMessageLength`, `kMaxMessageLength = 512` (Editor/Mono/EditorDialog.cs:142-147, called at :246/:294/:348). Now every dialog goes through `Confirm`/`Alert` → `FitDialogMessage` (≤ 500 chars, last-resort cut + "(full text in the Console)" + full text logged). Lists go through `ComposeListDialog(head, lines, tail)`: lines cut to 100 chars, overflow shown as "- ... and N more (see Console)", head/tail (e.g. "The full report is in the Console.") always kept. Validate now puts one summary line per import-settings group in the dialog; per-file details go only to the Console. Icon confirmation is compact (worst case 8 sizes = 425 chars, never cut). |
+| F2 | IMGUI buttons run modal dialogs / reimports and keep laying out | **fixed** | Confirmed pattern in 6000.6: PlayerSettingsEditor.cs:2471-2476 (`GUIUtility.ExitGUI(); // Fixes case 690421`), TextureImporterInspector.cs:1292-1298. `GUIUtility.ExitGUI()` (Modules/IMGUI/GUIUtility.cs:153, throws `ExitGUIException` :24, not obsolete) is now the last statement of each of the 13 state-changing handlers: timeline override change, Clear Override, Use, Refresh (both windows), steps 1–3, Player Settings Helper..., Validate, Disable Splash..., Assign Standalone Icons..., Assign Default Icon.... Menu-item paths (not in OnGUI) do not call it. |
+| F3 | Disabled-before-Start / disabled-while-playing overlay leaves blocker and art over the login | **fixed** | Confirmed: Awake only reset when `!playOnStart`; OnDisable did not hide; the prefab was saved "playing" (blocker on, t = 0 state). Now: `Awake` always calls `HideAll()` + `ApplyInputBlocking(false)` unless `Play()` already ran (guard keeps Play-from-another-Awake working); `OnDisable` also calls `HideAll()` (cache invalidated → the next Update re-applies the frame after re-enable); new public `ClearPreview()` (no completion, no login change); the installer validates with `EvaluateAt(0f)`, then calls `ClearPreview()` and saves the blocker `enabled = false`, `raycastTarget = false`. `Play()` → `ApplyInputBlocking(true)` → `ApplyTime(0)` still runs before the first rendered frame. |
+| F4 | RestoreLogin overwrites alpha that was never changed | **fixed** | Confirmed (alpha was saved and restored unconditionally). `_alphaModified` is set only where the overlay writes alpha (LockLogin with Reveal on, UpdateLoginReveal on an actual write). RestoreLogin writes alpha only when it is set. Hardening taken over: `interactable`/`blocksRaycasts` are restored only while they still hold `false` (the value the overlay wrote), so a value the login code switched on meanwhile is kept. This is never worse than before; the case "login code switched it off itself" stays ambiguous and is documented ("use a dedicated CanvasGroup"). |
+| F5 | Veil leaves undimmed bands with a hard seam at 2560×1440, 1920×1200, 21:9 … | **confirmed, NOT fixed here (deferred to the art pipeline)** | Margins confirmed with `avarneth-mathtest --scales` on the current timeline (2560×1440: 80/45 px, 1920×1200: 0/60, 1600×900: 80/45, 1440×900: 0/45, 1536×864: 48/27, 2560×1080: 320/0, 3440×1440: 520/45). Veil edge alpha measured: 70–102 before the concurrent rebuild, 64 now, so the seam is still there. The contract-compatible fix is a re-bake of `AVE_Veil.png` with its alpha running out to 0 at the border (`tools/effects.py` `veil()` / `tools/startup.py`), followed by the startup/frames/sheets/previews stages. That pipeline belongs to the art task and was being rebuilt concurrently, so running it here would bake in-progress emblem/wordmark sources. The alternative (full-screen veil Image) needs a contract amendment. Documented as a known limitation in UNITY_INSTALLATION.md. |
+| F6 | Play() under an inactive parent locks the login while no Update runs | **fixed** | Confirmed. After `SetActive`/`enabled`, `Play()` checks `gameObject.activeInHierarchy` (GameObject.bindings.cs:308, not obsolete). When false it logs one error, calls `Finish()` (no lock was taken, completion raised once) and returns. `activeInHierarchy` was chosen over `isActiveAndEnabled` because the latter is `IsAddedToManager` and can still be false when `Play()` is called from another script's Awake. `_errorLogged` is now reset per `Play()`. |
+| F7 | Mathf.RoundToInt (banker's) for particle sizes | **fixed** | Runtime `PrepareBindings` and installer particle placement / sprite-size check now use `AvarnethStartupMath.Snap` (floor(v + 0.5)). `grep RoundToInt` over the package: 0 hits. |
+| F8 | Configure Import Settings rewrites every PNG recursively without asking; the root may be Assets/ | **fixed** | Confirmed: `FindAssets(filter, folders)` sets `SearchArea.SelectedFolders` (AssetDatabaseSearching.cs:26-36). This search is recursive; the old code had no name filter and no confirmation. Now: (a) only contract files: `AVE_*.png` **directly** in Layers/Frames/Particles (`ParentPath(path) == folder`), PNGs referenced by a valid timeline under those folders (`IsSafeRelativePath`), and `Icons/AVE_Icon_<n>.png`; (b) direct children only; (c) `IsAllowedRootFolder`: the root must be `Assets/<something>`. The root is never `Assets/` and never outside Assets/; such timelines are reported as "unusable folder" (also when picked as override). The window and Validate warn when the folder is not named `Importable_Assets`; (d) the files that would change are computed first, then a confirmation dialog shows the root path and counts; Cancel changes nothing. Validation and the prefab warning count use the same file sets. |
+| F9 | HasActiveEventSystem uses isActiveAndEnabled (IsAddedToManager) in Edit Mode | **fixed** (plausible, unverifiable natively) | Confirmed `isActiveAndEnabled` → `[NativeMethod("IsAddedToManager")]` (Behaviour.bindings.cs:20-24). Its Edit Mode value is native and cannot be checked here. Now `es.enabled && es.gameObject.activeInHierarchy`, which is correct either way. |
+| F10 | Scale table in UNITY_INSTALLATION.md assumed full bounds | **fixed** | Confirmed. Recomputed with the real `ComputePixelScale` for the **current** bounds (126,47,227×168) via the new `--scales` mode: 1920×1080 → 4, 2560×1440 → 5, 3840×2160 → 8, 1600×900 → 3, 1366×768 → 3, 1280×720 → 3, 1680×1050 → 4 (same values as the reviewer's for 120,46,240×170). Doc table replaced. It now notes that parts of the canvas outside contentBounds can be cropped and that the values change when the pipeline changes contentBounds. |
+| F11 | UI label "PC, Mac & Linux Standalone" not in 6000.6 source | **fixed** | Confirmed: `grep -rn "PC, Mac & Linux"` over the 6000.6 tree finds nothing. The toggle text is `string.Format("Override for {0}", platform.title.text)` (PlayerSettingsIconsEditor.cs:441), the title comes from native `GetBuildTargetGroupDisplayName` (BuildPlatform.cs:243, BuildPipeline.bindings.cs:74), and the only spelled-out name is "Windows, Mac, Linux" (ProjectAuditorEditor/Utils/Formatting.cs:210). Installer strings → "Standalone platform override" and "Icon (Standalone)". PLAYER_SETTINGS.md now names the Standalone tab and "Override for <tab name>", with those source references. |
+| F12 | Install guide states untested behaviour as fact; input claim is conditional | **fixed** | Added a "Prüfstatus: NICHT getestet" box at the top of UNITY_INSTALLATION.md (and a line in PLAYER_SETTINGS.md and README_UNITY_FOLDER.txt). Untested statements are rephrased as "soll" / "Verhalten laut Code". The Skip-On-Click row now states that an EventSystem with the input module matching *Active Input Handling* (StandaloneInputModule / InputSystemUIInputModule) is needed, and that the package neither checks nor creates one. |
+| F13 | (Duplicate of F5 from another lens) veil does not cover the screen | **confirmed, NOT fixed here** | Same as F5. |
+
+### 7.1 Commands and results (clean builds, `rm -rf bin obj` first)
+
+```
+cd /tmp/claude-0/unityref/compile/Runtime     && dotnet build -nologo -v:minimal   -> 0 Error(s), 0 Warning(s)
+cd /tmp/claude-0/unityref/compile/Editor      && dotnet build -nologo -v:minimal   -> 0 Error(s), 0 Warning(s)
+cd /tmp/claude-0/unityref/compile/Editor      && dotnet build -nologo -v:minimal -p:ShowStubWarnings=true
+                                                -> 0 Error(s), 13 Warning(s), all CS0436 (stubbed PlayerSettings) at
+                                                   AvarnethStartupInstaller.cs 1807, 1808, 1809, 1824, 1825, 1931, 1944,
+                                                   1945, 1957, 1966, 1967, 1973, 1974 (every PlayerSettings use)
+cd /tmp/claude-0/unityref/compile/EditorSplit && dotnet build -nologo -v:minimal   -> 0 Error(s), 0 Warning(s)
+strings Runtime/bin/Debug/netstandard2.1/Eckertengineering.Avarneth.Startup.dll | grep -ci unityeditor   -> 0
+python3 /tmp/claude-0/unityref/compile/apicheck_6000_6.py   -> 182 OK, missing: 0 (only obsolete hit: the NOT-used
+                                                                FindObjectsByType(…, FindObjectsSortMode) reference row)
+
+cd /tmp/claude-0/unityref/mathtest && dotnet build -nologo -v:minimal                 -> 0 Error(s), 0 Warning(s)
+dotnet bin/Debug/net8.0/avarneth-mathtest.dll --selftest                              -> 97 passed, 0 failed, exit 0
+dotnet bin/Debug/net8.0/avarneth-mathtest.dll sample.json 20 | cmp - sample_20fps.csv -> identical (sha256 1ebf09b3…a200d)
+dotnet bin/Debug/net8.0/avarneth-mathtest.dll sample.json 60 | cmp - sample_60fps.csv -> identical (sha256 ae64b89b…c0f1)
+dotnet bin/Debug/net8.0/avarneth-mathtest.dll <Importable_Assets/Animation_Timeline.json> 60 > real_60fps.csv
+                                                    -> exit 0, 4357 lines (12 layers + 24 particles × 121 frames + header)
+dotnet bin/Debug/net8.0/avarneth-mathtest.dll --scales <Importable_Assets/Animation_Timeline.json>   -> exit 0 (table F5/F10)
+dotnet bin/Debug/net8.0/avarneth-mathtest.dll        -> usage, exit 2;   … /nonexistent.json 60 -> exit 1
+python3 /tmp/claude-0/unityref/mathtest/strict_compare.py sample.json <real timeline>
+   fps 20, 24, 25, 30, 50, 60, 75, 90, 120, 144, 165, 240: 0 mismatches (frame/kind/id/visible/index and every
+   field of visible rows), both files
+
+cd /tmp/claude-0/unityref/dialogtest && python3 gen_extract.py <AvarnethStartupInstaller.cs> && dotnet build
+   -> 0 Error(s), 0 Warning(s);  dotnet bin/Debug/net8.0/avarneth-dialogtest.dll -> 18 passed, 0 failed, exit 0
+```
+
+`dialogtest` (new, harness only, net8.0): `gen_extract.py` copies the dialog-budget helpers **verbatim** into
+`Extracted.cs` (installer lines 1546-1604 plus the 3 constants, source sha256 recorded in the generated header).
+These are `Shorten`, `JoinLimited`, `ComposeListDialog` and `FitDialogMessage`. Loading the editor harness assembly
+by reflection fails under CoreCLR (`TypeLoadException: Internal call method with non_NULL RVA`, from the Unity
+reference DLLs), so the extracted copy is tested instead. It checks: 56 × 288-char validation lines → 404 chars with
+head and closing line kept and an exact "and 53 more" count; 40-entry missing-sprite abort → 478 chars;
+oversized head → cut to 500 with notice; surrogate pair not split; worst-case 8-size icon confirmation → 425 chars.
+The mathtest gained `--scales <timeline>`, which runs `ComputePixelScale` for 13 resolutions on the file's own
+contentBounds.
+
+### 7.2 API verification changes (6000.6.0f1 source)
+
+| API | file:line | [Obsolete] |
+|---|---|---|
+| `GameObject.activeInHierarchy` (runtime Play() guard, installer EventSystem check) | Runtime/Export/Scripting/GameObject.bindings.cs:308 | no |
+| `Behaviour.enabled` (installer EventSystem check; already listed) | Runtime/Export/Scripting/Behaviour.bindings.cs:18 | no |
+| `GUIUtility.ExitGUI()` | Modules/IMGUI/GUIUtility.cs:153 | no |
+| `ExitGUIException` | Modules/IMGUI/GUIUtility.cs:24 | no |
+| `Mathf.RoundToInt(float)` | – | **removed** from the package (no longer used) |
+| `System.Collections.Generic.SortedSet<T>` | .NET (netstandard2.1) | – |
+
+Reference only (not called): `EditorDialog.LimitMessageLength` (Editor/Mono/EditorDialog.cs:142-147),
+`Behaviour.isActiveAndEnabled` = `IsAddedToManager` (Behaviour.bindings.cs:20-24).
+Stub file unchanged (section 5); no new stubs were needed (`GUIUtility.ExitGUI` and `activeInHierarchy` are in
+the 2021.3 reference DLLs).
+
+### 7.3 Files after this round
+
+| File | Lines | SHA-256 |
+|---|---|---|
+| `05_Unity_Integration/Runtime/AvarnethStartupTimelineMath.cs` (unchanged) | 456 | `9caa1d5c55a4b8940ff4bad6eb9d2f5a550d1913bf7af029e629dcbddf46be41` |
+| `05_Unity_Integration/Runtime/AvarnethStartupAnimation.cs` | 886 | `375b61bd0716e60b2b9a662fd107d3870763533474e8931e54bd515318cdddff` |
+| `05_Unity_Integration/Editor/AvarnethStartupInstaller.cs` | 1979 | `8e0cf575db5d567ba50c2c4417b07e7e22ef91bbf560cf4b0034dccd78763130` |
+| `05_Unity_Integration/Runtime/Eckertengineering.Avarneth.Startup.asmdef` (unchanged) | 16 | `f962027098f16cbb44041ee0ffd663bece07cd3c365247b05550e421b83ea0f4` |
+| `05_Unity_Integration/Editor/Eckertengineering.Avarneth.Startup.Editor.asmdef` (unchanged) | 19 | `b641e4c5abff7ed52424fe07529b00dc7ecb466f310300a973837d800e5e0c87` |
+| `05_Unity_Integration/README_UNITY_FOLDER.txt` | 17 | `8657c5eb1ec78944399d08f54e070c982f3eb28e40f65913f1111dd5835a5cbc` |
+| `07_Documentation/UNITY_INSTALLATION.md` (DE) | 141 | `247798676c58ccc6a27ff7b6c24d5b5b4ccdcf144ef2cb70d8bb7821bc0c8be8` |
+| `07_Documentation/PLAYER_SETTINGS.md` (DE; keeps the concurrent `03_Windows_Icons/AVARNETH.ico` edit) | 88 | `a4d0e7aed6f1fe33f5a6470ffc05440f02f8180df609bce447e92c3b5aeaad67` |
+
+Harness additions: `/tmp/claude-0/unityref/dialogtest/` (`DialogTest.csproj`, `gen_extract.py`, generated
+`Extracted.cs`, `Program.cs`); mathtest `Program.cs` gained `--scales`; `apicheck_6000_6.py` gained 3 rows and
+lost the `Mathf.RoundToInt` row.
+
+### 7.4 What this round does NOT prove (in addition to section 6)
+
+- Nothing ran in Unity: the effect of `GUIUtility.ExitGUI()` on the IMGUI layout state, the 512-character dialog
+  limit, the Awake/OnDisable/`activeInHierarchy` ordering, the CanvasGroup restore rules and the neutral prefab
+  were checked only by reading the 6000.6 C# source and the code. Native behaviour (`IsAddedToManager` in Edit
+  Mode, dialog rendering) is not visible in the C# source.
+- The dialog helpers were tested as a verbatim copy, not inside the compiled editor assembly.
+- The veil seam (F5/F13) is still present in the shipped `AVE_Veil.png`.
+- The docs scale table matches the timeline as of 16:52:39 UTC. A later pipeline run that changes `contentBounds`
+  needs `avarneth-mathtest --scales` to be re-run and the table updated.
+
+## 8. Full-screen layer change (contract 3.1b, after the art review)
+
+The art review found that the 480×270 veil layer inside the pixel-scaled ArtRoot leaves undimmed bars on
+screens that are not exact multiples of 480×270 (also reported by the runtime reviewer, F5/F13). Fix:
+
+* Contract: optional layer field `"fullscreen": true` – stretched over the whole overlay canvas, outside ArtRoot,
+  x/y/dx/dy ignored, only alpha animated; its sprite is a smooth gradient imported with **Bilinear**.
+* Runtime (`AvarnethStartupAnimation.cs`): `StartupLayerBinding.fullscreen`; `PrepareBindings` applies stretch
+  anchors (`anchorMin = 0,0`, `anchorMax = 1,1`, `offsetMin/offsetMax = 0`) instead of top-left anchors;
+  `SetLayerVisible` neither resizes nor positions full-screen Images (sprite + alpha only).
+* Installer (`AvarnethStartupInstaller.cs`): `LayerJson.fullscreen`; new stretched container `Backdrop` (sibling 0,
+  before `ArtRoot`) that holds full-screen layer Images; `SmoothSpriteAssetPaths()` → `CheckSpriteSettings/ApplySpriteSettings`
+  expect/apply `FilterMode.Bilinear` only for those sprites (Configure, prefab pre-check and Validate use the same rule);
+  regeneration also removes an old `Backdrop`.
+* Art: `AVE_Veil.png` is now a smooth radial gradient (alpha 64…140) with a constant outermost row/column so the
+  clamped bilinear edge is invisible.
+
+Results after the change (clean `--no-incremental` builds, same references as above):
+
+| Build | Errors | Warnings |
+|---|---|---|
+| Runtime only (no UnityEditor reference) | 0 | 0 |
+| Editor (runtime + editor + stub) | 0 | 0 |
+| Editor split (editor as own assembly) | 0 | 0 |
+| Math test (net8.0) | 0 | 0 |
+
+* API check against 6000.6.0f1 source (`apicheck_6000_6.py`): 185 entries OK, 0 missing; new entries
+  `RectTransform.offsetMin` (`Runtime/Transform/ScriptBindings/RectTransform.bindings.cs:165`),
+  `RectTransform.offsetMax` (`…:179`), `FilterMode.Bilinear` (`Runtime/Export/Graphics/GraphicsEnums.cs:335`), none obsolete.
+  The only obsolete hit is the explicitly *not used* `FindObjectsByType<T>(FindObjectsInactive, FindObjectsSortMode)`.
+* Math self-test: 97 passed, 0 failed.
+* C# math vs. Python preview evaluator on the shipped revision-2 `Animation_Timeline.json`: 0 mismatches
+  at 30 fps (2196 rows), 60 fps (4356 rows) and 144 fps (10404 rows).
+* Not proven: as in sections 6 and 7.4 – nothing ran inside Unity 6000.6.

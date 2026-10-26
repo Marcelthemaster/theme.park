@@ -1,7 +1,8 @@
 # AVARNETH: VEIL OF EMBERS – Player Settings (Icons & Splash Screen)
 
-Gilt für Unity **6000.6.0f1**, Zielplattform Windows x64 (*PC, Mac & Linux Standalone*).
+Gilt für Unity **6000.6.0f1**, Zielplattform Windows x64 (Plattformgruppe *Standalone*).
 Alle Einstellungen liegen unter **Edit > Project Settings > Player**.
+Prüfstatus: Das Helper-Fenster (Abschnitt 3) ist in Unity 6000.6 **nicht getestet** (nur Compile-Check, siehe `UNITY_INSTALLATION.md`).
 
 > [!WARNING]
 > **Company Name und Product Name nicht „nebenbei“ ändern.**
@@ -18,8 +19,15 @@ Alle Einstellungen liegen unter **Edit > Project Settings > Player**.
 
 ## 1. Icon (Windows / Standalone)
 
-1. Reiter **PC, Mac & Linux Standalone** (Monitor-Symbol) > Abschnitt **Icon**.
-2. **Override for PC, Mac & Linux Standalone** aktivieren.
+1. Reiter der Plattformgruppe **Standalone** (Monitor-Symbol) > Abschnitt **Icon**.
+2. Den Schalter **Override for <Reitername>** aktivieren.
+
+   Den genauen Reiternamen liefert Unity nativ (`BuildPipeline.GetBuildTargetGroupDisplayName`, extern,
+   `Editor/Mono/BuildPipeline/BuildPipeline.bindings.cs:74`; Schalter-Text
+   `string.Format("Override for {0}", platform.title.text)` in
+   `Editor/Mono/Inspector/PlayerSettingsEditor/PlayerSettingsIconsEditor.cs:441`). Die einzige ausgeschriebene
+   Bezeichnung für Standalone in der 6000.6-C#-Quelle ist „Windows, Mac, Linux“
+   (`Modules/ProjectAuditorEditor/Utils/Formatting.cs:210`); maßgeblich ist, was der Inspector anzeigt.
 3. Für jede angezeigte Größe die passende Textur aus `Importable_Assets/Icons/` zuweisen:
    `AVE_Icon_<Größe>.png`; gibt es die Größe nicht, die nächstgrößere Datei.
 
@@ -69,8 +77,8 @@ vor dem Release bitte direkt prüfen und die für das eigene Abo geltenden Bedin
 
 | Aktion | Was passiert | API |
 |---|---|---|
-| Anzeige | aktueller Zustand von *Show Splash Screen*, *Show Unity Logo*, Standalone-Icons je Größe, Default Icon | `PlayerSettings.SplashScreen.show/showUnityLogo`, `PlayerSettings.GetIconSizes/GetIcons(NamedBuildTarget.Standalone, IconKind.Any)` |
-| Assign AVARNETH Standalone Icons... | Dialog listet jede Größe „alt → neu“; erst nach Bestätigung gesetzt. Größen ohne passendes AVARNETH-Icon behalten ihr bisheriges Icon. | `PlayerSettings.SetIcons(NamedBuildTarget.Standalone, …, IconKind.Any)` |
+| Anzeige | aktueller Zustand von *Show Splash Screen*, *Show Unity Logo*, Standalone-Icons je Größe (Abschnitt *Icon (Standalone)*), Default Icon | `PlayerSettings.SplashScreen.show/showUnityLogo`, `PlayerSettings.GetIconSizes/GetIcons(NamedBuildTarget.Standalone, IconKind.Any)` |
+| Assign AVARNETH Standalone Icons... | Dialog listet jede zu ändernde Größe „alt → neu“ (lange alte Texturnamen gekürzt, vollständige Liste vorab in der Konsole); erst nach Bestätigung gesetzt. Größen ohne passendes AVARNETH-Icon behalten ihr bisheriges Icon. Stimmt schon alles, wird nichts geändert. | `PlayerSettings.SetIcons(NamedBuildTarget.Standalone, …, IconKind.Any)` |
 | Assign AVARNETH Default Icon... | setzt nach Bestätigung das Default Icon auf die größte AVARNETH-Icon-Datei | `PlayerSettings.SetIcons(NamedBuildTarget.Unknown, …, IconKind.Any)` |
 | Disable Unity Splash Screen... | nach Bestätigung (mit Lizenzhinweis): *Show Splash Screen* = aus, *Show Unity Logo* = aus | `PlayerSettings.SplashScreen.show/showUnityLogo` |
 

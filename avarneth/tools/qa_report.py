@@ -49,6 +49,11 @@ def collect():
         n, m, _ = crosscheck.run(jp, fps)
         cc.append((fps, n, len(m)))
     ev['crosscheck'] = cc
+    ap = subprocess.run(['python3', f'{REF}/compile/apicheck_6000_6.py'], capture_output=True, text=True)
+    oks = [l for l in ap.stdout.splitlines() if l.startswith('OK |')]
+    used_obsolete = [l for l in oks if 'OBSOLETE' in l and '[NOT used]' not in l]
+    missing = sum(1 for l in ap.stdout.splitlines() if l.startswith('MISSING'))
+    ev['apicheck'] = (missing == 0 and not used_obsolete, len(oks), missing)
     stubs = os.path.join(REF, 'compile', 'Stubs')
     ev['stubs'] = []
     for f in sorted(os.listdir(stubs)):
@@ -102,8 +107,10 @@ def render(ev):
     u.append({'status': status(bad == 0), 'check': 'C#-Laufzeitmathematik = Python-Referenz (Vorschau-Renderer) für die echte Animation_Timeline.json',
               'evidence': f'{total} CSV-Zeilen (Layer + Partikel je Frame) bei ' + ', '.join(f'{f} fps' for f, _, _ in ev['crosscheck'])
               + f' verglichen: {bad} Abweichungen (Sichtbarkeit, Flipbook-Index, Pixelposition, Alpha ±0.002)'})
-    u.append({'status': 'PASS', 'check': 'Verwendete Unity-APIs gegen Unity-6000.6.0f1-Quellcode geprüft (Signatur, [Obsolete])',
-              'evidence': 'Unity C# Reference Source, Tag 6000.6.0f1 – Liste mit Datei:Zeile siehe Abschnitt 6 (aus dem Code-Review-Protokoll)'})
+    api_ok, api_n, api_missing = ev['apicheck']
+    u.append({'status': status(api_ok), 'check': 'Verwendete Unity-APIs gegen den Unity-6000.6.0f1-Quellcode geprüft (Existenz, Signatur, [Obsolete])',
+              'evidence': f'apicheck_6000_6.py gegen Unity-C#-Reference-Source (Tag 6000.6.0f1): {api_n} Einträge OK, {api_missing} fehlend; '
+              'kein verwendetes Member ist [Obsolete]. Datei:Zeile-Liste in UNITY_COMPILE_EVIDENCE.md'})
     u.extend(r for r in rows.get('Unity-Integration', []))
 
     pk = []
@@ -158,12 +165,9 @@ def render(ev):
               '5. Play: Animation ca. 2 s, danach Overlay deaktiviert, Login bedienbar, keine Fehler/Warnungen; bei 1280×720, 1920×1080 und 2560×1440 prüfen.',
               '6. Windows-Build mit gesetzten Icons: EXE-, Taskleisten- und Alt-Tab-Symbol prüfen; Splash-Einstellungen gemäß PLAYER_SETTINGS.md.',
               '7. Ergebnisse in diesem Bericht von NOT TESTED auf PASS/FAIL setzen.', '']
-    api = os.path.join(WORK, 'unity_compile_evidence.md')
-    if os.path.isfile(api):
-        txt = open(api).read()
-        m = re.search(r'(?ms)^#+ .*?(API|Unity API).*?$\n(.*?)(?=^#+ |\Z)', txt)
-        lines += ['## 8. Anhang: Unity-API-Nachweis (Auszug aus dem Code-Review-Protokoll)', '']
-        lines += [txt.strip() if len(txt) < 30000 else txt[:30000] + '\n…(gekürzt)…', '']
+    lines += ['## 8. Anhang', '',
+              'Vollständiges Compile-/API-Protokoll (englisch, mit allen Befehlen, Datei:Zeile-Nachweisen gegen den '
+              'Unity-6000.6.0f1-Quellcode, Stub-Liste und Review-Runden): `UNITY_COMPILE_EVIDENCE.md`.', '']
     with open(os.path.join(PKG, '07_Documentation', 'QA_REPORT.md'), 'w') as f:
         f.write('\n'.join(lines) + '\n')
     counts = {}

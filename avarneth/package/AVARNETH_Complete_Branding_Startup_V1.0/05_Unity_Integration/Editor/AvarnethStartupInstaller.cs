@@ -66,6 +66,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         public int y;
         public int order;
         public KeyJson[] keys;
+        public bool fullscreen;
     }
 
     /// <summary>One entry of a layer's "keys".</summary>
@@ -152,6 +153,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         internal const string PrefabRootName = "AvarnethStartup";
         internal const string ArtRootName = "ArtRoot";
         internal const string ParticlesContainerName = "Particles";
+        internal const string BackdropName = "Backdrop";
         internal const string IconPrefix = "AVE_Icon_";
         internal const string ContractFilePrefix = "AVE_";
         internal const string StandardRootName = "Importable_Assets";
@@ -340,7 +342,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                     }
 
                     error = "No TextAsset named '" + TimelineAssetName + "' with schema '" + AvarnethStartupMath.TimelineSchema +
-                            "' was found in the project.\n\nCopy the 05_Unity_Integration folder (including Importable_Assets) into a subfolder of Assets/ and let Unity import it.";
+                            "' was found in the project.\n\nCopy the 05_Unity_Integration folder (including Importable_Assets) into the project, e.g. as Assets/AVARNETH/Startup/, and let Unity import it.";
                     return false;
                 }
 
@@ -553,6 +555,23 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             return true;
         }
 
+        /// <summary>
+        /// Asset paths of the static sprites of full-screen layers ("fullscreen": true). These are smooth gradients
+        /// stretched over the screen and are imported with Bilinear filtering; every other sprite uses Point.
+        /// </summary>
+        internal static HashSet<string> SmoothSpriteAssetPaths(InstallRoot root, TimelineJson data)
+        {
+            var set = new HashSet<string>(StringComparer.Ordinal);
+            if (data == null || data.layers == null) return set;
+            foreach (LayerJson layer in data.layers)
+            {
+                if (layer == null || !layer.fullscreen || string.IsNullOrEmpty(layer.sprite)) continue;
+                if (IsSafeRelativePath(layer.sprite)) set.Add(root.RootFolder + "/" + layer.sprite);
+            }
+
+            return set;
+        }
+
         internal static IEnumerable<string> ReferencedSpritePaths(TimelineJson data)
         {
             foreach (LayerJson layer in data.layers)
@@ -695,11 +714,12 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         }
 
         /// <summary>Appends every deviation from the contract sprite import settings to <paramref name="problems"/>.</summary>
-        internal static void CheckSpriteSettings(TextureImporter ti, List<string> problems)
+        internal static void CheckSpriteSettings(TextureImporter ti, List<string> problems, bool smooth = false)
         {
+            FilterMode expectedFilter = smooth ? FilterMode.Bilinear : FilterMode.Point;
             if (ti.textureType != TextureImporterType.Sprite) problems.Add("Texture Type is " + ti.textureType + " (expected Sprite)");
             if (ti.spriteImportMode != SpriteImportMode.Single) problems.Add("Sprite Mode is " + ti.spriteImportMode + " (expected Single)");
-            if (ti.filterMode != FilterMode.Point) problems.Add("Filter Mode is " + ti.filterMode + " (expected Point)");
+            if (ti.filterMode != expectedFilter) problems.Add("Filter Mode is " + ti.filterMode + " (expected " + expectedFilter + ")");
             if (ti.mipmapEnabled) problems.Add("Generate Mip Maps is on");
             if (ti.textureCompression != TextureImporterCompression.Uncompressed) problems.Add("Compression is " + ti.textureCompression + " (expected None)");
             if (ti.wrapModeU != TextureWrapMode.Clamp || ti.wrapModeV != TextureWrapMode.Clamp) problems.Add("Wrap Mode is not Clamp");
@@ -734,15 +754,15 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             if (standalone != null && standalone.overridden) problems.Add("has a Standalone platform override");
         }
 
-        private static bool ApplySpriteSettings(TextureImporter ti)
+        private static bool ApplySpriteSettings(TextureImporter ti, bool smooth)
         {
             var problems = new List<string>();
-            CheckSpriteSettings(ti, problems);
+            CheckSpriteSettings(ti, problems, smooth);
             if (problems.Count == 0) return false;
 
             ti.textureType = TextureImporterType.Sprite;
             ti.spriteImportMode = SpriteImportMode.Single;
-            ti.filterMode = FilterMode.Point;
+            ti.filterMode = smooth ? FilterMode.Bilinear : FilterMode.Point;
             ti.mipmapEnabled = false;
             ti.textureCompression = TextureImporterCompression.Uncompressed;
             ti.wrapMode = TextureWrapMode.Clamp;
@@ -802,6 +822,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
             ParsedTimeline parsed = ParseTimeline(root);
             List<string> spritePaths = CollectSpritePngs(root, parsed.IsValid ? parsed.Data : null);
+            HashSet<string> smoothPaths = SmoothSpriteAssetPaths(root, parsed.IsValid ? parsed.Data : null);
             List<string> iconPaths = CollectIconPngs(root);
 
             // Determine what would change before touching anything.
@@ -813,7 +834,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             {
                 if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) { failed.Add(path); continue; }
                 problems.Clear();
-                CheckSpriteSettings(ti, problems);
+                CheckSpriteSettings(ti, problems, smoothPaths.Contains(path));
                 if (problems.Count > 0) spriteChanges.Add(path);
             }
 
@@ -846,7 +867,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                 {
                     foreach (string path in spriteChanges)
                     {
-                        if (!(AssetImporter.GetAtPath(path) is TextureImporter ti) || !ApplySpriteSettings(ti)) continue;
+                        if (!(AssetImporter.GetAtPath(path) is TextureImporter ti) || !ApplySpriteSettings(ti, smoothPaths.Contains(path))) continue;
                         ti.SaveAndReimport();
                         changed++;
                     }
@@ -986,11 +1007,12 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         {
             int count = 0;
             var problems = new List<string>();
+            HashSet<string> smoothPaths = SmoothSpriteAssetPaths(root, data);
             foreach (string path in CollectSpritePngs(root, data))
             {
                 if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
                 problems.Clear();
-                CheckSpriteSettings(ti, problems);
+                CheckSpriteSettings(ti, problems, smoothPaths.Contains(path));
                 if (problems.Count > 0) count++;
             }
 
@@ -1047,12 +1069,17 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             for (int i = root.transform.childCount - 1; i >= 0; i--)
             {
                 Transform child = root.transform.GetChild(i);
-                if (child.name == ArtRootName || (animation.ArtRoot != null && child == animation.ArtRoot.transform))
+                if (child.name == ArtRootName || child.name == BackdropName || (animation.ArtRoot != null && child == animation.ArtRoot.transform))
                     Object.DestroyImmediate(child.gameObject);
             }
 
+            // Full-screen layers live in a stretched Backdrop drawn before the pixel-scaled ArtRoot.
+            RectTransform backdrop = CreateRect(BackdropName, root.transform, uiLayer);
+            backdrop.SetSiblingIndex(0);
+            SetStretch(backdrop);
+
             RectTransform artRoot = CreateRect(ArtRootName, root.transform, uiLayer);
-            artRoot.SetSiblingIndex(0);
+            artRoot.SetSiblingIndex(1);
             artRoot.anchorMin = new Vector2(0.5f, 0.5f);
             artRoot.anchorMax = new Vector2(0.5f, 0.5f);
             artRoot.pivot = new Vector2(0.5f, 0.5f);
@@ -1076,7 +1103,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             foreach (int index in sorted)
             {
                 LayerJson layer = data.layers[index];
-                if (particleContainer == null && layer.order >= ParticleOrderSplit)
+                if (particleContainer == null && !layer.fullscreen && layer.order >= ParticleOrderSplit)
                     particleContainer = CreateParticleContainer(artRoot, canvasWidth, canvasHeight, uiLayer);
 
                 Sprite staticSprite = sprites.Get(layer.sprite);
@@ -1091,8 +1118,17 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                 if (initial == null) return "Layer '" + layer.id + "' has no sprite.";
 
                 string name = string.IsNullOrEmpty(layer.id) ? "Layer_" + index : layer.id;
-                Image image = CreateImage(name, artRoot, initial, uiLayer);
-                image.rectTransform.anchoredPosition = new Vector2(layer.x, -layer.y);
+                Image image;
+                if (layer.fullscreen)
+                {
+                    image = CreateImage(name, backdrop, initial, uiLayer);
+                    SetStretch(image.rectTransform);
+                }
+                else
+                {
+                    image = CreateImage(name, artRoot, initial, uiLayer);
+                    image.rectTransform.anchoredPosition = new Vector2(layer.x, -layer.y);
+                }
 
                 var keys = new StartupKey[layer.keys.Length];
                 for (int k = 0; k < keys.Length; k++)
@@ -1120,6 +1156,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                     position = new Vector2Int(layer.x, layer.y),
                     order = layer.order,
                     keys = keys,
+                    fullscreen = layer.fullscreen,
                 });
             }
 
@@ -1204,6 +1241,15 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             Rect r = sprite.rect;
             rect.sizeDelta = new Vector2(r.width, r.height); // native size (sprite PPU 100 == canvas reference PPU 100)
             return image;
+        }
+
+        private static void SetStretch(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
         }
 
         private static void SetTopLeft(RectTransform rect)
@@ -1407,12 +1453,13 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             // Import settings: one summary line per group for the dialog, one line per file for the Console.
             var problems = new List<string>();
             List<string> spritePaths = CollectSpritePngs(root, parsed.IsValid ? parsed.Data : null);
+            HashSet<string> smoothSprites = SmoothSpriteAssetPaths(root, parsed.IsValid ? parsed.Data : null);
             int wrongSprites = 0;
             foreach (string path in spritePaths)
             {
                 if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
                 problems.Clear();
-                CheckSpriteSettings(ti, problems);
+                CheckSpriteSettings(ti, problems, smoothSprites.Contains(path));
                 if (problems.Count == 0) continue;
                 wrongSprites++;
                 details.Add("Import settings " + RelativeToRoot(root, path) + ": " + string.Join("; ", problems));
@@ -1653,29 +1700,38 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             Repaint();
         }
 
+        // Every handler that opens a modal dialog, imports/writes assets, opens a window or changes the data the
+        // layout is built from ends with GUIUtility.ExitGUI(), as Unity's own inspectors do after such actions
+        // (6000.6 PlayerSettingsEditor.cs:2471-2476, TextureImporterInspector.cs:1292-1298). It throws
+        // ExitGUIException, which Unity catches; the rest of this (now stale) IMGUI pass is skipped.
         private void OnGUI()
         {
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
 
             EditorGUILayout.LabelField("Importable asset root", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("The root is the folder that contains Animation_Timeline.json (schema " + AvarnethStartupMath.TimelineSchema + ").", EditorStyles.wordWrappedLabel);
+            EditorGUILayout.LabelField("The root is the folder that contains Animation_Timeline.json (schema " + AvarnethStartupMath.TimelineSchema + "). It must be a subfolder of Assets/.", EditorStyles.wordWrappedLabel);
 
             TextAsset current = AvarnethStartupInstaller.TimelineOverride;
             EditorGUI.BeginChangeCheck();
             var picked = (TextAsset)EditorGUILayout.ObjectField("Timeline override", current, typeof(TextAsset), false);
             if (EditorGUI.EndChangeCheck())
             {
+                string pickedPath = picked != null ? AssetDatabase.GetAssetPath(picked) : null;
                 if (picked != null && !AvarnethStartupInstaller.IsContractTimeline(picked))
-                    EditorUtility.DisplayDialog(AvarnethStartupInstaller.DialogTitle, "'" + AssetDatabase.GetAssetPath(picked) + "' is not an AVARNETH startup timeline.", "OK");
+                    AvarnethStartupInstaller.Alert(AvarnethStartupInstaller.DialogTitle, "'" + pickedPath + "' is not an AVARNETH startup timeline.");
+                else if (picked != null && !AvarnethStartupInstaller.IsAllowedRootFolder(AvarnethStartupInstaller.ParentPath(pickedPath)))
+                    AvarnethStartupInstaller.Alert(AvarnethStartupInstaller.DialogTitle, "'" + pickedPath + "' cannot be used: its folder must be a subfolder of Assets/.");
                 else
                     AvarnethStartupInstaller.TimelineOverride = picked;
                 Refresh();
+                GUIUtility.ExitGUI();
             }
 
             if (current != null && GUILayout.Button("Clear Override (use automatic detection)"))
             {
                 AvarnethStartupInstaller.TimelineOverride = null;
                 Refresh();
+                GUIUtility.ExitGUI();
             }
 
             EditorGUILayout.Space();
@@ -1688,34 +1744,68 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                 {
                     AvarnethStartupInstaller.TimelineOverride = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
                     Refresh();
+                    GUIUtility.ExitGUI();
                 }
                 EditorGUILayout.EndHorizontal();
             }
 
-            if (GUILayout.Button("Refresh")) Refresh();
+            if (GUILayout.Button("Refresh"))
+            {
+                Refresh();
+                GUIUtility.ExitGUI();
+            }
 
             EditorGUILayout.Space();
             InstallRoot root = _root;
             bool resolved = root != null;
             if (resolved)
+            {
                 EditorGUILayout.HelpBox("Root: " + root.RootFolder + "\nPrefab: " + root.PrefabPath, MessageType.Info);
+                if (!AvarnethStartupInstaller.HasStandardRootName(root))
+                    EditorGUILayout.HelpBox("This folder is not named " + AvarnethStartupInstaller.StandardRootName + ". Check that it really is the AVARNETH importable asset folder before step 1.", MessageType.Warning);
+            }
             else
+            {
                 EditorGUILayout.HelpBox(_rootError ?? "No usable timeline found.", MessageType.Warning);
+            }
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Steps", EditorStyles.boldLabel);
             using (new EditorGUI.DisabledScope(!resolved))
             {
-                if (GUILayout.Button("1. Configure Sprite Import Settings")) AvarnethStartupInstaller.ConfigureImportSettings(root, true);
-                if (GUILayout.Button("2. Create or Update Startup Prefab")) AvarnethStartupInstaller.CreateOrUpdatePrefab(root, true);
+                if (GUILayout.Button("1. Configure Sprite Import Settings..."))
+                {
+                    AvarnethStartupInstaller.ConfigureImportSettings(root, true);
+                    GUIUtility.ExitGUI();
+                }
+
+                if (GUILayout.Button("2. Create or Update Startup Prefab"))
+                {
+                    AvarnethStartupInstaller.CreateOrUpdatePrefab(root, true);
+                    GUIUtility.ExitGUI();
+                }
+
                 using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
                 {
-                    if (GUILayout.Button("3. Add Startup Overlay To Open Scene...")) AvarnethStartupInstaller.AddOverlayToOpenScene();
+                    if (GUILayout.Button("3. Add Startup Overlay To Open Scene..."))
+                    {
+                        AvarnethStartupInstaller.AddOverlayToOpenScene();
+                        GUIUtility.ExitGUI();
+                    }
                 }
             }
 
-            if (GUILayout.Button("Player Settings Helper...")) AvarnethPlayerSettingsHelperWindow.Open();
-            if (GUILayout.Button("Validate Installation")) AvarnethStartupInstaller.ValidateInstallation(true);
+            if (GUILayout.Button("Player Settings Helper..."))
+            {
+                AvarnethPlayerSettingsHelperWindow.Open();
+                GUIUtility.ExitGUI();
+            }
+
+            if (GUILayout.Button("Validate Installation"))
+            {
+                AvarnethStartupInstaller.ValidateInstallation(true);
+                GUIUtility.ExitGUI();
+            }
 
             EditorGUILayout.EndScrollView();
         }
@@ -1780,12 +1870,16 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             EditorGUILayout.LabelField("Splash Image", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("Show Splash Screen", PlayerSettings.SplashScreen.show ? "On" : "Off");
             EditorGUILayout.LabelField("Show Unity Logo", PlayerSettings.SplashScreen.showUnityLogo ? "On" : "Off");
-            if (GUILayout.Button("Disable Unity Splash Screen...")) DisableSplash();
+            if (GUILayout.Button("Disable Unity Splash Screen..."))
+            {
+                DisableSplash();
+                GUIUtility.ExitGUI(); // modal dialog + PlayerSettings change: end this IMGUI pass (see installer window)
+            }
 
             EditorGUILayout.Space();
 
             // Icons
-            EditorGUILayout.LabelField("Icon (PC, Mac & Linux Standalone)", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Icon (Standalone)", EditorStyles.boldLabel);
             if (_root == null)
             {
                 EditorGUILayout.HelpBox("The importable asset root was not found (see Tools > AVARNETH > Startup > Installer...).", MessageType.Warning);
@@ -1812,6 +1906,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                 {
                     Refresh();
                     AssignStandaloneIcons(_sizes, _current);
+                    GUIUtility.ExitGUI();
                 }
             }
 
@@ -1820,11 +1915,20 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             EditorGUILayout.LabelField("Current", _defaultIcon != null ? _defaultIcon.name : "(not set)");
             using (new EditorGUI.DisabledScope(_root == null || _iconFiles.Count == 0))
             {
-                if (GUILayout.Button("Assign AVARNETH Default Icon...")) AssignDefaultIcon();
+                if (GUILayout.Button("Assign AVARNETH Default Icon..."))
+                {
+                    AssignDefaultIcon();
+                    GUIUtility.ExitGUI();
+                }
             }
 
             EditorGUILayout.Space();
-            if (GUILayout.Button("Refresh")) Refresh();
+            if (GUILayout.Button("Refresh"))
+            {
+                Refresh();
+                GUIUtility.ExitGUI();
+            }
+
             EditorGUILayout.EndScrollView();
         }
 
@@ -1836,22 +1940,40 @@ namespace Eckertengineering.Avarneth.Branding.Editor
         private void AssignStandaloneIcons(int[] sizes, Texture2D[] current)
         {
             var planned = new Texture2D[sizes.Length];
-            var changes = new List<string>();
+            var changes = new List<string>();   // full text (Console)
+            var compact = new List<string>();   // dialog lines, short enough for 8+ sizes within the dialog limit
+            var unchanged = new List<string>();
             for (int i = 0; i < sizes.Length; i++)
             {
                 Texture2D before = i < current.Length ? current[i] : null;
                 string path = AvarnethStartupInstaller.PickIcon(_iconFiles, sizes[i]);
                 Texture2D tex = path != null ? AssetDatabase.LoadAssetAtPath<Texture2D>(path) : null;
                 planned[i] = tex != null ? tex : before; // no fitting AVARNETH icon: keep the current one
+                string size = sizes[i].ToString(CultureInfo.InvariantCulture);
                 if (planned[i] != before)
-                    changes.Add(sizes[i] + " px: " + (before != null ? before.name : "(not set)") + " -> " + AvarnethStartupInstaller.FileName(path));
+                {
+                    string from = before != null ? before.name : "(not set)";
+                    changes.Add(size + " px: " + from + " -> " + AvarnethStartupInstaller.FileName(path));
+                    compact.Add(size + ": " + AvarnethStartupInstaller.Shorten(from, 16) + " -> " + AvarnethStartupInstaller.FileName(path));
+                }
                 else
-                    changes.Add(sizes[i] + " px: unchanged");
+                {
+                    changes.Add(size + " px: unchanged");
+                    unchanged.Add(size);
+                }
             }
 
-            string message = "PlayerSettings.SetIcons(Standalone) will set:\n\n" + string.Join("\n", changes) +
-                             "\n\nNo other Player Setting is changed. Use File > Save Project to write ProjectSettings to disk.";
-            if (!EditorUtility.DisplayDialog("Assign AVARNETH Standalone Icons", message, "Assign Icons", "Cancel")) return;
+            if (compact.Count == 0)
+            {
+                AvarnethStartupInstaller.Alert("Assign AVARNETH Standalone Icons", "The Standalone icons already match the AVARNETH icons. Nothing was changed.");
+                return;
+            }
+
+            Debug.Log("[AVARNETH Startup] Planned Standalone icon changes:\n" + string.Join("\n", changes));
+            string message = "SetIcons(Standalone) will set:\n" + string.Join("\n", compact) +
+                             (unchanged.Count > 0 ? "\nUnchanged: " + string.Join(", ", unchanged) + " px" : string.Empty) +
+                             "\n\nNothing else is changed. File > Save Project writes it to disk.";
+            if (!AvarnethStartupInstaller.Confirm("Assign AVARNETH Standalone Icons", message, "Assign Icons", "Cancel")) return;
 
             PlayerSettings.SetIcons(NamedBuildTarget.Standalone, planned, IconKind.Any);
             Debug.Log("[AVARNETH Startup] Standalone icons assigned:\n" + string.Join("\n", changes));
@@ -1875,9 +1997,9 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             planned[0] = tex;
 
             string message = "PlayerSettings.SetIcons(Default) will set the Default Icon:\n\n" +
-                             (before != null ? before.name : "(not set)") + " -> " + AvarnethStartupInstaller.FileName(path) +
+                             AvarnethStartupInstaller.Shorten(before != null ? before.name : "(not set)", 80) + " -> " + AvarnethStartupInstaller.FileName(path) +
                              "\n\nNo other Player Setting is changed. Use File > Save Project to write ProjectSettings to disk.";
-            if (!EditorUtility.DisplayDialog("Assign AVARNETH Default Icon", message, "Assign Default Icon", "Cancel")) return;
+            if (!AvarnethStartupInstaller.Confirm("Assign AVARNETH Default Icon", message, "Assign Default Icon", "Cancel")) return;
 
             PlayerSettings.SetIcons(NamedBuildTarget.Unknown, planned, IconKind.Any);
             Debug.Log("[AVARNETH Startup] Default icon assigned: " + path);
@@ -1893,7 +2015,7 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                 "Licence note: Unity announced on 12 Sep 2024 that the Made with Unity splash screen is optional for games made with Unity 6, " +
                 "including Unity Personal. For older editor versions Personal projects had to show it. Check the licence terms that apply to " +
                 "your subscription before shipping.\n\nNo other Player Setting is changed.";
-            if (!EditorUtility.DisplayDialog("Disable Unity Splash Screen", message, "Disable Splash Screen", "Cancel")) return;
+            if (!AvarnethStartupInstaller.Confirm("Disable Unity Splash Screen", message, "Disable Splash Screen", "Cancel")) return;
 
             PlayerSettings.SplashScreen.show = false;
             PlayerSettings.SplashScreen.showUnityLogo = false;
