@@ -110,34 +110,57 @@ def emblem_outline_glow(emblem: Canvas, margin=2):
     ring1 = outline(big)
     ring2 = outline(big | ring1) & ~big
     c = Canvas(W, H)
-    c.a[ring2] = _rgba('ember', 6, 70)
-    c.a[ring1] = _rgba('gold', 8, 210)
+    c.a[ring2] = _rgba('gold', 5, 70)
+    c.a[ring1] = _rgba('gold', 7, 200)
     Y = np.arange(H)[:, None].repeat(W, 1)
-    c.a[ring1 & (Y < H * 0.25)] = _rgba('gold', 9, 230)
+    c.a[ring1 & (Y < 6)] = _rgba('gold', 8, 220)          # near-white only at the very apex
     return c
 
 
-LIGHT_SET = {
-    'gold': {9: 8, 8: 8, 7: 7, 6: 6},
-    'stone': {7: 7, 6: 6},
-    'iron': {7: 7, 6: 6},
-}
+_RAMP_LUT = {}
 
 
-def highlight_flash(layer: Canvas, restrict=None):
-    """Warm highlight on the already-light pixels only (3-step ramp gold8/7/6)."""
+def _ramp_index():
+    if not _RAMP_LUT:
+        for ramp, cols in RAMPS.items():
+            for i, c in enumerate(cols):
+                _RAMP_LUT[tuple(c)] = (ramp, i)
+    return _RAMP_LUT
+
+
+def _lum(rgb):
+    return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
+
+
+def ramp_shift(rgb, steps):
+    """Same colour moved `steps` up its own palette ramp (never darker)."""
+    info = _ramp_index().get(tuple(int(v) for v in rgb))
+    if info is None:
+        return None
+    ramp, i = info
+    j = min(len(RAMPS[ramp]) - 1, i + steps)
+    if j == i:
+        return None
+    return RAMPS[ramp][j]
+
+
+def highlight_flash(layer: Canvas, restrict=None, steps=2, min_lum=95):
+    """Light layer: every reasonably light pixel of `layer`, moved `steps` up its own ramp.
+
+    Drawn with normal alpha blending it can only brighten (each colour is lighter than the pixel below),
+    so the flash reads as light on the metal instead of a tint. Outline / extrusion / shadow pixels
+    (luminance < min_lum) are excluded."""
     c = Canvas(layer.w, layer.h)
-    lut = {}
-    for ramp, m in LIGHT_SET.items():
-        for i, j in m.items():
-            lut[tuple(RAMPS[ramp][i])] = j
     a = layer.a
     for y, x in zip(*np.where(a[..., 3] > 0)):
         if restrict is not None and not restrict[y, x]:
             continue
-        j = lut.get((int(a[y, x, 0]), int(a[y, x, 1]), int(a[y, x, 2])))
-        if j is not None:
-            c.a[y, x] = _rgba('gold', j)
+        rgb = a[y, x, :3]
+        if _lum(rgb) < min_lum:
+            continue
+        nc = ramp_shift(rgb, steps)
+        if nc is not None:
+            c.a[y, x] = (nc[0], nc[1], nc[2], 255)
     return c
 
 
@@ -172,7 +195,9 @@ def veil(w=480, h=270, cx=240.0, cy=135.0, rx=300.0, ry=170.0, center=140, edge=
     return c
 
 
-def shine_frames(face_mask, n=28, slope=0.5, margin=26):
+def shine_frames(layer: Canvas, face_mask, n=28, slope=0.5, margin=26, min_lum=95):
+    """Slanted band of light sweeping left -> right over the gold faces: core +2 ramp steps,
+    flanks +1 step, computed from the pixel below (never darker); outline/extrusion excluded."""
     H, W = face_mask.shape
     Y, X = np.mgrid[0:H, 0:W]
     frames = []
@@ -182,16 +207,23 @@ def shine_frames(face_mask, n=28, slope=0.5, margin=26):
         x0 = start + (end - start) * p
         u = np.abs((X - (H - Y) * slope) - x0)
         c = Canvas(W, H)
-        c.a[(u <= 7) & face_mask] = _rgba('gold', 6, 70)
-        c.a[(u <= 4) & face_mask] = _rgba('gold', 7, 130)
-        c.a[(u <= 1.5) & face_mask] = _rgba('gold', 8, 200)
+        for y, x in zip(*np.where((u <= 7) & face_mask)):
+            rgb = layer.a[y, x, :3]
+            if _lum(rgb) < min_lum:
+                continue
+            steps = 2 if u[y, x] <= 2.5 else 1
+            nc = ramp_shift(rgb, steps)
+            if nc is None:
+                continue
+            alpha = 255 if u[y, x] <= 4.5 else 150
+            c.a[y, x] = (nc[0], nc[1], nc[2], alpha)
         frames.append(c)
     return frames
 
 
-def glint_frames(n=10, size=17):
+def glint_frames(n=8, size=17):
     c0 = size // 2
-    sizes = [1, 3, 5, 7, 8, 7, 5, 4, 2, 1][:n]
+    sizes = [1, 3, 5, 8, 7, 5, 3, 1][:n]
     frames = []
     for k in sizes:
         c = Canvas(size, size)

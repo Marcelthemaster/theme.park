@@ -71,9 +71,9 @@ def build(seed=2026):
     gw, gh = 96, 106
     sprites['Layers/AVE_EmblemGlow.png'] = fx.radial_glow(gw, gh, 46, 51)
     gx, gy = ex + emb.w // 2 - gw // 2, ey + emb.h // 2 - gh // 2
-    sprites['Layers/AVE_EmblemFlash.png'] = fx.highlight_flash(emb)
+    sprites['Layers/AVE_EmblemFlash.png'] = fx.highlight_flash(emb, steps=2)
     sprites['Layers/AVE_EmblemOutlineGlow.png'] = fx.emblem_outline_glow(emb, margin=2)
-    sprites['Layers/AVE_WordmarkFlash.png'] = fx.highlight_flash(wm, restrict=face)
+    sprites['Layers/AVE_WordmarkFlash.png'] = fx.highlight_flash(wm, restrict=face, steps=2)
 
     def seq(name, frames):
         paths = []
@@ -84,8 +84,8 @@ def build(seed=2026):
         return paths
 
     trace_paths = seq('EmblemTrace', fx.emblem_trace_frames(emb, amask, 12, 4, margin=2))
-    shine_paths = seq('WordmarkShine', fx.shine_frames(face, n=28))
-    glint_paths = seq('Glint', fx.glint_frames(10))
+    shine_paths = seq('WordmarkShine', fx.shine_frames(wm, face, n=28))
+    glint_paths = seq('Glint', fx.glint_frames(8))
     apex_x = ex + emb.w // 2
     apex_y = ey + int(np.where(emb.alpha_mask()[:, emb.w // 2])[0].min()) + 2
 
@@ -96,43 +96,42 @@ def build(seed=2026):
         sprites[path] = p
         part_paths.append(path)
 
-    FADE0, FADE1 = 1.74, 2.0
+    FADE0, FADE1 = 1.76, 2.0          # logo layers: hold, then inCubic (stays solid, passes the mid-opacities fast)
     n_tr, n_sh, n_gl = len(trace_paths), len(shine_paths), len(glint_paths)
     tr0 = 0.0
     sh0 = 38 * F
-    gl0 = 95 * F
+    gl0 = 96 * F
 
+    out = 'inCubic'
     layers = [
         layer('veil', 'Layers/AVE_Veil.png', 0, 0, 0,
-              [key(0.0, 0.0), key(0.30, 1.0, ease='smooth'), key(FADE0 - 0.04, 1.0), key(FADE1, 0.0, ease='smooth')],
+              [key(0.0, 0.0), key(0.30, 1.0, ease='smooth'), key(1.74, 1.0), key(FADE1, 0.0, ease='smooth')],
               fullscreen=True),
         layer('emblemGlow', 'Layers/AVE_EmblemGlow.png', gx, gy, 10,
-              [key(0.16, 0.0), key(0.34, 0.35, ease='smooth'), key(1.60, 0.35), key(1.72, 0.6, ease='smooth'),
+              [key(0.16, 0.0), key(0.34, 0.35, ease='smooth'), key(1.60, 0.35), key(1.70, 0.55, ease='smooth'),
                key(FADE1, 0.0, ease='smooth')]),
         layer('publisher', 'Layers/AVE_Publisher.png', px_, py_, 20,
-              [key(0.30, 0.0), key(0.60, 0.65, ease='smooth'), key(FADE0, 0.65), key(FADE1, 0.0, ease='smooth')]),
+              [key(0.30, 0.0), key(0.60, 0.65, ease='smooth'), key(FADE0, 0.65), key(FADE1, 0.0, ease=out)]),
         layer('emblem', 'Layers/AVE_Emblem.png', ex, ey, 30,
-              [key(0.16, 0.0), key(0.34, 1.0, ease='smooth'), key(FADE0, 1.0), key(FADE1, 0.0, ease='smooth')]),
+              [key(0.16, 0.0), key(0.34, 1.0, ease='smooth'), key(FADE0, 1.0), key(FADE1, 0.0, ease=out)]),
         layer('emblemFlash', 'Layers/AVE_EmblemFlash.png', ex, ey, 32,
-              [key(0.22, 0.0), key(0.32, 0.55, ease='smooth'), key(0.50, 0.0, ease='smooth'),
-               key(1.64, 0.0), key(1.76, 0.4, ease='smooth'), key(1.90, 0.0, ease='smooth')]),
+              [key(0.22, 0.0), key(0.30, 0.6, ease='smooth'), key(0.46, 0.0, ease='smooth'),
+               key(1.62, 0.0), key(1.70, 0.55, ease='smooth'), key(1.80, 0.0, ease='smooth')]),
         layer('emblemOutlineGlow', 'Layers/AVE_EmblemOutlineGlow.png', ex - 2, ey - 2, 33,
-              [key(0.24, 0.0), key(0.34, 0.9, ease='smooth'), key(0.60, 0.0, ease='smooth'),
-               key(1.62, 0.0), key(1.72, 0.6, ease='smooth'), key(1.86, 0.0, ease='smooth')]),
-        layer('emblemTrace', '', ex - 2, ey - 2, 34, [key(0.0, 0.0), key(0.05, 1.0, ease='outCubic')],
-              frames=trace_paths, frame_start=tr0, frame_end=tr0 + n_tr * F, after='hide'),
+              [key(0.24, 0.0), key(0.34, 0.7, ease='smooth'), key(0.60, 0.0, ease='smooth'),
+               key(1.60, 0.0), key(1.68, 0.6, ease='smooth'), key(1.78, 0.0, ease='smooth')]),
+        layer('emblemTrace', '', ex - 2, ey - 2, 34,
+              [key(0.0, 0.0), key(0.05, 1.0, ease='outCubic'), key(tr0 + n_tr * F, 1.0), key(0.36, 0.0, ease='smooth')],
+              frames=trace_paths, frame_start=tr0, frame_end=tr0 + n_tr * F, after='hold'),
         layer('wordmark', 'Layers/AVE_Wordmark.png', wx, wy, 40,
-              [key(0.35, 0.0, dy=1.0), key(0.44, 0.25, dy=1.0), key(0.445, 0.27, dy=0.0, ease='step'),
-               key(0.80, 1.0, ease='outCubic'), key(FADE0, 1.0), key(FADE1, 0.0, ease='smooth')]),
+              [key(0.35, 0.0), key(0.80, 1.0, ease='outCubic'), key(FADE0, 1.0), key(FADE1, 0.0, ease=out)]),
         layer('wordmarkFlash', 'Layers/AVE_WordmarkFlash.png', wx, wy, 41,
-              [key(0.36, 0.0, dy=1.0), key(0.44, 0.5, dy=1.0, ease='smooth'), key(0.445, 0.5, dy=0.0, ease='step'),
-               key(0.62, 0.0, ease='smooth'),
-               key(1.66, 0.0), key(1.78, 0.4, ease='smooth'), key(1.92, 0.0, ease='smooth')]),
+              [key(0.38, 0.0), key(0.45, 0.65, ease='smooth'), key(0.60, 0.0, ease='smooth'),
+               key(1.62, 0.0), key(1.70, 0.6, ease='smooth'), key(1.80, 0.0, ease='smooth')]),
         layer('wordmarkShine', '', wx, wy, 42, [key(0.0, 1.0)],
               frames=shine_paths, frame_start=sh0, frame_end=sh0 + n_sh * F, after='hide'),
         layer('subtitle', 'Layers/AVE_Subtitle.png', sx, sy, 50,
-              [key(1.15, 0.0, dy=1.0), key(1.22, 0.22, dy=1.0), key(1.225, 0.24, dy=0.0, ease='step'),
-               key(1.45, 1.0, ease='outCubic'), key(FADE0, 1.0), key(FADE1, 0.0, ease='smooth')]),
+              [key(1.15, 0.0), key(1.45, 1.0, ease='outCubic'), key(FADE0, 1.0), key(FADE1, 0.0, ease=out)]),
         layer('glint', '', apex_x - 8, apex_y - 8, 110, [key(0.0, 1.0)],
               frames=glint_paths, frame_start=gl0, frame_end=gl0 + n_gl * F, after='hide'),
     ]
@@ -192,23 +191,23 @@ def build(seed=2026):
                   x=ex + x0 + ux * 4, y=ey + y0 + uy * 4, vx=ux * sp, vy=uy * sp - rnd.uniform(4, 9), ay=6.0,
                   alpha=0.9, fadeIn=0.15, fadeOut=0.6)
 
-    lock_x0 = min(wx, sx)                        # horizontal extent of the lettering
-    lock_x1 = max(wx + wm.w, sx + sub.w)
+    tip_l = (sx + 1, sy + 7)                  # outer end of the left ornament rule
+    tip_r = (sx + sub.w - 2, sy + 7)          # outer end of the right ornament rule
 
-    def ember(i, n):  # phase 3: a few embers beside the lockup and smouldering just below the subtitle
+    def ember(i, n):  # phase 3: embers thrown off the ornament tips and smouldering under the baseline
         mode = i % 3
         if mode == 0:
-            x0, y0 = rnd.uniform(lock_x0 - 26, lock_x0 - 6), rnd.uniform(sy - 14, sy + 10)
-            vx, vy = rnd.uniform(-8, 1), rnd.uniform(-28, -12)
+            x0, y0 = tip_l[0] + rnd.uniform(-3, 0), tip_l[1] + rnd.uniform(-1, 2)
+            vx, vy, ay = rnd.uniform(-14, -6), rnd.uniform(-9, -4), 6.0
         elif mode == 1:
-            x0, y0 = rnd.uniform(lock_x1 + 6, lock_x1 + 26), rnd.uniform(sy - 14, sy + 10)
-            vx, vy = rnd.uniform(-1, 8), rnd.uniform(-28, -12)
+            x0, y0 = tip_r[0] + rnd.uniform(0, 3), tip_r[1] + rnd.uniform(-1, 2)
+            vx, vy, ay = rnd.uniform(6, 14), rnd.uniform(-9, -4), 6.0
         else:
-            x0, y0 = rnd.uniform(sx + 20, sx + sub.w - 20), sy + sub.h + rnd.uniform(3, 9)
-            vx, vy = rnd.uniform(-6, 6), rnd.uniform(-7, -2)
+            x0, y0 = rnd.uniform(sx + 24, sx + sub.w - 24), sy + sub.h + rnd.uniform(1, 4)
+            vx, vy, ay = rnd.uniform(-5, 5), rnd.uniform(-4, -1), 0.0
         t0 = 1.15 + 0.40 * i / max(1, n - 1) + rnd.uniform(-0.02, 0.02)
-        return _p(sprite=rnd.choice([0, 1, 2, 2, 3]), t0=t0, life=min(rnd.uniform(0.40, 0.70), 1.97 - t0),
-                  x=x0, y=y0, vx=vx, vy=vy, ay=8.0 if mode < 2 else 0.0, alpha=1.0, fadeIn=0.15, fadeOut=0.55)
+        return _p(sprite=rnd.choice([0, 1, 2, 2, 3]), t0=t0, life=min(rnd.uniform(0.35, 0.60), 1.95 - t0),
+                  x=x0, y=y0, vx=vx, vy=vy, ay=ay, alpha=1.0, fadeIn=0.15, fadeOut=0.55)
 
     def accent(i, n):  # phase 4: a few gold motes released beside the emblem as the accent passes
         side = -1 if i % 2 == 0 else 1

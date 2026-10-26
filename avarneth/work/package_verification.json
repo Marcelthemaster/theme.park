@@ -5,11 +5,11 @@
  ],
  "sha256_check": [
   true,
-  "499 Einträge, sha256sum -c: alle OK"
+  "511 Einträge, sha256sum -c: alle OK"
  ],
  "complete": [
   true,
-  "500 Dateien im ZIP, 500 im Quellordner"
+  "512 Dateien im ZIP, 512 im Quellordner"
  ],
  "no_zero_bytes": [
   true,
@@ -17,12 +17,12 @@
  ],
  "readable": [
   true,
-  "alle 500 Dateien nach dem Entpacken geöffnet/geparst; Fehler: keine"
+  "alle 512 Dateien nach dem Entpacken geöffnet/geparst; Fehler: keine"
  ],
  "docs": [
   true,
   "vorhanden: ['README.md', 'BRAND_GUIDELINES.md', 'UNITY_INSTALLATION.md', 'PLAYER_SETTINGS.md', 'ANIMATION_SPECIFICATION.md', 'QA_REPORT.md', 'UNITY_COMPILE_EVIDENCE.md']"
  ],
- "zip_size": 6790817,
- "zip_sha256": "00f4187d74fb22f9a179c54693980fe991a04de3d5e5c1611dd92f3f4139dc53"
+ "zip_size": 6556932,
+ "zip_sha256": "2d4bd4ce7b83466d5714468b1d982dc7eb632876379b49592037bc2f7a542c34"
 }

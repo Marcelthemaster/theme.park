@@ -22,7 +22,7 @@ Alle Grafiken sind echte Pixel-Art auf nativem Raster (keine Fotos, keine Filter
 |---|---|
 | `01_Brand_Identity/` | Wortmarke, vollständiger Titel, Publisher-Präsentation, Wappen, Untertitel, Publisher (×4) · `Source_Files/` mit 1×/2×/8×, Palette, Pixelmaps, Generator-Quellcode |
 | `02_Logo_Variants/` | 3 Designrichtungen (Classic Fantasy, Dark Fantasy, **Magic & Iron = Produktionsstandard**) inkl. Übersicht |
-| `03_Windows_Icons/` | `AVARNETH.ico` (15 Größen 16–256 inkl. Windows-Zwischengrößen), PNG 16/24/32/48/64/128/256/512, `Extra/` (20/30/36/40/60/72/80/96/1024) |
+| `03_Windows_Icons/` | `AVARNETH.ico` (22 Größen 16–256 inkl. aller Windows-Skalierungsgrößen), PNG 16/24/32/48/64/128/256/512, `Extra/` (alle übrigen Größen inkl. 1024) |
 | `04_Animated_Startup/` | Logo- und Effekt-Layer, Partikel, Sprite-Sheets (+JSON), transparente Animationsframes, `Animation_Timeline.json` |
 | `05_Unity_Integration/` | `Runtime/AvarnethStartupAnimation.cs` (+ `AvarnethStartupTimelineMath.cs`, asmdef), `Editor/AvarnethStartupInstaller.cs` (+ asmdef), `Importable_Assets/` |
 | `06_Previews/` | MP4 (1920×1080, 60 fps), GIF, Logo-Standbilder, Icon-Vorschau, Kontaktbogen |

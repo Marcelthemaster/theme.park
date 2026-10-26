@@ -123,10 +123,10 @@
   "layerId": "emblemTrace",
   "timelineStart": 0.0,
   "timelineEnd": 0.2667,
-  "afterFrames": "hide",
+  "afterFrames": "hold",
   "positionArtPx": [
     206,
-    71
+    70
   ],
   "note": "Frames are evenly distributed over [timelineStart, timelineEnd) - see Animation_Timeline.json."
 }

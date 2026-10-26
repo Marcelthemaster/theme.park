@@ -82,12 +82,14 @@ werden; der Untertitel ist separat ein- und ausblendbar.
 ## 2. Konzept – „Das Glut-Tor“
 
 * **Schild:** geschmiedeter Wappenschild – Außenrahmen aus dunklem Eisen, Innenrand aus Altgold mit Nieten,
-  das Feld eine genietete Eisenplatte mit Plattenfuge und dezent eingeprägtem Gebirgsrelief.
-* **Das A als Festung:** Zwei goldene Flanken bilden das **A** von AVARNETH; ihr Gipfel durchbricht den
-  Schildrand nach oben. Im oberen Innenraum steht ein **Bergfried mit Zinnen und zwei arkanen Lanzettfenstern**
-  (der einzige kühle Magie-Akzent), der goldene Querbalken ist der **Sturz** über dem Tor.
-* **Monumentales Tor:** im Quadermauerwerk unter dem Sturz – ein **eisernes Fallgitter vor glühender Glut**
-  (sauberer 4-stufiger Glutverlauf, kein Dithering).
+  das Feld eine genietete Eisenplatte mit Plattenfuge.
+* **Das A als Festungsrahmen:** Zwei goldene Flanken bilden das **A** von AVARNETH; ihr Gipfel durchbricht den
+  Schildrand nach oben. Im oberen Innenraum steht ein **schlanker Bergfried** mit drei Zinnen und einer dunklen
+  Schießscharte; der goldene Querbalken ist der **Sturz**, in den eine **arkane Rune** eingelassen ist (der einzige
+  kühle Magie-Akzent).
+* **Torbau:** unter dem Sturz ein rechteckiger, zinnenbewehrter Torbau aus Quadermauerwerk, durch einen dunklen
+  Raum von den A-Schenkeln getrennt; darin das **eiserne Fallgitter** (Stäbe mit Spitzen) vor dunkler Glut mit
+  hellem Kern am Torfuß.
 * **Glutstein:** klein und bündig in die Schildspitze gesetzt – das Siegel der Marke.
 
 Industrielle Fantasy (Schmiede, Eisen, Nieten, Glut) ohne Science-Fiction-Anmutung; keine Neonfarben.
@@ -117,7 +119,9 @@ Licht kommt immer von oben links; alle Flächen sind regionsweise monoton schatt
 * **Schutzzone:** mindestens ½ X (16 Kunst-Pixel) rund um jede Logo-Variante frei von anderen Elementen.
 * **Wortmarke:** nie kleiner als nativ 1× ({wm[0]}×{wm[1]} px). Für kleinere Flächen das Wappen bzw. die Icons verwenden.
 * **Wappen:** nativ {em[0]}×{em[1]} px; für 48/64 px die Icon-Fassung (`03_Windows_Icons/AVARNETH_48/64.png`),
-  darunter ausschließlich die pro Größe gezeichneten Kleinst-Fassungen (40, 36, 32, 30, 24, 20, 16 px).
+  darunter ausschließlich die pro Größe gezeichneten Kleinst-Fassungen (42, 40, 36, 32, 30, 28, 24, 20, 16 px).
+* **Helle Hintergründe:** Lockups mit Untertitel/Publisher nie direkt auf hellen Grund setzen – immer auf dunkler
+  Fläche oder mit dem Abdunkelungs-Layer (die 1-px-Konturen sind für dunkle Szenen ausgelegt).
 * **Untertitel** nie ohne Wortmarke als Spieltitel verwenden; immer unterhalb und kleiner als AVARNETH.
 
 ## 5. Farben
@@ -153,8 +157,10 @@ Lichtrichtung in allen Assets: **oben links**. Konturen: `iron0` (#07070b). Kein
 
 ## 8. Designrichtungen
 
-Alle drei Richtungen teilen exakt dieselbe Geometrie; nur die Materialien wechseln (exaktes Paletten-Remapping,
-jedes Pixel bleibt eine Palettenfarbe). Übersicht: `02_Logo_Variants/Variants_Overview.png`.
+Alle drei Richtungen teilen bewusst exakt dieselbe Geometrie (der Brief verlangt, dass sie auf derselben
+Markenidentität beruhen) – sie sind **Material- und Farbwelten**, keine abweichenden Logo-Konzepte: exaktes
+Paletten-Remapping (jedes Pixel bleibt eine Palettenfarbe) plus eigene Extrusionstiefe.
+Übersicht: `02_Logo_Variants/Variants_Overview.png`.
 
 ![Designrichtungen](../02_Logo_Variants/Variants_Overview.png)
 
@@ -169,16 +175,19 @@ Vorschauen verwendet. Die beiden anderen Richtungen liegen als statische Alterna
 
 ## 9. Windows-Icon
 
-`03_Windows_Icons/AVARNETH.ico` enthält **15 Größen**: 16, 20, 24, 30, 32, 36, 40, 48, 60, 64, 72, 80, 96, 128, 256 px
-(bis 128 als 32-bit-DIB mit Alpha und AND-Maske, 256 als PNG). Damit muss Windows auch bei 125 %/150 %-Skalierung
-(20/30/36/40/60/72 px) nicht weichzeichnen.
+`03_Windows_Icons/AVARNETH.ico` enthält **22 Größen**: 16, 20, 24, 28, 30, 32, 36, 40, 42, 48, 56, 60, 64, 72, 80, 84, 96,
+120, 128, 144, 192, 256 px (bis 96 px als 32-bit-DIB mit Alpha und AND-Maske, ab 120 px PNG-komprimiert). Damit muss
+Windows bei 100/125/150/175/200 % Skalierung und in den „Große Symbole“-Ansichten nicht weichzeichnen.
 
-* 16, 20, 24, 30, 32, 36, 40 px: pro Größe auf dem Pixelraster gezeichnete Kleinst-Fassung – ein geschlossener Schild
-  mit mittelgrauer Eisenplatte (bleibt auf dunkler Taskleiste sichtbar), beide A-Schenkel klar golden, dunkler
-  Innenraum mit arkanem Fenster, Tor mit Glutkern; keine Funken, kein Anhänger.
+* 16, 20, 24, 28, 30, 32, 36, 40, 42 px: pro Größe auf dem Pixelraster gezeichnete Kleinst-Fassung – ein geschlossener
+  Schild mit mittelgrauer Eisenplatte (bleibt auf dunkler Taskleiste sichtbar), beide A-Schenkel klar golden, Rune im
+  Querbalken, ab 28 px Bergfried mit Schießscharte, Tor mit Glut nur am Fuß; keine Funken.
 * 48/64 px: Icon-Fassung des Wappens (hellere Platte und rechte Seite).
-* Alle übrigen Größen sind exakte Ganzzahl-Vielfache: 60 = 20×3, 72 = 24×3, 80 = 40×2, 96 = 48×2, 128/256/512/1024 = 64×2/4/8/16.
-* PNG-Einzeldateien: 16/24/32/48/64/128/256/512 im Hauptordner, alle Zwischengrößen und 1024 in `Extra/`.
+* Alle übrigen Größen sind exakte Ganzzahl-Vielfache der feineren Zeichnungen: 56 = 28×2, 60 = 30×2, 72 = 36×2,
+  80 = 40×2, 84 = 42×2, 96 = 48×2, 120 = 30×4, 144 = 36×4, 192 = 48×4, 128/256/512/1024 = 64×2/4/8/16.
+* **Wichtig für die Spiel-EXE:** Unity erzeugt das EXE-Icon nur aus den Icon-Slots der Player Settings (wenige Größen);
+  für ein EXE-Icon ohne Weichzeichnung siehe den optionalen Release-Schritt in `PLAYER_SETTINGS.md` (ICO ins EXE schreiben).
+* PNG-Einzeldateien: 16/24/32/48/64/128/256/512 im Hauptordner, alle übrigen Größen (inkl. 1024) in `Extra/`.
 """
 
 
@@ -230,10 +239,10 @@ kein Ladebildschirm – nur Sprites, die per Code animiert werden.
 
 | Zeit | Phase | Inhalt |
 |---|---|---|
-| 0.00–0.35 s | 1 – Wappen | Eine goldene Lichtlinie zeichnet in 12 Frames (je 1/60 s) die Wappen-Silhouette von der Turmspitze beidseitig bis zur Schildspitze, danach in 4 Frames die beiden A-Schenkel und den Querbalken. Erst wenn die Linie geschlossen ist, blendet die Füllung ein (0.16–0.34 s); kurzes Aufleuchten nur der hellen Flächen, Kontur-Glühen außerhalb der Kontur, 8 Goldfunken lösen sich vom Rand. |
-| 0.35–1.15 s | 2 – Wortmarke | Licht führt: Glanzlicht auf den Goldflächen (0.36–0.62 s) während AVARNETH einblendet; ein einziger 1-Kunst-Pixel-Setzschritt bei geringer Deckkraft (0.445 s); goldener Lichtstreif 0.63–1.10 s (28 Frames à 1/60 s, auf die Goldflächen maskiert). Publisher-Zeile blendet dezent auf 65 % ein (0.30–0.60 s). |
-| 1.15–1.60 s | 3 – Untertitel | VEIL OF EMBERS blendet ein (1-px-Setzschritt bei geringer Deckkraft), 12 Glutpartikel steigen seitlich der Schrift auf bzw. glimmen unter dem Untertitel – kein Partikel kreuzt Schrift oder Wappen. |
-| 1.60–2.00 s | 4 – Akzent & Ausblendung | Gestaffelter Lichtakzent: Glint an der Turmspitze (1.58 s), Kontur-Glühen (1.62 s), Wappen-Glanz (1.64 s), Wortmarken-Glanz (1.66 s), je ≥ 0.10 s weich an- und abschwellend; ab 1.74 s weiches Ausblenden aller Ebenen bis 2.00 s. Der Login-Bootstrap bleibt die ganze Zeit sichtbar (nur abgedunkelt durch `AVE_Veil`). |
+| 0.00–0.35 s | 1 – Wappen | Eine goldene Lichtlinie zeichnet in 12 Frames (je 1/60 s) die Wappen-Silhouette von der Turmspitze beidseitig bis zur Schildspitze, danach in 4 Frames die A-Schenkel und den Querbalken; das letzte Bild bleibt stehen und löst sich bis 0.36 s weich auf. Die Füllung blendet erst ab 0.16 s ein; kurzes Aufleuchten (helle Flächen 2 Rampenstufen heller), warmes Kontur-Glühen außerhalb der Kontur, 8 Goldfunken lösen sich vom Rand. |
+| 0.35–1.15 s | 2 – Wortmarke | Licht führt: Die Goldflächen leuchten 0.38–0.60 s über ihren Endzustand hinaus, während AVARNETH in einer einzigen weichen Kurve einblendet (keine Positionssprünge). Goldener Lichtstreif 0.63–1.10 s (28 Frames à 1/60 s, hebt die Goldflächen um 1–2 Rampenstufen an, nie dunkler). Publisher-Zeile blendet dezent auf 65 % ein (0.30–0.60 s). |
+| 1.15–1.60 s | 3 – Untertitel | VEIL OF EMBERS blendet in einer weichen Kurve ein; 12 Glutpartikel lösen sich von den Enden der Ornament-Linien bzw. glimmen unter der Grundlinie – kein Partikel kreuzt Schrift oder Wappen. |
+| 1.60–2.00 s | 4 – Akzent & Ausblendung | Gestaffelter Lichtakzent mit Höhepunkt vor dem Ausblenden: Glint an der Turmspitze (1.60–1.73 s), Kontur-Glühen (Spitze 1.68 s), Wappen- und Wortmarken-Glanz (Spitze 1.70 s). Ab 1.76 s blenden die Logo-Ebenen mit inCubic aus (bleiben lange satt und durchlaufen die halbtransparenten Zwischenstufen schnell), die Abdunkelung ab 1.74 s. Der Login-Bootstrap bleibt die ganze Zeit sichtbar. |
 
 ## 3. Ebenen (Render-Reihenfolge aufsteigend; Partikel liegen zwischen order < 100 und ≥ 100)
 
@@ -315,7 +324,7 @@ Alle Grafiken sind echte Pixel-Art auf nativem Raster (keine Fotos, keine Filter
 |---|---|
 | `01_Brand_Identity/` | Wortmarke, vollständiger Titel, Publisher-Präsentation, Wappen, Untertitel, Publisher (×4) · `Source_Files/` mit 1×/2×/8×, Palette, Pixelmaps, Generator-Quellcode |
 | `02_Logo_Variants/` | 3 Designrichtungen (Classic Fantasy, Dark Fantasy, **Magic & Iron = Produktionsstandard**) inkl. Übersicht |
-| `03_Windows_Icons/` | `AVARNETH.ico` (15 Größen 16–256 inkl. Windows-Zwischengrößen), PNG 16/24/32/48/64/128/256/512, `Extra/` (20/30/36/40/60/72/80/96/1024) |
+| `03_Windows_Icons/` | `AVARNETH.ico` (22 Größen 16–256 inkl. aller Windows-Skalierungsgrößen), PNG 16/24/32/48/64/128/256/512, `Extra/` (alle übrigen Größen inkl. 1024) |
 | `04_Animated_Startup/` | Logo- und Effekt-Layer, Partikel, Sprite-Sheets (+JSON), transparente Animationsframes, `Animation_Timeline.json` |
 | `05_Unity_Integration/` | `Runtime/AvarnethStartupAnimation.cs` (+ `AvarnethStartupTimelineMath.cs`, asmdef), `Editor/AvarnethStartupInstaller.cs` (+ asmdef), `Importable_Assets/` |
 | `06_Previews/` | MP4 (1920×1080, 60 fps), GIF, Logo-Standbilder, Icon-Vorschau, Kontaktbogen |

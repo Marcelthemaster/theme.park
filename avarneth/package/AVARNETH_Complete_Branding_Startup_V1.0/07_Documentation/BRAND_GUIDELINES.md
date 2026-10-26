@@ -21,12 +21,14 @@ werden; der Untertitel ist separat ein- und ausblendbar.
 ## 2. Konzept – „Das Glut-Tor“
 
 * **Schild:** geschmiedeter Wappenschild – Außenrahmen aus dunklem Eisen, Innenrand aus Altgold mit Nieten,
-  das Feld eine genietete Eisenplatte mit Plattenfuge und dezent eingeprägtem Gebirgsrelief.
-* **Das A als Festung:** Zwei goldene Flanken bilden das **A** von AVARNETH; ihr Gipfel durchbricht den
-  Schildrand nach oben. Im oberen Innenraum steht ein **Bergfried mit Zinnen und zwei arkanen Lanzettfenstern**
-  (der einzige kühle Magie-Akzent), der goldene Querbalken ist der **Sturz** über dem Tor.
-* **Monumentales Tor:** im Quadermauerwerk unter dem Sturz – ein **eisernes Fallgitter vor glühender Glut**
-  (sauberer 4-stufiger Glutverlauf, kein Dithering).
+  das Feld eine genietete Eisenplatte mit Plattenfuge.
+* **Das A als Festungsrahmen:** Zwei goldene Flanken bilden das **A** von AVARNETH; ihr Gipfel durchbricht den
+  Schildrand nach oben. Im oberen Innenraum steht ein **schlanker Bergfried** mit drei Zinnen und einer dunklen
+  Schießscharte; der goldene Querbalken ist der **Sturz**, in den eine **arkane Rune** eingelassen ist (der einzige
+  kühle Magie-Akzent).
+* **Torbau:** unter dem Sturz ein rechteckiger, zinnenbewehrter Torbau aus Quadermauerwerk, durch einen dunklen
+  Raum von den A-Schenkeln getrennt; darin das **eiserne Fallgitter** (Stäbe mit Spitzen) vor dunkler Glut mit
+  hellem Kern am Torfuß.
 * **Glutstein:** klein und bündig in die Schildspitze gesetzt – das Siegel der Marke.
 
 Industrielle Fantasy (Schmiede, Eisen, Nieten, Glut) ohne Science-Fiction-Anmutung; keine Neonfarben.
@@ -36,15 +38,15 @@ Licht kommt immer von oben links; alle Flächen sind regionsweise monoton schatt
 
 | Variante | Datei (1080p-Export ×4) | nativ (1×) | ×4 |
 |---|---|---|---|
-| A – Hauptlogo (Wortmarke) | `01_Brand_Identity/AVARNETH_Logo.png` | 223×48 | 892×192 |
-| A – Hauptlogo mit optionalem Wappen | `01_Brand_Identity/AVARNETH_Logo_With_Emblem.png` | 223×124 | 892×496 |
-| B – Vollständiger Titel mit Wappen | `01_Brand_Identity/AVARNETH_Complete_Logo.png` | 223×142 | 892×568 |
-| C – Publisher-Präsentation | `01_Brand_Identity/AVARNETH_Publisher_Presentation.png` | 223×161 | 892×644 |
+| A – Hauptlogo (Wortmarke) | `01_Brand_Identity/AVARNETH_Logo.png` | 221×47 | 884×188 |
+| A – Hauptlogo mit optionalem Wappen | `01_Brand_Identity/AVARNETH_Logo_With_Emblem.png` | 221×123 | 884×492 |
+| B – Vollständiger Titel mit Wappen | `01_Brand_Identity/AVARNETH_Complete_Logo.png` | 221×141 | 884×564 |
+| C – Publisher-Präsentation | `01_Brand_Identity/AVARNETH_Publisher_Presentation.png` | 221×158 | 884×632 |
 | D – Wappen / Emblem | `01_Brand_Identity/AVARNETH_Emblem.png` | 71×80 | 284×320 |
 | Untertitel (mit Glut-Ornamenten) | `01_Brand_Identity/AVARNETH_VeilOfEmbers.png` | 193×22 | 772×88 |
 | Untertitel (ohne Ornamente) | `01_Brand_Identity/AVARNETH_VeilOfEmbers_Plain.png` | 135×22 | 540×88 |
-| Publisher-Zeile | `01_Brand_Identity/Eckertengineering_Presents.png` | 123×18 | 492×72 |
-| Publisher-Kennung | `01_Brand_Identity/Eckertengineering.png` | 99×18 | 396×72 |
+| Publisher-Zeile | `01_Brand_Identity/Eckertengineering_Presents.png` | 124×16 | 496×64 |
+| Publisher-Kennung | `01_Brand_Identity/Eckertengineering.png` | 101×16 | 404×64 |
 
 * `Source_Files/native_1x/` = Pixel-Master (1 Kunst-Pixel = 1 Bildpixel), `exports_2x/`, `exports_8x/` für andere Zielgrößen.
 * Die Wortmarke ist **keine Schrift**: alle Buchstaben sind eigens konstruiert (3:1-Diagonalen bei A/V, 2:1 bei N/R,
@@ -62,9 +64,11 @@ Licht kommt immer von oben links; alle Flächen sind regionsweise monoton schatt
 
 * **Maßeinheit X** = Versalhöhe der Wortmarke = 32 Kunst-Pixel (1×).
 * **Schutzzone:** mindestens ½ X (16 Kunst-Pixel) rund um jede Logo-Variante frei von anderen Elementen.
-* **Wortmarke:** nie kleiner als nativ 1× (223×48 px). Für kleinere Flächen das Wappen bzw. die Icons verwenden.
+* **Wortmarke:** nie kleiner als nativ 1× (221×47 px). Für kleinere Flächen das Wappen bzw. die Icons verwenden.
 * **Wappen:** nativ 71×80 px; für 48/64 px die Icon-Fassung (`03_Windows_Icons/AVARNETH_48/64.png`),
-  darunter ausschließlich die pro Größe gezeichneten Kleinst-Fassungen (40, 36, 32, 30, 24, 20, 16 px).
+  darunter ausschließlich die pro Größe gezeichneten Kleinst-Fassungen (42, 40, 36, 32, 30, 28, 24, 20, 16 px).
+* **Helle Hintergründe:** Lockups mit Untertitel/Publisher nie direkt auf hellen Grund setzen – immer auf dunkler
+  Fläche oder mit dem Abdunkelungs-Layer (die 1-px-Konturen sind für dunkle Szenen ausgelegt).
 * **Untertitel** nie ohne Wortmarke als Spieltitel verwenden; immer unterhalb und kleiner als AVARNETH.
 
 ## 5. Farben
@@ -104,29 +108,34 @@ Lichtrichtung in allen Assets: **oben links**. Konturen: `iron0` (#07070b). Kein
 
 ## 8. Designrichtungen
 
-Alle drei Richtungen teilen exakt dieselbe Geometrie; nur die Materialien wechseln (exaktes Paletten-Remapping,
-jedes Pixel bleibt eine Palettenfarbe). Übersicht: `02_Logo_Variants/Variants_Overview.png`.
+Alle drei Richtungen teilen bewusst exakt dieselbe Geometrie (der Brief verlangt, dass sie auf derselben
+Markenidentität beruhen) – sie sind **Material- und Farbwelten**, keine abweichenden Logo-Konzepte: exaktes
+Paletten-Remapping (jedes Pixel bleibt eine Palettenfarbe) plus eigene Extrusionstiefe.
+Übersicht: `02_Logo_Variants/Variants_Overview.png`.
 
 ![Designrichtungen](../02_Logo_Variants/Variants_Overview.png)
 
 | Richtung | Ordner | Charakter |
 |---|---|---|
 | **Magic & Iron (Produktionsstandard)** | `02_Logo_Variants/Magic_And_Iron/` | Produktionsstandard – magische Eisen-/Schmiede-Fantasy: dunkles Eisen, Altgold, Glut, arkanes Blau; schlanke 2-px-Extrusion. |
-| Classic Fantasy | `02_Logo_Variants/Classic_Fantasy/` | Klassische Fantasy – heraldisches Königsblau mit hellem Gold und warmem Stein; 3-px-Extrusion in Blau. |
-| Dark Fantasy | `02_Logo_Variants/Dark_Fantasy/` | Dunkle, monumentale Fantasy – geschwärztes Silber, karmesinrote Glut, tieferer Stein; schwere 4-px-Extrusion. |
+| Classic Fantasy | `02_Logo_Variants/Classic_Fantasy/` | Klassische Fantasy – grünspan-patinierte Bronzeplatten mit hellem Gold und warmem Stein; 3-px-Extrusion in Patina. |
+| Dark Fantasy | `02_Logo_Variants/Dark_Fantasy/` | Dunkle, monumentale Fantasy – geschwärztes Eisen, Gold nur an den Lichtkanten, Glut im Tor; schwere 4-px-Extrusion. |
 
 **Produktionsstandard ist „Magic & Iron“** – er ist vollständig animiert, als Unity-Assets exportiert und in allen
 Vorschauen verwendet. Die beiden anderen Richtungen liegen als statische Alternativen vor.
 
 ## 9. Windows-Icon
 
-`03_Windows_Icons/AVARNETH.ico` enthält **15 Größen**: 16, 20, 24, 30, 32, 36, 40, 48, 60, 64, 72, 80, 96, 128, 256 px
-(bis 128 als 32-bit-DIB mit Alpha und AND-Maske, 256 als PNG). Damit muss Windows auch bei 125 %/150 %-Skalierung
-(20/30/36/40/60/72 px) nicht weichzeichnen.
+`03_Windows_Icons/AVARNETH.ico` enthält **22 Größen**: 16, 20, 24, 28, 30, 32, 36, 40, 42, 48, 56, 60, 64, 72, 80, 84, 96,
+120, 128, 144, 192, 256 px (bis 96 px als 32-bit-DIB mit Alpha und AND-Maske, ab 120 px PNG-komprimiert). Damit muss
+Windows bei 100/125/150/175/200 % Skalierung und in den „Große Symbole“-Ansichten nicht weichzeichnen.
 
-* 16, 20, 24, 30, 32, 36, 40 px: pro Größe auf dem Pixelraster gezeichnete Kleinst-Fassung – ein geschlossener Schild
-  mit mittelgrauer Eisenplatte (bleibt auf dunkler Taskleiste sichtbar), beide A-Schenkel klar golden, dunkler
-  Innenraum mit arkanem Fenster, Tor mit Glutkern; keine Funken, kein Anhänger.
+* 16, 20, 24, 28, 30, 32, 36, 40, 42 px: pro Größe auf dem Pixelraster gezeichnete Kleinst-Fassung – ein geschlossener
+  Schild mit mittelgrauer Eisenplatte (bleibt auf dunkler Taskleiste sichtbar), beide A-Schenkel klar golden, Rune im
+  Querbalken, ab 28 px Bergfried mit Schießscharte, Tor mit Glut nur am Fuß; keine Funken.
 * 48/64 px: Icon-Fassung des Wappens (hellere Platte und rechte Seite).
-* Alle übrigen Größen sind exakte Ganzzahl-Vielfache: 60 = 20×3, 72 = 24×3, 80 = 40×2, 96 = 48×2, 128/256/512/1024 = 64×2/4/8/16.
-* PNG-Einzeldateien: 16/24/32/48/64/128/256/512 im Hauptordner, alle Zwischengrößen und 1024 in `Extra/`.
+* Alle übrigen Größen sind exakte Ganzzahl-Vielfache der feineren Zeichnungen: 56 = 28×2, 60 = 30×2, 72 = 36×2,
+  80 = 40×2, 84 = 42×2, 96 = 48×2, 120 = 30×4, 144 = 36×4, 192 = 48×4, 128/256/512/1024 = 64×2/4/8/16.
+* **Wichtig für die Spiel-EXE:** Unity erzeugt das EXE-Icon nur aus den Icon-Slots der Player Settings (wenige Größen);
+  für ein EXE-Icon ohne Weichzeichnung siehe den optionalen Release-Schritt in `PLAYER_SETTINGS.md` (ICO ins EXE schreiben).
+* PNG-Einzeldateien: 16/24/32/48/64/128/256/512 im Hauptordner, alle übrigen Größen (inkl. 1024) in `Extra/`.

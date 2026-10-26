@@ -130,7 +130,7 @@ SMALL5 = {
     'T': "###\n.#.\n.#.\n.#.\n.#.",
     'N': "#..#\n##.#\n#.##\n#..#\n#..#",
     'G': ".###\n#...\n#.##\n#..#\n.###",
-    'I': "#\n#\n#\n#\n#",
+    'I': "###\n.#.\n.#.\n.#.\n###",
     'P': "###.\n#..#\n###.\n#...\n#...",
     'S': ".##\n#..\n.#.\n..#\n##.",
     ' ': "..\n..\n..\n..\n..",
@@ -534,5 +534,6 @@ def styled(mask, face, top=None, bottom=None, edge=('iron', 0), shadow=('iron', 
         c.put(m & (Y == 0), col(*top))
     if bottom:
         c.put(m & (Y == h - 1), col(*bottom))
-    c.put(outline(m | sh), col(*edge))
+    if edge is not None:
+        c.put(outline(m | sh), col(*edge))
     return c

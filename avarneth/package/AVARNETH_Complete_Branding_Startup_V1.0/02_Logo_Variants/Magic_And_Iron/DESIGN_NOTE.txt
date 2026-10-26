@@ -1,3 +1,3 @@
 Produktionsstandard – magische Eisen-/Schmiede-Fantasy: dunkles Eisen, Altgold, Glut, arkanes Blau; schlanke 2-px-Extrusion.
 
-Gleiche Geometrie wie der Produktionsstandard (dieselbe Markenidentität); Material/Farbe per exaktem Paletten-Remapping und eigene Extrusionstiefe (siehe 07_Documentation/BRAND_GUIDELINES.md, Abschnitt 8).
+Designrichtung als Material-/Farbwelt: gleiche Geometrie wie der Produktionsstandard (bewusst dieselbe Markenidentität), Material und Farbe per exaktem Paletten-Remapping, eigene Extrusionstiefe. Keine abweichenden Logo-Konzepte (siehe 07_Documentation/BRAND_GUIDELINES.md, Abschnitt 8).

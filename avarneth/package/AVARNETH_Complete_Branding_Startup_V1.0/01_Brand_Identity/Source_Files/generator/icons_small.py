@@ -89,36 +89,40 @@ def build(size):
     upper = inner & (Y < y_c)
     lower = inner & (Y >= y_c + bt)
     c.put(upper, col('iron', 1))
-    c.put(lower, col('stone', 4) if N >= 24 else col('iron', 1))
-    if N >= 24:
-        c.put(lower & (X > cx + 1), col('stone', 3))
+    c.put(lower, col('stone', 4))
+    c.put(lower & (X > cx + (1 if N < 24 else 1)), col('stone', 3))
 
-    # arcane window(s) in the upper counter
-    wy = y_c - (3 if N >= 30 else 2)
+    # keep tower in the upper counter (>= 30 px): slim stone block with a dark arrow slit
     if N >= 30:
-        for wx in (cx - 1, cx + 1):
-            c.put(rect_mask(Wc, H, wx, wy - 1, wx + 1, wy + 2) & upper, col('arcane', 5))
-            c.px(wx, wy - 1, col('arcane', 7))
-    elif N >= 20:
-        c.put(rect_mask(Wc, H, cx, wy - 1, cx + 1, wy + 1) & upper, col('arcane', 5))
-        c.px(cx, wy - 1, col('arcane', 7))
-    else:
-        c.px(cx, wy, col('arcane', 6))
+        t_top = max(apex + lt + 3, y_c - 5)
+        tower = (np.abs(X - cx) <= 1) & (Y >= t_top) & (Y < y_c) & upper
+        c.put(tower, col('stone', 5))
+        c.put(tower & (X == cx + 1), col('stone', 3))
+        c.put(tower & (Y == t_top), col('stone', 7))
+        c.px(cx, t_top, col('iron', 1))                       # crenel between two merlons
+        c.put(tower & (X == cx) & (Y >= y_c - 3) & (Y < y_c - 1), col('iron', 0))
 
-    # gate opening with ember core
-    g_top = y_c + bt + (1 if N >= 24 else 0)
+    # arcane rune set into the gold crossbar (the only cool accent)
+    if N >= 30:
+        for dx in (-1, 0, 1):
+            c.px(cx + dx, y_c, col('arcane', 5))
+        c.px(cx, y_c, col('arcane', 7))
+    else:
+        c.px(cx, y_c, col('arcane', 6))
+
+    # gate: dark arched opening, ember glow only at its foot
+    g_top = y_c + bt + 1
     gw = 1 if N < 30 else 2                          # half width of the opening
     gate = (np.abs(X - cx) <= gw) & (Y >= g_top) & (Y <= y_b) & inner
-    if N >= 24:
-        gate &= ~((Y == g_top) & (np.abs(X - cx) == gw))     # rounded arch corners
-    c.put(gate, col('ember', 3))
+    gate &= ~((Y == g_top) & (np.abs(X - cx) == gw))         # rounded arch corners
+    c.put(gate, col('ember', 1))
     t = (Y - g_top) / max(1, y_b - g_top)
-    c.put(gate & (t >= 0.34), col('ember', 5))
-    c.put(gate & (t >= 0.67), col('ember', 6))
+    c.put(gate & (t >= 0.5), col('ember', 3))
+    c.put(gate & (t >= 0.75) & (np.abs(X - cx) <= max(0, gw - 1)), col('ember', 6))
+    c.put(gate & (Y == y_b) & (X == cx), col('ember', 7))
     if N >= 30:
-        c.put(gate & (X == cx) & (t < 0.67), col('iron', 1))
-    if N >= 24:
-        c.put((outline(gate) & lower) & ~gate, col('stone', 6))
+        c.put(gate & (((X - cx) % 2) == 1) & (t < 0.75), col('iron', 4))
+    c.put((outline(gate) & lower) & ~gate, col('stone', 6))
 
     # dark separation around the A legs on the plate
     sep = outline(peak) & (plate2 if big else plate)
@@ -126,13 +130,14 @@ def build(size):
     by = y_b + 1
     k = leg_x(y_b)
     for x in range(cx - k, cx + k + 1):
-        if 0 <= by < H and (plate[by, x] or rim[by, x]):
+        if 0 <= by < H and (plate2 if big else plate)[by, x]:        # never across the gold rim
             c.px(x, by, col('iron', 1))
 
-    if N >= 30:
+    if N >= 30:                                                      # 2 px ember stone in the tip
         gy = y_b + 3
-        if gy < H - 2:
+        if gy + 1 < H - 1 and inside[gy + 1, cx]:
             c.px(cx, gy, col('ember', 7))
+            c.px(cx, gy + 1, col('ember', 4))
 
     # ---- global outline (shield + peak above it)
     m = c.alpha_mask()
@@ -142,7 +147,7 @@ def build(size):
     return out
 
 
-SIZES = (16, 20, 24, 30, 32, 36, 40)
+SIZES = (16, 20, 24, 28, 30, 32, 36, 40, 42)
 
 
 if __name__ == '__main__':

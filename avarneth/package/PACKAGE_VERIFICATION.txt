@@ -1,10 +1,10 @@
-AVARNETH_Complete_Branding_Startup_V1.0.zip - package verification (2026-10-26T17:17:30+00:00)
-zip size: 6790817 bytes
-zip sha256: 00f4187d74fb22f9a179c54693980fe991a04de3d5e5c1611dd92f3f4139dc53
+AVARNETH_Complete_Branding_Startup_V1.0.zip - package verification (2026-10-26T17:37:07+00:00)
+zip size: 6556932 bytes
+zip sha256: 2d4bd4ce7b83466d5714468b1d982dc7eb632876379b49592037bc2f7a542c34
 
 PASS  zip_test: No errors detected in compressed data of /home/user/theme.park/avarneth/package/AVARNETH_Complete_Branding_Startup_V1.0.zip.
-PASS  complete: 500 Dateien im ZIP, 500 im Quellordner
-PASS  readable: alle 500 Dateien nach dem Entpacken geöffnet/geparst; Fehler: keine
+PASS  complete: 512 Dateien im ZIP, 512 im Quellordner
+PASS  readable: alle 512 Dateien nach dem Entpacken geöffnet/geparst; Fehler: keine
 PASS  no_zero_bytes: Nullbyte-Dateien: keine
-PASS  sha256_check: 499 Einträge, sha256sum -c: alle OK
+PASS  sha256_check: 511 Einträge, sha256sum -c: alle OK
 PASS  docs: vorhanden: ['README.md', 'BRAND_GUIDELINES.md', 'UNITY_INSTALLATION.md', 'PLAYER_SETTINGS.md', 'ANIMATION_SPECIFICATION.md', 'QA_REPORT.md', 'UNITY_COMPILE_EVIDENCE.md']

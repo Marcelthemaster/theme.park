@@ -49,14 +49,14 @@ def _stem(polys, x0, w, top=True, foot=True, y0=0, y1=CAP):
 def _A():
     w = 27
     c = w / 2.0
-    apex = -4.0
-    t = 5.5                           # horizontal leg thickness
+    apex = -3.0
+    t = 4.5                           # horizontal leg thickness (open counters)
     outer = [(c, apex), (c + (CAP - apex) / 3.0, CAP), (c - (CAP - apex) / 3.0, CAP)]
     ia = apex + 3 * t
     inner = [(c, ia), (c + (CAP - ia) / 3.0, CAP + 0.01), (c - (CAP - ia) / 3.0, CAP + 0.01)]
     lx = c - (CAP - apex) / 3.0
-    bar = [[(0, 20), (w, 20), (w, 23), (0, 23)]]                       # crossbar (clipped to outer)
-    feet = [[(lx - 3, CAP), (lx + 1.2, CAP - 5), (lx + t + 1.2, CAP)]]  # left foot, mirrored
+    bar = [[(0, 21), (w, 21), (w, 24), (0, 24)]]                       # crossbar (clipped to outer)
+    feet = [[(lx - 2, CAP), (lx + 1.2, CAP - 5), (lx + t + 1.0, CAP)]]  # left foot, mirrored
     return {'w': w, 'sym': True, 'outer': outer, 'inner': inner, 'bar': bar, 'feet': feet}
 
 
@@ -104,7 +104,7 @@ def _E():
 
 
 def _T():
-    w = 27
+    w = 26                            # even width: mirror axis between two pixel columns
     c = w / 2.0
     polys = [[(0, 7), (0, 0), (c, 0), (c, 3), (2, 3)], [(0, 0), (c, 0), (c, THIN), (0, THIN)]]
     polys.append([(c - STEM / 2, 0), (c, 0), (c, CAP), (c - STEM / 2, CAP)])
@@ -113,7 +113,7 @@ def _T():
 
 
 def _H():
-    w = 29
+    w = 28                            # even width: mirror axis between two pixel columns
     c = w / 2.0
     polys = []
     _stem(polys, 3, STEM)
@@ -185,7 +185,7 @@ def layout(text, target=7.0, min_gap=2):
                 gp = _gaps(prev_only, cand, all_rows)
                 if not gp or min(gp) < min_gap:
                     continue
-                mean = np.mean(_gaps(prev_only, cand, cap_rows) or [99])
+                mean = np.mean(np.minimum(_gaps(prev_only, cand, cap_rows), 11) if _gaps(prev_only, cand, cap_rows) else [99])
                 if mean >= target:
                     best = off
                     break
@@ -221,16 +221,29 @@ def shade(mask, letters, ember_gates=EMBER_GATES, ext_depth=2):
     c = Canvas(W, H)
     Y = np.arange(H)[:, None].repeat(W, 1) - (UP + PAD)
 
-    # dark-iron extrusion: lit first row, darker rows below (production: 2 px)
+    # dark-iron extrusion (production: 2 px). It is cast only from downward-facing horizontal runs of
+    # at least 2 px, so the 1:3 diagonals do not get a 'tooth' on every stair step.
+    def runs(m):
+        left = np.zeros_like(m)
+        right = np.zeros_like(m)
+        left[:, 1:] = m[:, :-1]
+        right[:, :-1] = m[:, 1:]
+        return m & (left | right)
+
     ext = np.zeros_like(mask)
     acc = mask.copy()
+    src = mask.copy()
     for k in range(ext_depth):
+        below_empty = np.zeros_like(src)
+        below_empty[:-1] = ~acc[1:]
+        bottom = runs(src & below_empty)
         e = np.zeros_like(mask)
-        e[1:] = acc[:-1]
+        e[1:] = bottom[:-1]
         e &= ~acc
         c.put(e, col('iron', 4 if k == 0 else (2 if k == ext_depth - 1 else 3)))
         ext |= e
         acc |= e
+        src = e
     e1, e2 = ext, np.zeros_like(ext)
 
     nx, ny = normals(letters, H, W)
@@ -258,26 +271,24 @@ def shade(mask, letters, ember_gates=EMBER_GATES, ext_depth=2):
 
 
 def _ember_gates(c, mask, letters):
-    """A tiny glowing gate in the lower counter of every A (links wordmark and emblem)."""
+    """Ember heart: the two lowest rows of each A's upper counter glow like the emblem's gate."""
     oy = UP + PAD
     for ch, x, w in letters:
         if ch != 'A':
             continue
         cx = x + w // 2
-        y0, y1 = oy + 25, oy + CAP          # below the crossbar to the baseline
-        for y in range(y0, y1):
+        bar_top = oy + 21                     # crossbar top row (see _A)
+        for k, y in enumerate((bar_top - 2, bar_top - 1)):
             row = mask[y]
-            span = [xx for xx in range(cx - 8, cx + 9)
-                    if not row[xx] and any(row[xx - j] for j in range(1, 9)) and any(row[xx + j] for j in range(1, 9))]
+            span = [xx for xx in range(cx - 6, cx + 7) if not row[xx]]
+            span = [xx for xx in span if any(row[xx - j] for j in range(1, 7)) and any(row[xx + j] for j in range(1, 7))]
             if len(span) < 3:
                 continue
-            a, b = min(span) + 1, max(span) - 1           # keep a 1 px dark gap to the legs
-            rel = (y - y0) / max(1, (y1 - y0 - 1))
-            k = 4 if rel < 0.3 else (5 if rel < 0.65 else 6)
+            a, b = min(span) + 1, max(span) - 1          # 1 px dark gap to the legs
             for xx in range(a, b + 1):
-                c.px(xx, y, col('ember', k))
-            c.px(a - 1, y, col('iron', 0))
-            c.px(b + 1, y, col('iron', 0))
+                c.px(xx, y, col('ember', 3 if k == 0 else 5))
+            if k == 1:
+                c.px(cx, y, col('ember', 7))
 
 
 def build(text='AVARNETH', return_face=False, ember_gates=EMBER_GATES, ext_depth=2):

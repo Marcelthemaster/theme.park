@@ -41,7 +41,7 @@ def flourish(length=20, mirror=False):
 
 def build_subtitle(with_flourish=True, tracking=2):
     m = text_mask(EMBER9, 'VEIL OF EMBERS', tracking=tracking, space=3)
-    t = styled(m, _gold_face, edge=('iron', 0), shadow=('gold', 1))
+    t = styled(m, _gold_face, edge=('iron', 0), shadow=('iron', 2))
     if not with_flourish:
         return t
     fl = flourish()
@@ -63,11 +63,12 @@ def _steel_flat(c, m, Y):
 
 
 def build_publisher(text='ECKERTENGINEERING', tracking=2):
-    m = text_mask(SMALL5, text, tracking=tracking, space=4)
-    return styled(m, _steel_flat, edge=('iron', 0), shadow=('iron', 1))
+    """Engraved small capitals: flat steel letters with a single 1 px dark drop shadow (no outline)."""
+    m = text_mask(SMALL5, text, tracking=tracking, space=3)
+    return styled(m, _steel_flat, edge=None, shadow=('iron', 1), pad=1)
 
 
 def build_presents_line(tracking=1):
     """ECKERTENGINEERING PRESENTS as one discreet line in a single flat steel tone."""
-    m = text_mask(SMALL5, 'ECKERTENGINEERING PRESENTS', tracking=tracking, space=4)
-    return styled(m, _steel_flat, edge=('iron', 0), shadow=('iron', 1))
+    m = text_mask(SMALL5, 'ECKERTENGINEERING PRESENTS', tracking=tracking, space=3)
+    return styled(m, _steel_flat, edge=None, shadow=('iron', 1), pad=1)

@@ -41,8 +41,22 @@ plattformspezifischer Override gesetzt ist. Unity skaliert es auf alle benötigt
 verfügbare AVARNETH-Icon-Datei verwenden.
 
 **Hinweis zur `.ico`-Datei:** Das Icon der gebauten `.exe` erzeugt Unity beim Build selbst aus den oben
-zugewiesenen Icon-Texturen. Die mitgelieferte `03_Windows_Icons/AVARNETH.ico` ist für Desktop-Verknüpfungen, Installer und
-Launcher gedacht und wird von Unity nicht verwendet.
+zugewiesenen Icon-Texturen (nur die im Inspector gelisteten Größen). Die mitgelieferte `03_Windows_Icons/AVARNETH.ico`
+(22 pixelgenaue Größen 16–256 px inkl. der Windows-Skalierungsgrößen 20/24/30/36/40/42/56/60/72/84/120/144/192) wird
+von Unity **nicht** verwendet. Sie ist für Desktop-Verknüpfungen, Installer und Launcher gedacht.
+
+**Optionaler Release-Schritt – ICO direkt ins EXE schreiben (nicht in dieser Umgebung getestet):**
+Damit Taskleiste, Alt-Tab, Startmenü und Explorer auch bei 125 %/150 % Skalierung keine weichgezeichneten
+Zwischengrößen zeigen, kann nach dem Build das Icon-Gruppen-Resource der EXE durch die ICO ersetzt werden, z. B. mit
+dem Open-Source-Werkzeug `rcedit` (Electron-Projekt):
+
+```
+rcedit "Build\<ProductName>.exe" --set-icon "03_Windows_Icons\AVARNETH.ico"
+```
+
+Prüfen (z. B. unter Linux/WSL mit icoutils): `wrestool -x -t14 <ProductName>.exe > exe_icon.ico` und
+`icotool -l exe_icon.ico` → alle 22 Größen müssen gelistet sein. Installer und Verknüpfungen sollten ebenfalls
+direkt auf `AVARNETH.ico` verweisen. Ein Code-Signing der EXE muss **nach** diesem Schritt erfolgen.
 
 ## 2. Splash Image
 

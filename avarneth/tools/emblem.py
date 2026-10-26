@@ -97,36 +97,23 @@ class Emblem:
                         c.px(px_, py_ + 1, col('gold', 3))
 
         # ---- field: riveted dark iron plate
-        base_i = 4 if icon else 2
+        base_i = 4 if icon else 3
         c.put(field, col('iron', base_i))
         fe = inner_edge(field, diagonal=False)
-        c.put(fe & (Y < r(12) + max(3, r(5))), col('iron', base_i + 1))          # top inner bevel (lit)
-        c.put(fe & (X < cx) & (Y < low_y), col('iron', base_i + 1))               # left inner bevel (lit)
-        c.put(fe & (X > cx), col('iron', 1))                             # right inner bevel (shade)
-        c.put(fe & (X < cx) & (Y >= low_y), col('iron', 1))
+        c.put(fe & (X > cx), col('iron', base_i - 1))                    # right inner bevel (shade)
+        c.put(fe & (X < cx) & (Y >= low_y), col('iron', base_i - 1))
+        c.put(fe & (X < cx) & (Y < low_y), col('iron', base_i + 1))      # left inner bevel (lit)
+        c.put(fe & (Y < r(12) + max(3, r(5))), col('iron', base_i + 1))  # top inner bevel (lit, both sides)
         if full:
             seam_y = r(31)
-            c.put(field & (Y == seam_y) & ~fe, col('iron', 1))
-            c.put(field & (Y == seam_y + 1) & ~fe, col('iron', 3))
+            c.put(field & (Y == seam_y) & ~fe, col('iron', 2))
+            c.put(field & (Y == seam_y + 1) & ~fe, col('iron', 4))
             for (rx, ry) in [(9, 17), (9, 45), (54, 17), (54, 45)]:
                 px_, py_ = r(rx), r(ry)
                 if field[py_, px_]:
-                    c.px(px_, py_, col('iron', 5))
-                    c.px(px_ + 1, py_ + 1, col('iron', 1))
-                    c.px(px_ - 1, py_, col('iron', 4))
-
-        # ---- engraved mountain relief on the plate (low contrast, mirrored)
-        if full:
-            pts = [(s(4), s(56)), (s(4), s(47)), (s(8), s(42)), (s(11), s(45)), (s(16), s(37)),
-                   (s(21), s(44)), (s(24), s(41)), (s(28), s(48)), (s(28), s(60)), (s(4), s(60))]
-            mt = mirror_x(poly_mask(W, H, pts)) & field
-            c.put(mt, col('iron', 3))
-            ridge = mt & ~np.roll(mt, 1, axis=0)
-            # lit slopes rise to the right (light from the left), shaded slopes fall
-            left_lit = ridge & np.roll(~mt, -1, axis=1)
-            c.put(ridge, col('iron', 4))
-            c.put(ridge & (X > cx), col('iron', 3))
-            c.put(mt & ~ridge & np.roll(ridge, 1, axis=0) & (X < cx), col('iron', 3))
+                    c.px(px_, py_, col('iron', 6))
+                    c.px(px_ + 1, py_ + 1, col('iron', 2))
+                    c.px(px_ - 1, py_, col('iron', 5))
 
         self._keep(c, field, outer, detail)
 
@@ -163,93 +150,118 @@ class Emblem:
         upper = inner & (Y < bar_y0)
         lower = inner & (Y >= bar_y1)
 
-        # ---- upper counter: dark sky-iron with the keep tower
+        # ---- upper counter: dark void with a slim keep tower (3 one-pixel merlons, one arrow slit)
         c.put(upper, col('iron', 1))
-        tw = max(1, r(3))                      # half width of the keep tower
-        t_top = r(26)
+        tw = max(1, r(2))                      # half width of the keep (5 px at S=1)
+        t_top = r(23)
         tower = rect_mask(W, H, cx - tw, t_top, cx + tw + 1, bar_y0) & upper
         mh = max(1, r(2))
-        # crenellations: merlon / crenel / merlon / crenel / merlon
-        mer = rect_mask(W, H, cx - tw, t_top - mh, cx - tw + max(1, r(2)), t_top)
-        mer |= rect_mask(W, H, cx + tw + 1 - max(1, r(2)), t_top - mh, cx + tw + 1, t_top)
-        if tw >= 3:
-            mer |= rect_mask(W, H, cx, t_top - mh, cx + 1, t_top)
+        mer = np.zeros_like(tower)
+        for mx in range(cx - tw, cx + tw + 1, 2):
+            mer |= rect_mask(W, H, mx, t_top - mh, mx + 1, t_top)
         tower |= mer & upper
         c.put(tower, col('stone', 4))
-        c.put(tower & (X <= cx - tw + max(0, r(1))), col('stone', 6))
-        c.put(tower & (X >= cx + tw - max(0, r(1))), col('stone', 3))
+        c.put(tower & (X < cx), col('stone', 5))
+        c.put(tower & (X == cx - tw), col('stone', 6))
+        c.put(tower & (X == cx + tw), col('stone', 3))
         tops = tower & ~np.roll(tower, 1, axis=0)
         c.put(tops, col('stone', 7))
         c.put(outline(tower) & upper, col('iron', 0))
-        # two arcane lancet windows
         if self.S >= 0.6:
-            wy0, wy1 = r(29), r(29) + max(2, r(4))
-            for wx in (cx - max(1, r(1.5)), cx + max(1, r(1.5))):
-                c.put(rect_mask(W, H, wx, wy0, wx + 1, wy1), col('arcane', 5))
-                c.px(wx, wy0, col('arcane', 7))
-                c.px(wx, wy1 - 1, col('arcane', 3))
-        else:
-            c.px(cx, r(30), col('arcane', 6))
+            sy0 = r(29)
+            c.put(rect_mask(W, H, cx, sy0, cx + 1, sy0 + max(2, r(3))), col('iron', 0))   # arrow slit
 
-        # ---- lower counter: masonry wall with the gate
-        c.put(lower, col('stone', 4))
-        c.put(lower & (X > cx + r(5)), col('stone', 3))
+        # ---- lower counter: dark void with a rectangular gatehouse
+        c.put(lower, col('iron', 1))
+        gh_w = max(3, r(8))                    # gatehouse half width
+        gh_top = bar_y1 + max(1, r(2))
+        house = rect_mask(W, H, cx - gh_w, gh_top + max(1, r(2)), cx + gh_w + 1, base_y) & lower
+        par = np.zeros_like(house)              # crenellated parapet
+        for mx in range(cx - gh_w, cx + gh_w + 1, 3):
+            par |= rect_mask(W, H, mx, gh_top, mx + 2, gh_top + max(1, r(2)))
+        house |= par & lower
+        c.put(house, col('stone', 4))
+        c.put(house & (X > cx + r(3)), col('stone', 3))
+        c.put(house & (X == cx - gh_w), col('stone', 6))
+        c.put(house & (X == cx + gh_w), col('stone', 2))
+        htops = house & ~np.roll(house, 1, axis=0)
+        c.put(htops, col('stone', 6))
         if full:
-            yy = Y - bar_y1
-            mortar = lower & (yy % 5 == 4)
-            joint = lower & (((X - cx + 3 * ((yy // 5) % 2)) % 6) == 0) & (yy % 5 != 4)
+            yy = Y - (gh_top + 2)
+            body = house & (Y > gh_top + 2) & (X > cx - gh_w) & (X < cx + gh_w)
+            mortar = body & (yy % 4 == 3)
+            joint = body & (((X - cx + 2 * ((yy // 4) % 2)) % 4) == 0) & (yy % 4 != 3)
             c.put(mortar | joint, col('stone', 2))
-            c.put(lower & (yy % 5 == 0) & (X <= cx + r(5)) & ~joint, col('stone', 5))
+        c.put(outline(house) & lower, col('iron', 0))
 
-        # gate (arch) with frame, ember glow and iron portcullis
-        gr = max(2, r(5.5))
-        g_top = r(43)
+        # gate (arch) with frame, dark ember glow and an iron portcullis
+        gr = max(2, r(4))
+        g_top = gh_top + max(3, r(5))
         gate = rect_mask(W, H, cx - gr, g_top + gr, cx + gr + 1, base_y)
         gate |= ellipse_mask(W, H, self.CX, g_top + gr + 0.5, gr + 0.5, gr + 0.5) & (Y < g_top + gr + 1)
-        gate &= lower
-        gframe = dilate(gate, 1.0) & ~gate & lower
+        gate &= house
+        gframe = dilate(gate, 1.0) & ~gate & house
         c.put(gframe, col('stone', 6))
         c.put(gframe & (X > cx), col('stone', 3))
-        span = max(1, base_y - g_top)
-        t = (Y - g_top) / span
-        c.put(gate, col('ember', 3))
-        c.put(gate & (t >= 0.35), col('ember', 4))
-        c.put(gate & (t >= 0.62), col('ember', 5))
-        c.put(gate & (t >= 0.84), col('ember', 6))
+        c.put(gate, col('ember', 1))
+        c.put(gate & (Y >= base_y - max(4, r(6))), col('ember', 2))
+        core = gate & (np.abs(X - cx) <= max(1, r(1))) & (Y >= base_y - max(2, r(3)))
+        c.put(core, col('ember', 5))
+        c.put(core & (Y == base_y - 1), col('ember', 6))
         if self.S >= 0.6:
-            bars = gate & (((X - cx) % 2) == 1)
-            c.put(bars, col('iron', 1))
-            c.put(gate & (Y == g_top + gr + 1) & ~bars, col('iron', 2))
+            vbars = gate & (((X - cx) % 2) == 0) & (np.abs(X - cx) <= gr - 1) & (Y < base_y - 1)
+            hrows = (Y == g_top + gr + 1) | (Y == g_top + gr + max(3, r(5)))
+            hbars = gate & hrows
+            c.put(vbars | hbars, col('iron', 5))
+            c.put(vbars & (Y == g_top + gr - 1), col('iron', 6))
+            c.put(hbars & ~vbars, col('iron', 4))
+            c.put(gate & (((X - cx) % 2) == 0) & (np.abs(X - cx) <= gr - 1) & (Y == base_y - 2), col('iron', 6))  # spikes
         # keystone
-        c.put(rect_mask(W, H, cx - 1, g_top - 1, cx + 2, g_top + 1) & lower, col('gold', 7))
+        c.put(rect_mask(W, H, cx - 1, g_top - 1, cx + 2, g_top + 1) & house, col('gold', 7))
         c.px(cx, g_top - 1, col('gold', 9))
 
-        # ---- gold flanks of the A (left lit, right shade - both clearly gold)
+        # ---- gold flanks of the A: bands by horizontal distance from the outer edge (clean 1:3 stairs)
         flank = peak & ~inner
-        dd = np.floor(edt_inside(peak)).astype(int)
-        lf = flank & (X < cx)
-        rf = flank & (X > cx)
-        c.put(lf, col('gold', 5))
-        c.put(lf & (dd <= 1), col('gold', 7))
-        c.put(lf & (dd == 2), col('gold', 6))
-        c.put(rf, col('gold', 3))
-        c.put(rf & (dd <= 1), col('gold', 5))
-        c.put(rf & (dd == 2), col('gold', 4))
-        c.put(flank & (X == cx), col('gold', 8))
+        for y in range(H):
+            xs = np.where(peak[y])[0]
+            if len(xs) == 0:
+                continue
+            x0, x1 = xs.min(), xs.max()
+            for x in range(x0, x1 + 1):
+                if not flank[y, x]:
+                    continue
+                if x < cx:
+                    d = x - x0
+                    c.px(x, y, col('gold', 7 if d == 0 else (6 if d == 1 else 5)))
+                elif x > cx:
+                    d = x1 - x
+                    c.px(x, y, col('gold', 5 if d == 0 else (4 if d == 1 else 3)))
+                else:
+                    c.px(x, y, col('gold', 8))
         c.px(cx, r(3) + 1, col('gold', 9))
 
-        # ---- crossbar / lintel
+        # ---- crossbar / lintel with the arcane rune (the only cool accent)
         bar = (Y >= bar_y0) & (Y < bar_y1) & peak
         c.put(bar, col('gold', 5))
         c.put(bar & (Y == bar_y0), col('gold', 8))
         c.put(bar & (Y == bar_y1 - 1), col('gold', 3))
+        ry = bar_y0 + (1 if bar_h >= 3 else 0)
+        rw = max(1, r(2))
+        c.put(rect_mask(W, H, cx - rw, ry, cx + rw + 1, ry + 1), col('arcane', 5))
+        c.px(cx, ry, col('arcane', 7))
+        if rw >= 2:
+            c.px(cx - rw - 1, ry, col('gold', 2))
+            c.px(cx + rw + 1, ry, col('gold', 2))
 
-        # ---- base ledge
+        # ---- base ledge (one tone on top, single darker pixel at the right end)
         k = (s(59) - s(3)) / 3.0
         ledge = (Y >= base_y) & (Y < base_y + max(2, r(3))) & (np.abs(X - self.CX + 0.5) <= k + 1) & field
         c.put(ledge, col('stone', 4))
-        c.put(ledge & (Y == base_y), col('stone', 6))
-        c.put(ledge & (Y == base_y) & (X < cx), col('stone', 7))
+        top_row = ledge & (Y == base_y)
+        c.put(top_row, col('stone', 6))
+        xs = np.where(top_row.any(0))[0]
+        if len(xs):
+            c.px(xs.max(), base_y, col('stone', 5))
         c.put(ledge & (Y == base_y + max(2, r(3)) - 1), col('stone', 2))
 
         # ---- dark separation lines around the keep (inside the shield)

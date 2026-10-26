@@ -178,6 +178,42 @@ def graphics():
         f'Dateinamen: {hits or "keine Treffer"}; Generator-Texte: {gen_hits or "keine Treffer"}; C#: {cs_hits or "keine Treffer"} '
         '(Erwähnung von WOE nur in der Dokumentation als interner Name)')
 
+    # seam check: an outline-dark pixel squeezed between two gold face pixels (horizontally or vertically)
+    gold = {tuple(c) for c in RAMPS['gold'][4:]}
+    dark = tuple(RAMPS['iron'][0])
+    seams = []
+    for name in ('AVARNETH_Logo_1x.png', 'AVARNETH_VeilOfEmbers_1x.png'):
+        a = rgba(os.path.join(PKG, '01_Brand_Identity', 'Source_Files', 'native_1x', name))
+        h, w = a.shape[:2]
+        isg = np.zeros((h, w), bool)
+        isd = np.zeros((h, w), bool)
+        for y in range(h):
+            for x in range(w):
+                t = tuple(int(v) for v in a[y, x, :3])
+                isg[y, x] = a[y, x, 3] > 0 and t in gold
+                isd[y, x] = a[y, x, 3] > 0 and t == dark
+        hz = np.zeros((h, w), bool)
+        vt = np.zeros((h, w), bool)
+        hz[:, 1:-1] = isd[:, 1:-1] & isg[:, :-2] & isg[:, 2:]      # dark between gold left/right
+        vt[1:-1, :] = isd[1:-1, :] & isg[:-2, :] & isg[2:, :]      # dark between gold above/below
+        from scipy import ndimage as _nd
+        found = []
+        # a seam = such pixels forming a straight run of >= 5 px (vertical for hz, horizontal for vt);
+        # shorter runs are legitimate 1-px counters / notches (V crotch, B/R counters)
+        for m_, axis in ((hz, 0), (vt, 1)):
+            st = np.array([[0, 1, 0], [0, 1, 0], [0, 1, 0]]) if axis == 0 else np.array([[0, 0, 0], [1, 1, 1], [0, 0, 0]])
+            lab, nlab = _nd.label(m_, structure=st)
+            for i in range(1, nlab + 1):
+                ys, xs = np.where(lab == i)
+                if len(ys) >= 5:
+                    found.append((int(xs.min()), int(ys.min()), len(ys)))
+        if found:
+            seams.append(f'{name}: {found[:4]}')
+    rec(A, 'Keine Nahtfehler in Glyphen (keine durchgehende Konturlinie ≥ 5 px zwischen Goldflächen, vgl. frühere T/H-Naht)',
+        'PASS' if not seams else 'FAIL',
+        f'Wortmarke und Untertitel (1×) Pixel für Pixel geprüft (kurze 1-px-Innenräume wie V-Scheitel/B-Punzen ausgenommen); '
+        f'Funde: {seams or "keine"}')
+
     em = rgba(os.path.join(PKG, '01_Brand_Identity', 'AVARNETH_Emblem.png'))
     rec(A, 'AVARNETH-Wappen eigenständig verwendbar', 'PASS',
         f'01_Brand_Identity/AVARNETH_Emblem.png {em.shape[1]}×{em.shape[0]} (nativ {em.shape[1] // 4}×{em.shape[0] // 4}), ohne Text; '
@@ -204,11 +240,14 @@ def icons():
     rec(A, 'ICO-Datei technisch gültig', 'PASS' if ok else 'FAIL',
         f'icotool -l: {len(sizes)} Bilder {sizes}, 32 bit; Pillow liest {pil_sizes}; file: "{ftype.split(": ", 1)[-1]}"')
     pngs = {s: os.path.join(PKG, '03_Windows_Icons', f'AVARNETH_{s}.png') for s in (16, 24, 32, 48, 64, 128, 256, 512)}
-    pngs.update({s: os.path.join(PKG, '03_Windows_Icons', 'Extra', f'AVARNETH_{s}.png') for s in (20, 30, 36, 40, 60, 72, 80, 96, 1024)})
+    import icons as icons_mod0
+    extra = sorted(set(icons_mod0.ICO_SIZES) | set(icons_mod0.DERIVED) | {16, 24, 32, 48, 64, 128, 256, 512, 1024}) 
+    pngs.update({s: os.path.join(PKG, '03_Windows_Icons', 'Extra', f'AVARNETH_{s}.png') for s in extra
+                 if s not in (16, 24, 32, 48, 64, 128, 256, 512)})
     dims_ok = all(Image.open(p).size == (s, s) for s, p in pngs.items())
     rec(A, 'Benötigte Auflösungen vorhanden (PNG 16/24/32/48/64/128/256/512 + Zwischengrößen, ICO 16–256)', 'PASS' if dims_ok and ok else 'FAIL',
-        f'PNG-Maße geprüft: {", ".join(f"{s}" for s in sorted(pngs))} px (quadratisch); ICO-Einträge {sizes}; '
-        '512/1024 als PNG (das ICO-Format endet bei 256)')
+        f'PNG-Maße geprüft: {", ".join(f"{s}" for s in sorted(pngs))} px (quadratisch); ICO-Einträge {sizes} '
+        f'(bis 96 px als 32-bit-DIB mit AND-Maske, ab 120 px PNG-komprimiert); 512/1024 nur als PNG (ICO endet bei 256)')
     tmp = tempfile.mkdtemp()
     subprocess.run(['icotool', '-x', '-o', tmp, ico], check=True, capture_output=True)
     diffs = []
@@ -237,7 +276,7 @@ def icons():
             deriv.append(s)
     rec(A, 'Große/Zwischengrößen sind bitgenaue Ganzzahl-Vielfache (keine Interpolation)', 'PASS' if not deriv else 'FAIL',
         f'{", ".join(f"{s}={src}×{k}" for s, (src, k) in icons_mod.DERIVED.items())}; Abweichungen: {deriv or "keine"}')
-    rec(A, 'Kleine Varianten erkennbar (16–40 px pro Größe gezeichnet, geschlossene Silhouette, hoher Kontrast)', 'PASS',
+    rec(A, 'Kleine Varianten erkennbar (16–42 px pro Größe gezeichnet, geschlossene Silhouette, hoher Kontrast)', 'PASS',
         'Visuelle Prüfung 1:1 auf dunklem und hellem Grund (06_Previews/AVARNETH_Icon_Preview.png) + unabhängige Bildkritik; Messwerte: ' + '; '.join(stats))
 
 

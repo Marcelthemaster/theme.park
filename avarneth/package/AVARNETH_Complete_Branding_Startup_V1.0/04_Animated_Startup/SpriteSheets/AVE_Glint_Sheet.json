@@ -2,7 +2,7 @@
   "image": "AVE_Glint_Sheet.png",
   "frameWidth": 17,
   "frameHeight": 17,
-  "frameCount": 10,
+  "frameCount": 8,
   "columns": 10,
   "rows": 1,
   "origin": "top-left, y down",
@@ -62,29 +62,15 @@
       "y": 0,
       "w": 17,
       "h": 17
-    },
-    {
-      "index": 8,
-      "x": 136,
-      "y": 0,
-      "w": 17,
-      "h": 17
-    },
-    {
-      "index": 9,
-      "x": 153,
-      "y": 0,
-      "w": 17,
-      "h": 17
     }
   ],
   "layerId": "glint",
-  "timelineStart": 1.5833,
-  "timelineEnd": 1.75,
+  "timelineStart": 1.6,
+  "timelineEnd": 1.7333,
   "afterFrames": "hide",
   "positionArtPx": [
     231,
-    69
+    68
   ],
   "note": "Frames are evenly distributed over [timelineStart, timelineEnd) - see Animation_Timeline.json."
 }

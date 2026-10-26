@@ -20,7 +20,7 @@ Package (`/home/user/theme.park/avarneth/package/AVARNETH_Complete_Branding_Star
 | `05_Unity_Integration/README_UNITY_FOLDER.txt` | 16 | `7dc7f423eca34d3512a1ec06141c68c5fb990dc5054c764324121014d49c5abb` |
 | `07_Documentation/UNITY_INSTALLATION.md` (DE) | 100 | `bd629a1151e58a441ea959e1796925a43557f5a8a471be1f5a138f5179ef46f8` |
 | `07_Documentation/PLAYER_SETTINGS.md` (DE) | 80 | `4f9048cdfdab0147ff1b8e206f10a00d47337b2b556e0d8358e1838285518018` |
-| `05_Unity_Integration/Materials/.gitkeep` (keeps the intentionally empty folder; Unity ignores dot files) | 0 | – |
+| `05_Unity_Integration/Materials/.gitkeep` (keeps the intentionally empty folder; Unity ignores dot files) | 0 | – | (removed again in §8: zero-byte placeholder, folder not needed)
 
 \* Hashes are from the state at the time this file was written; re-hash before release (`sha256sum`).
 
@@ -487,6 +487,8 @@ screens that are not exact multiples of 480×270 (also reported by the runtime r
   before `ArtRoot`) that holds full-screen layer Images; `SmoothSpriteAssetPaths()` → `CheckSpriteSettings/ApplySpriteSettings`
   expect/apply `FilterMode.Bilinear` only for those sprites (Configure, prefab pre-check and Validate use the same rule);
   regeneration also removes an old `Backdrop`.
+* Package hygiene: `05_Unity_Integration/Materials/.gitkeep` (zero-byte placeholder) removed; no Materials folder is
+  shipped because only the standard `UI/Default` material is used.
 * Art: `AVE_Veil.png` is now a smooth radial gradient (alpha 64…140) with a constant outermost row/column so the
   clamped bilinear edge is invisible.
 

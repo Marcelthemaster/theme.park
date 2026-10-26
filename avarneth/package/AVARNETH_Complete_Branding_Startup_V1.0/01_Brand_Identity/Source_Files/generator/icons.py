@@ -1,11 +1,12 @@
-"""Windows icon set (revision 2).
+"""Windows icon set (revision 3).
 
-* 16/20/24/30/32/36/40 px: reduced emblem drawn per size on the pixel grid (icons_small).
+* 16/20/24/28/30/32/36/40/42 px: reduced emblem drawn per size on the pixel grid (icons_small).
 * 48/64 px: the emblem master in its 'icon' variant (brighter plate and right side).
-* Every other size is an exact integer nearest-neighbour multiple of one of those:
-  60 = 20x3, 72 = 24x3, 80 = 40x2, 96 = 48x2, 128 = 64x2, 256 = 64x4, 512 = 64x8, 1024 = 64x16.
-  So Windows never has to resample (125 %/150 % display scaling asks for 20/30/36/40/60/72 px).
-* The .ico is written by our own writer (16-128 as 32-bit DIB + AND mask, 256 as PNG),
+* Every other size is an exact integer nearest-neighbour multiple of one of the finer drawings:
+  56 = 28x2, 60 = 30x2, 72 = 36x2, 80 = 40x2, 84 = 42x2, 96 = 48x2, 120 = 30x4, 144 = 36x4,
+  192 = 48x4, 128 = 64x2, 256 = 64x4, 512 = 64x8, 1024 = 64x16.
+  So Windows never has to resample (125/150/175/200 % scaling and the 'large icons' views).
+* The .ico is written by our own writer (up to 96 px as 32-bit DIB + AND mask, from 120 px as PNG),
   so no resampling ever touches the pixels.
 """
 from __future__ import annotations
@@ -20,8 +21,10 @@ import emblem
 import icons_small
 from pix import Canvas, alpha_over
 
-ICO_SIZES = (16, 20, 24, 30, 32, 36, 40, 48, 60, 64, 72, 80, 96, 128, 256)
-DERIVED = {60: (20, 3), 72: (24, 3), 80: (40, 2), 96: (48, 2), 128: (64, 2), 256: (64, 4), 512: (64, 8), 1024: (64, 16)}
+ICO_SIZES = (16, 20, 24, 28, 30, 32, 36, 40, 42, 48, 56, 60, 64, 72, 80, 84, 96, 120, 128, 144, 192, 256)
+DERIVED = {56: (28, 2), 60: (30, 2), 72: (36, 2), 80: (40, 2), 84: (42, 2), 96: (48, 2), 120: (30, 4),
+           144: (36, 4), 192: (48, 4), 128: (64, 2), 256: (64, 4), 512: (64, 8), 1024: (64, 16)}
+PNG_FROM = 120          # ICO entries of this size and larger are stored PNG-compressed
 
 
 def _center(c: Canvas, size):
@@ -62,7 +65,7 @@ def write_ico(path, icons, sizes=ICO_SIZES):
     blobs = []
     for s in sizes:
         arr = icons[s].a
-        if s >= 256:
+        if s >= PNG_FROM:
             b = io.BytesIO()
             Image.fromarray(arr, 'RGBA').save(b, 'PNG', optimize=True)
             blobs.append((s, b.getvalue()))

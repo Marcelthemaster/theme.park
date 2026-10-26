@@ -86,7 +86,7 @@ AvarnethStartup   Canvas (Screen Space - Overlay, Sort Order 1000), CanvasScaler
 | On Completed | – | UnityEvent, genau einmal pro Durchlauf |
 
 Integer-Skalierung (`IntegerNearest`) für die **Content Bounds der mitgelieferten Timeline**
-(`contentBounds` 126, 47, 227 × 168 Art-px; berechnet mit `AvarnethStartupMath.ComputePixelScale`):
+(`contentBounds` 127, 48, 225 × 165 Art-px; berechnet mit `AvarnethStartupMath.ComputePixelScale`):
 1920×1080 → 4, 2560×1440 → 5, 3840×2160 → 8, 1600×900 → 3, 1366×768 → 3, 1280×720 → 3, 1680×1050 → 4.
 Der Faktor wird nur verkleinert, solange die Content Bounds den Bildschirm verlassen würden; Teile des
 480 × 270-Canvas außerhalb der Content Bounds dürfen daher abgeschnitten werden (z. B. 1280×720: Canvas

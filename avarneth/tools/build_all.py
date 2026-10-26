@@ -130,9 +130,9 @@ def stage_variants():
         cd = card(cc, 3, label)
         save(cd, os.path.join(d, f'Preview_Card_{theme}.png'))
         with open(os.path.join(d, 'DESIGN_NOTE.txt'), 'w') as f:
-            f.write(variants.DESCRIPTIONS[theme] + '\n\nGleiche Geometrie wie der Produktionsstandard (dieselbe Markenidentität); '
-                    'Material/Farbe per exaktem Paletten-Remapping und eigene Extrusionstiefe '
-                    '(siehe 07_Documentation/BRAND_GUIDELINES.md, Abschnitt 8).\n')
+            f.write(variants.DESCRIPTIONS[theme] + '\n\nDesignrichtung als Material-/Farbwelt: gleiche Geometrie wie der '
+                    'Produktionsstandard (bewusst dieselbe Markenidentität), Material und Farbe per exaktem Paletten-Remapping, '
+                    'eigene Extrusionstiefe. Keine abweichenden Logo-Konzepte (siehe 07_Documentation/BRAND_GUIDELINES.md, Abschnitt 8).\n')
         cards.append(cd)
     H = max(c.shape[0] for c in cards)
     W = sum(c.shape[1] for c in cards)
@@ -151,7 +151,7 @@ def stage_icons():
     d = P('03_Windows_Icons')
     for s in (16, 24, 32, 48, 64, 128, 256, 512):
         save(ic[s].a, os.path.join(d, f'AVARNETH_{s}.png'))
-    for s in (20, 30, 36, 40, 60, 72, 80, 96, 1024):
+    for s in sorted(set(ic) - {16, 24, 32, 48, 64, 128, 256, 512}):
         save(ic[s].a, os.path.join(d, 'Extra', f'AVARNETH_{s}.png'))
     icons_mod.write_ico(os.path.join(d, 'AVARNETH.ico'), ic)
     # Unity copies (PlayerSettings icon slots - the helper picks exact sizes)
@@ -341,8 +341,8 @@ def contact_sheet(tl, arr, path):
 
 def icon_preview(path):
     ic = icons_mod.build_all()
-    sizes = (16, 20, 24, 30, 32, 36, 40, 48, 64, 128, 256)
-    W, H = 1500, 760
+    sizes = (16, 20, 24, 28, 30, 32, 36, 40, 42, 48, 64, 128, 256)
+    W, H = 1640, 760
     out = np.zeros((H, W, 4), np.uint8)
     out[..., 3] = 255
     out[:H // 2, :, :3] = (16, 17, 24)        # dark (taskbar-like)
