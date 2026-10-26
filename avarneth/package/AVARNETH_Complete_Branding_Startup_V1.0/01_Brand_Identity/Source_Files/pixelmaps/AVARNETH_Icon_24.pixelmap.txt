@@ -1,0 +1,25 @@
+# AVARNETH icon 24x24 - palette cell codes (see palette/AVARNETH_Palette.txt), .. = transparent
+.. .. .. .. .. .. .. .. .. .. i0 g9 i0 .. .. .. .. .. .. .. .. .. .. ..
+.. .. .. .. .. .. .. .. .. .. i0 g8 i0 .. .. .. .. .. .. .. .. .. .. ..
+.. .. .. .. .. .. .. .. .. .. i0 g8 i0 .. .. .. .. .. .. .. .. .. .. ..
+.. .. .. .. .. .. .. .. .. i0 g7 g8 g3 i0 .. .. .. .. .. .. .. .. .. ..
+.. i0 i0 i0 i0 i0 i0 i0 i0 i0 g7 g8 g3 i0 i0 i0 i0 i0 i0 i0 i0 i0 .. ..
+i0 g7 g7 g7 g7 g7 g7 g7 g7 i0 g7 g8 g3 i0 g7 g7 g7 g7 g7 g7 g7 g5 i0 ..
+i0 g7 g2 g2 g2 g2 g2 g2 i0 g7 g5 s7 g2 g3 i0 g2 g2 g2 g2 g2 g2 g5 i0 ..
+i0 g7 g2 i2 i2 i2 i2 i2 i0 g7 g5 a4 g2 g3 i0 i2 i2 i2 i2 i2 g2 g5 i0 ..
+i0 g7 g2 i2 e5 i2 i2 i2 i0 g7 a4 a7 a4 g3 i0 i2 i2 i2 i2 i2 g2 g5 i0 ..
+i0 g7 g2 i2 i2 i2 i2 i0 g7 g5 s5 a4 s3 g2 g3 i0 i2 i2 i2 i2 g2 g5 i0 ..
+i0 g7 g2 i2 i2 i2 i2 i0 g7 g5 s5 s7 s3 g2 g3 i0 i2 i2 e3 i2 g2 g5 i0 ..
+i0 g7 g2 i3 i3 i3 i3 i0 g7 g7 g7 g7 g7 g7 g7 i0 i3 i3 i3 i3 g2 g5 i0 ..
+i0 g7 g2 i3 i3 i3 i0 g2 g2 g2 g2 g2 g2 g2 g2 g2 i0 i3 i3 i3 g2 g5 i0 ..
+i0 g7 g2 i3 i3 i3 i0 g7 g5 s5 s5 g9 s3 s3 g2 g3 i0 i3 i3 i3 g2 g5 i0 ..
+.. i0 g7 g2 i3 i3 i0 g7 g5 s5 s7 e3 s6 s3 g2 g3 i0 i3 i3 g2 g5 i0 .. ..
+.. i0 g7 g2 i3 i0 g7 g5 s5 s7 e5 e5 e5 s6 s3 g2 g3 i0 i3 g2 g5 i0 .. ..
+.. .. i0 g7 g2 i0 g7 g5 s5 s7 e3 e5 e3 s6 s3 g2 g3 i0 g2 g5 i0 .. .. ..
+.. .. .. i0 g7 i0 g7 g5 s5 s7 e5 e7 e5 s6 s3 g2 g3 i0 g5 i0 .. .. .. ..
+.. .. .. .. i0 g7 g5 s5 s5 s7 e7 e8 e7 s6 s3 s3 g2 g3 i0 .. .. .. .. ..
+.. .. .. .. i0 g7 g5 s5 s5 s7 e7 e8 e7 s6 s3 s3 g2 g3 i0 .. .. .. .. ..
+.. .. .. .. .. i0 i0 s6 s6 s6 s6 s5 s5 s5 s5 s5 i0 i0 .. .. .. .. .. ..
+.. .. .. .. .. .. .. i0 g5 e1 e5 e8 e3 e1 g3 i0 .. .. .. .. .. .. .. ..
+.. .. .. .. .. .. .. .. i0 i0 g5 e5 g3 i0 i0 .. .. .. .. .. .. .. .. ..
+.. .. .. .. .. .. .. .. .. .. i0 i0 i0 .. .. .. .. .. .. .. .. .. .. ..

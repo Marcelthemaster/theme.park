@@ -1,0 +1,2 @@
+# Keep every byte exactly as produced (SHA256SUMS must match on any OS / autocrlf setting)
+* -text

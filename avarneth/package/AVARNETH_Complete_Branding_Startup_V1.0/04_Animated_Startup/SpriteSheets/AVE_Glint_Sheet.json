@@ -1,0 +1,90 @@
+{
+  "image": "AVE_Glint_Sheet.png",
+  "frameWidth": 17,
+  "frameHeight": 17,
+  "frameCount": 10,
+  "columns": 10,
+  "rows": 1,
+  "origin": "top-left, y down",
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 1,
+      "x": 17,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 2,
+      "x": 34,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 3,
+      "x": 51,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 4,
+      "x": 68,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 5,
+      "x": 85,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 6,
+      "x": 102,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 7,
+      "x": 119,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 8,
+      "x": 136,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    },
+    {
+      "index": 9,
+      "x": 153,
+      "y": 0,
+      "w": 17,
+      "h": 17
+    }
+  ],
+  "layerId": "glint",
+  "timelineStart": 1.58,
+  "timelineEnd": 1.82,
+  "afterFrames": "hide",
+  "positionArtPx": [
+    231,
+    67
+  ],
+  "note": "Frames are evenly distributed over [timelineStart, timelineEnd) - see Animation_Timeline.json."
+}

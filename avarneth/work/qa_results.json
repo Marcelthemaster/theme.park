@@ -1,0 +1,176 @@
+[
+ {
+  "area": "Grafik",
+  "check": "Alle PNG-Dateien lesbar und gültig (PIL verify)",
+  "status": "PASS",
+  "evidence": "399 PNG geprüft; Fehler: keine; Nicht-RGBA: keine"
+ },
+ {
+  "area": "Grafik",
+  "check": "Transparente PNG korrekt (transparenter Rand, deckende Motivpixel)",
+  "status": "PASS",
+  "evidence": "18 Marken-PNG (×4 und 1×): Rand vollständig α=0 und Motiv vorhanden; Probleme: keine"
+ },
+ {
+  "area": "Grafik",
+  "check": "Saubere Pixelkanten: keine halbtransparenten Kantenpixel (Alpha nur 0/255) in Logo-, Layer- und Icon-PNGs",
+  "status": "PASS",
+  "evidence": "60 Dateien geprüft; Abweichungen: keine"
+ },
+ {
+  "area": "Grafik",
+  "check": "Konsistente Farbgestaltung: alle Marken-/Icon-Pixel stammen aus der Master-Palette (bzw. Varianten-Palette)",
+  "status": "PASS",
+  "evidence": "Palette 45 Farben, davon 35 in den Marken-Mastern verwendet; Abweichungen: keine"
+ },
+ {
+  "area": "Grafik",
+  "check": "Keine Artefakte durch Mehrfach-Skalierung: ×2/×4/×8-Exporte sind bitgenaue Nearest-Neighbour-Vergrößerungen der 1×-Master",
+  "status": "PASS",
+  "evidence": "27 Exporte pixelgenau verglichen; Abweichungen: keine"
+ },
+ {
+  "area": "Grafik",
+  "check": "Titel korrekt geschrieben (AVARNETH / VEIL OF EMBERS / ECKERTENGINEERING PRESENTS)",
+  "status": "PASS",
+  "evidence": "Glyphen werden ausschließlich aus diesen Zeichenketten gesetzt: ['AVARNETH', 'ECKERTENGINEERING', 'PRESENTS', 'VEIL OF EMBERS']; zusätzlich visuell geprüft in 06_Previews/AVARNETH_Logo_Preview.png"
+ },
+ {
+  "area": "Grafik",
+  "check": "Kein sichtbares WOE-Altbranding (Dateinamen, gerenderte Texte, C#-Code)",
+  "status": "PASS",
+  "evidence": "Dateinamen: keine Treffer; Generator-Texte: keine Treffer; C#: keine Treffer (Erwähnung von WOE nur in der Dokumentation als interner Name)"
+ },
+ {
+  "area": "Grafik",
+  "check": "AVARNETH-Wappen eigenständig verwendbar",
+  "status": "PASS",
+  "evidence": "01_Brand_Identity/AVARNETH_Emblem.png 284×320 (nativ 71×80), ohne Text; eigener Animations-Layer Layers/AVE_Emblem.png"
+ },
+ {
+  "area": "Grafik",
+  "check": "Untertitel separat",
+  "status": "PASS",
+  "evidence": "01_Brand_Identity/AVARNETH_VeilOfEmbers.png (792×88) + _Plain; eigener Timeline-Layer \"subtitle\" (Layers/AVE_Subtitle.png)"
+ },
+ {
+  "area": "Grafik",
+  "check": "Hierarchie: Untertitel deutlich kleiner als die Wortmarke",
+  "status": "PASS",
+  "evidence": "Versalhöhe Wortmarke 32 px vs. Untertitel 9 px (nativ); Bildhöhen 51 vs. 22 px"
+ },
+ {
+  "area": "Windows-Icon",
+  "check": "ICO-Datei technisch gültig",
+  "status": "PASS",
+  "evidence": "icotool -l: 7 Bilder [16, 24, 32, 48, 64, 128, 256], 32 bit; Pillow liest [16, 24, 32, 48, 64, 128, 256]; file: \"MS Windows icon resource - 7 icons, 16x16, 32 bits/pixel, 24x24, 32 bits/pixel\""
+ },
+ {
+  "area": "Windows-Icon",
+  "check": "Benötigte Auflösungen vorhanden (PNG 16/24/32/48/64/128/256/512, ICO 16–256)",
+  "status": "PASS",
+  "evidence": "PNG-Maße geprüft: 16×16, 24×24, 32×32, 48×48, 64×64, 128×128, 256×256, 512×512; 512 ist als PNG geliefert (ICO-Format endet bei 256), zusätzlich Extra/AVARNETH_1024.png"
+ },
+ {
+  "area": "Windows-Icon",
+  "check": "Keine beschädigten Alpha-Kanäle (ICO-Inhalt bitgenau = PNG-Quellen, Alpha nur 0/255)",
+  "status": "PASS",
+  "evidence": "icotool -x Extraktion aller 7 Einträge pixelgenau mit den PNGs verglichen (inkl. Alpha); Abweichungen: keine"
+ },
+ {
+  "area": "Windows-Icon",
+  "check": "Kleine Varianten erkennbar (16/24/32 von Hand gesetzt, hoher Kontrast)",
+  "status": "PASS",
+  "evidence": "Visuelle Prüfung 1:1 auf dunklem und hellem Grund (06_Previews/AVARNETH_Icon_Preview.png) + unabhängige Bildkritik; Messwerte: 16px: 168 deckende Px, 19 Farben, Helligkeit 7–250, 19 Glut-Px; 24px: 382 deckende Px, 20 Farben, Helligkeit 7–250, 35 Glut-Px; 32px: 714 deckende Px, 23 Farben, Helligkeit 7–250, 57 Glut-Px"
+ },
+ {
+  "area": "Animation",
+  "check": "Timeline-JSON identisch in 04_Animated_Startup und Importable_Assets",
+  "status": "PASS",
+  "evidence": "json-Vergleich"
+ },
+ {
+  "area": "Animation",
+  "check": "Einzeldaten ausreichend für Unity: alle in der Timeline referenzierten Sprites existieren, Flipbook-Frames gleich groß",
+  "status": "PASS",
+  "evidence": "56 referenzierte Sprite-Dateien, fehlend: keine; Flipbook-Größen konsistent: True; 12 Layer, 40 Partikel, ungültige Partikel-Sprite-Indizes: keine"
+ },
+ {
+  "area": "Animation",
+  "check": "Tatsächliche Dauer ca. 2 Sekunden",
+  "status": "PASS",
+  "evidence": "duration = 2.00 s; letztes sichtbares Overlay-Frame bei t = 1.983 s (Frame 119 @60 fps); ab t = 2.000 s vollständig transparent (0.0 Alpha-Summe)"
+ },
+ {
+  "area": "Animation",
+  "check": "Kein abrupter Schnitt (weiches Aus-/Einblenden)",
+  "status": "FAIL",
+  "evidence": "Deckungssumme des Overlays je Frame gemessen: größter Sprung zwischen zwei 60-fps-Frames = 19.5 % der Spitze (bei t = 0.000 s); letztes sichtbares Frame hat noch 1.02 % der Spitzendeckung"
+ },
+ {
+  "area": "Animation",
+  "check": "Phasen im vorgegebenen Zeitfenster (Wappen 0–0.35 s, Schriftzug 0.35–1.15 s, Untertitel 1.15–1.60 s)",
+  "status": "PASS",
+  "evidence": "emblem: sichtbar ab 0.082 s, voll ab 0.315 s (Fenster 0.00–0.35); wordmark: sichtbar ab 0.352 s, voll ab 0.755 s (Fenster 0.35–1.15); subtitle: sichtbar ab 1.152 s, voll ab 1.420 s (Fenster 1.15–1.60)"
+ },
+ {
+  "area": "Animation",
+  "check": "Effektlayer vorhanden (Glow, Flash, Kontur-Glühen, Veil, Flipbooks, Partikel, Sprite-Sheets)",
+  "status": "PASS",
+  "evidence": "Effect_Layers: ['AVE_EmblemFlash.png', 'AVE_EmblemGlow.png', 'AVE_EmblemOutlineGlow.png', 'AVE_Veil.png', 'AVE_WordmarkFlash.png']; 40 Flipbook-Frames; 7 Partikel-Sprites; Sheets: ['AVE_EmblemTrace_Sheet.png', 'AVE_Glint_Sheet.png', 'AVE_Particles_Sheet.png', 'AVE_WordmarkShine_Sheet.png']"
+ },
+ {
+  "area": "Animation",
+  "check": "Transparenter Frame-Export vorhanden",
+  "status": "PASS",
+  "evidence": "120 Frames 480×270 @60 fps, 60 Frames 1920×1080 @30 fps (RGBA, transparent)"
+ },
+ {
+  "area": "Animation",
+  "check": "Gerenderte MP4-Vorschau (1920×1080, ≥30 fps, Wappen, Schriftzug, Untertitel, Übergang zur Login-Darstellung)",
+  "status": "PASS",
+  "evidence": "ffprobe: h264 1920×1080 yuv420p 60/1 fps, 180 Frames, 3.000 s = 2.00 s Animation + 1.00 s Login-Mock-up; Inhalte visuell im Kontaktbogen geprüft"
+ },
+ {
+  "area": "Animation",
+  "check": "GIF-Vorschau",
+  "status": "PASS",
+  "evidence": "960×540, 90 Frames @30 fps, Endlosschleife"
+ },
+ {
+  "area": "Unity-Integration",
+  "check": "Editor- und Runtime-Code sauber getrennt",
+  "status": "PASS",
+  "evidence": "Runtime: ['AvarnethStartupAnimation.cs', 'AvarnethStartupTimelineMath.cs'], Editor: ['AvarnethStartupInstaller.cs']; UnityEditor-Verweise im Runtime-Code: keine; Editor-asmdef includePlatforms=Editor"
+ },
+ {
+  "area": "Unity-Integration",
+  "check": "Keine Abhängigkeit von Nakama / Netzwerk / Authentifizierung",
+  "status": "PASS",
+  "evidence": "grep nakama|Socket|HttpClient|UnityWebRequest in allen .cs: keine Treffer"
+ },
+ {
+  "area": "Unity-Integration",
+  "check": "Keine erfundenen Projektpfade (keine fest verdrahteten Assets/...-Pfade)",
+  "status": "PASS",
+  "evidence": "keine fest verdrahteten Assets/-Pfade; Asset-Wurzel wird über Animation_Timeline.json (schema) gesucht"
+ },
+ {
+  "area": "Unity-Integration",
+  "check": "Kein Input-Manager/Input-System-Zugriff im Runtime-Code (kompatibel mit beiden Input-Backends)",
+  "status": "PASS",
+  "evidence": "keine Treffer"
+ },
+ {
+  "area": "Unity-Integration",
+  "check": "Keine VideoPlayer-Abhängigkeit",
+  "status": "PASS",
+  "evidence": "keine Treffer"
+ },
+ {
+  "area": "Unity-Integration",
+  "check": "Editor-Werkzeug ändert Company/Product Name und Identifier nicht",
+  "status": "PASS",
+  "evidence": "Zuweisungen: keine"
+ }
+]

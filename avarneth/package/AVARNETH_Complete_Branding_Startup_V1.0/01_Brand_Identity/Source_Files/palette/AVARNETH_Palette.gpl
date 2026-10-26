@@ -1,0 +1,49 @@
+GIMP Palette
+Name: AVARNETH Master Palette
+Columns: 10
+#
+  7   7  11	iron0
+ 17  18  25	iron1
+ 27  28  37	iron2
+ 38  40  51	iron3
+ 53  56  69	iron4
+ 74  78  93	iron5
+102 107 123	iron6
+141 146 161	iron7
+185 189 200	iron8
+227 229 234	iron9
+ 29  15   5	gold0
+ 58  31  10	gold1
+ 94  53  18	gold2
+135  81  28	gold3
+173 113  40	gold4
+205 148  55	gold5
+230 181  82	gold6
+244 210 126	gold7
+253 235 176	gold8
+255 251 230	gold9
+ 14  13  11	stone0
+ 26  24  21	stone1
+ 37  34  30	stone2
+ 50  46  41	stone3
+ 66  61  54	stone4
+ 85  79  70	stone5
+108 101  90	stone6
+135 128 115	stone7
+ 42   9   3	ember0
+ 86  20   6	ember1
+138  35  10	ember2
+193  57  14	ember3
+232  93  23	ember4
+255 139  43	ember5
+255 180  87	ember6
+255 216 146	ember7
+255 241 208	ember8
+  6  17  31	arcane0
+ 12  36  64	arcane1
+ 21  59 102	arcane2
+ 33  92 146	arcane3
+ 53 132 190	arcane4
+ 94 178 224	arcane5
+159 220 246	arcane6
+224 247 255	arcane7

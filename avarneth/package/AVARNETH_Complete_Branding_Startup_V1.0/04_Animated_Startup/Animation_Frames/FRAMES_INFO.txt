@@ -1,0 +1,5 @@
+Transparent full-overlay frames rendered from Animation_Timeline.json (straight alpha, RGBA PNG).
+native_480x270_60fps : 120 frames, frame i shows t = i/60 s (0.000 .. 1.983 s). Upscale x4 nearest-neighbour for 1920x1080.
+1080p_1920x1080_30fps: 60 frames, frame i shows t = i/30 s.
+At t >= 2.00 s the overlay is fully transparent (finished).
+These frames are a reference / fallback; the Unity integration animates the separate layers instead.

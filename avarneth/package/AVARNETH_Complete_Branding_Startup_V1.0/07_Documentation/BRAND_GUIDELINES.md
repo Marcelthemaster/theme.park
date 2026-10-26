@@ -1,0 +1,115 @@
+# AVARNETH: VEIL OF EMBERS – Brand Guidelines V1.0
+
+Entwickler & Publisher: **Eckertengineering** · Spielmarke: **AVARNETH: VEIL OF EMBERS** · Kurzbezeichnung: **AVE**
+
+> Der frühere interne Projektname WOE („World of Eckertengineering“) bleibt ausschließlich interner
+> Entwicklungsname (Verzeichnisse, Namespaces, Szenen, Nakama-IDs). Er erscheint in **keinem** der hier
+> gelieferten Grafik-Assets und darf nicht als sichtbarer Spieltitel verwendet werden.
+
+## 1. Markenarchitektur
+
+| Ebene | Element | Rolle |
+|---|---|---|
+| Studio | **ECKERTENGINEERING** / „ECKERTENGINEERING PRESENTS“ | dezent, Stahlgrau, eigene 7-px-Pixel-Versalien; konkurriert nie mit dem Titel |
+| Spielmarke | **AVARNETH** | dominante Wortmarke, Altgold mit Eisen-Extrusion |
+| Untertitel | **VEIL OF EMBERS** | deutlich kleiner (9-px-Versalien), Gold, flankiert von Glut-Rauten; eigener Layer |
+| Bildmarke | **Wappen „Das Glut-Tor“** | eigenständig verwendbar (Icon, Favicon, Siegel, Ladeindikator-Deko) |
+
+Alle Elemente liegen getrennt vor (Wortmarke, Untertitel, Wappen, Publisher) und können frei kombiniert
+werden; der Untertitel ist separat ein- und ausblendbar.
+
+## 2. Konzept – „Das Glut-Tor“
+
+* **Schild:** geschmiedeter Wappenschild – Außenrahmen aus dunklem Eisen, Innenrand aus Altgold mit Nieten.
+* **Gipfel = Buchstabe A:** Der Berg der Festung durchbricht den Schildrand nach oben. Seine goldenen
+  Flanken bilden zugleich das **A** von AVARNETH; der goldene Querbalken ist der Sturz über dem Tor.
+* **Monumentales Tor mit Glutkern:** Das Tor im Fels glüht von innen (Fallgitter, Glutverlauf) – „Embers“.
+* **Arkanes Fenster:** ein kleines blaues Rautenfenster als einziger kühler Magie-Akzent.
+* **Mauern & Türme:** Bergfestung mit Zinnen vor dunklem Eisenhimmel mit aufsteigenden Glutfunken – „Veil of Embers“.
+* **Glutstein:** in der Schildspitze, gefasst in Gold – das Siegel der Marke.
+
+Industrielle Fantasy (Schmiede, Eisen, Nieten, Glut) ohne Science-Fiction-Anmutung; keine Neonfarben.
+
+## 3. Logo-Varianten
+
+| Variante | Datei (1080p-Export ×4) | nativ (1×) | ×4 |
+|---|---|---|---|
+| A – Hauptlogo (Wortmarke) | `01_Brand_Identity/AVARNETH_Logo.png` | 236×51 | 944×204 |
+| A – Hauptlogo mit optionalem Wappen | `01_Brand_Identity/AVARNETH_Logo_With_Emblem.png` | 236×127 | 944×508 |
+| B – Vollständiger Titel mit Wappen | `01_Brand_Identity/AVARNETH_Complete_Logo.png` | 236×145 | 944×580 |
+| C – Publisher-Präsentation | `01_Brand_Identity/AVARNETH_Publisher_Presentation.png` | 236×166 | 944×664 |
+| D – Wappen / Emblem | `01_Brand_Identity/AVARNETH_Emblem.png` | 71×80 | 284×320 |
+| Untertitel (mit Glut-Ornamenten) | `01_Brand_Identity/AVARNETH_VeilOfEmbers.png` | 198×22 | 792×88 |
+| Untertitel (ohne Ornamente) | `01_Brand_Identity/AVARNETH_VeilOfEmbers_Plain.png` | 136×22 | 544×88 |
+| Publisher-Zeile | `01_Brand_Identity/Eckertengineering_Presents.png` | 186×20 | 744×80 |
+| Publisher-Kennung | `01_Brand_Identity/Eckertengineering.png` | 125×20 | 500×80 |
+
+* `Source_Files/native_1x/` = Pixel-Master (1 Kunst-Pixel = 1 Bildpixel), `exports_2x/`, `exports_8x/` für andere Zielgrößen.
+* Die Wortmarke ist **keine Schrift**: alle Buchstaben sind eigens konstruiert (3:1-Diagonalen, Sporn-Serifen,
+  Turmspitzen-A, facettierte Gold-Oberfläche mit 1-px-Fase, 3-px-Eisen-Extrusion, glühende Unterkante).
+* Untertitel und Publisher-Zeile verwenden eigene, handgezeichnete Pixel-Versalien (9 px bzw. 7 px Versalhöhe).
+
+## 4. Schutzzone und Mindestgrößen
+
+* **Maßeinheit X** = Versalhöhe der Wortmarke = 32 Kunst-Pixel (1×).
+* **Schutzzone:** mindestens ½ X (16 Kunst-Pixel) rund um jede Logo-Variante frei von anderen Elementen.
+* **Wortmarke:** nie kleiner als nativ 1× (236×51 px). Für kleinere Flächen das Wappen bzw. die Icons verwenden.
+* **Wappen:** nativ 71×80 px; ≥ 48 px Kantenlänge → vereinfachtes Wappen (`03_Windows_Icons/AVARNETH_48/64.png`),
+  darunter ausschließlich die von Hand gesetzten Icons 32 / 24 / 16 px.
+* **Untertitel** nie ohne Wortmarke als Spieltitel verwenden; immer unterhalb und kleiner als AVARNETH.
+
+## 5. Farben
+
+Alle Marken-Pixel verwenden ausschließlich diese Master-Palette (Rampen dunkel → hell). Dateien:
+`01_Brand_Identity/Source_Files/palette/` (`.gpl` für Aseprite/GIMP/Krita, `.hex`, Code-Tabelle, Farbfeld-PNG).
+
+| Rampe | Rolle | Farben |
+|---|---|---|
+| **iron** (10) | Dunkles Eisen / Anthrazit – Rahmen, Konturen, Extrusion, Schildfeld | `#07070b` `#111219` `#1b1c25` `#262833` `#353845` `#4a4e5d` `#666b7b` `#8d92a1` `#b9bdc8` `#e3e5ea` |
+| **gold** (10) | Altgold / warmes Metall – Wortmarke, Schildrand, A-Flanken, Untertitel | `#1d0f05` `#3a1f0a` `#5e3512` `#87511c` `#ad7128` `#cd9437` `#e6b552` `#f4d27e` `#fdebb0` `#fffbe6` |
+| **stone** (8) | Dunkler Naturstein – Bergfestung, Mauern, Sockel | `#0e0d0b` `#1a1815` `#25221e` `#322e29` `#423d36` `#554f46` `#6c655a` `#878073` |
+| **ember** (9) | Glut / Funken – Tor-Kern, Glutstein, Partikel, glühende Kanten (sparsam) | `#2a0903` `#561406` `#8a230a` `#c1390e` `#e85d17` `#ff8b2b` `#ffb457` `#ffd892` `#fff1d0` |
+| **arcane** (8) | Arkanes Blau – Fenster der Festung (sehr sparsam, Kontrastakzent) | `#06111f` `#0c2440` `#153b66` `#215c92` `#3584be` `#5eb2e0` `#9fdcf6` `#e0f7ff` |
+
+Lichtrichtung in allen Assets: **oben links**. Konturen: `iron0` (#07070b). Keine Verläufe außerhalb der Rampen.
+
+## 6. Pixel-Art-Regeln
+
+1. Skalierung nur ganzzahlig mit Nearest Neighbour (×2, ×3, ×4, ×8 …). Niemals bilinear/bikubisch.
+2. Keine Drehung (außer 90°-Schritte), keine Verzerrung, keine nachträglichen Filter, Schlagschatten oder Glows –
+   Licht- und Glut-Effekte nur über die gelieferten Effekt-Layer.
+3. Hintergründe: bevorzugt dunkel (Anthrazit, Nachtlandschaft). Auf hellen/unruhigen Flächen den mitgelieferten
+   Abdunkelungs-Layer (`AVE_Veil`) oder eine dunkle Fläche hinterlegen.
+4. Unity-Import: Filter **Point (no filter)**, Kompression **None**, Mip Maps **aus** (Details: `ANIMATION_SPECIFICATION.md`).
+
+## 7. Do & Don’t
+
+| Do | Don’t |
+|---|---|
+| Wortmarke dominant, Untertitel klein darunter | Untertitel größer oder gleich groß wie AVARNETH |
+| Publisher dezent und getrennt | ECKERTENGINEERING in Gold oder größer als der Untertitel |
+| Ganzzahlige Skalierung | 150 %-Skalierung mit Glättung |
+| Wappen allein als App-/EXE-Icon | Die lange Wortmarke als Icon |
+| Dunkler Hintergrund oder Veil-Layer | Logo direkt auf hellem, detailreichem Grund |
+| Bezeichnung „AVARNETH: VEIL OF EMBERS“ | „WOE“, „World of Eckertengineering“ als Titel |
+
+## 8. Designrichtungen
+
+Alle drei Richtungen teilen exakt dieselbe Geometrie; nur die Materialien wechseln (exaktes Paletten-Remapping,
+jedes Pixel bleibt eine Palettenfarbe). Übersicht: `02_Logo_Variants/Variants_Overview.png`.
+
+| Richtung | Ordner | Charakter |
+|---|---|---|
+| **Magic & Iron (Produktionsstandard)** | `02_Logo_Variants/Magic_And_Iron/` | Production standard - magic iron / forge fantasy: dark iron, aged gold, ember glow, arcane blue accent. |
+| Classic Fantasy | `02_Logo_Variants/Classic_Fantasy/` | Classic fantasy MMORPG - heraldic royal-blue steel with bright gold, warm stone. |
+| Dark Fantasy | `02_Logo_Variants/Dark_Fantasy/` | Dark monumental fantasy - blackened silver metal, crimson embers, deeper stone. |
+
+**Produktionsstandard ist „Magic & Iron“** – er ist vollständig animiert, als Unity-Assets exportiert und in allen
+Vorschauen verwendet. Die beiden anderen Richtungen liegen als statische Alternativen vor.
+
+## 9. Windows-Icon
+
+`03_Windows_Icons/AVARNETH.ico` enthält 16, 24, 32, 48, 64, 128 und 256 px (16–128 als 32-bit-DIB mit Alpha und
+AND-Maske, 256 als PNG). 16/24/32 px sind von Hand gesetzt (vereinfachter Schild, A-Gipfel, glühendes Tor),
+48/64 px eine reduzierte Wappen-Fassung, 128/256/512 (und `Extra/AVARNETH_1024.png`) exakte Ganzzahl-Vergrößerungen
+des 64-px-Masters.

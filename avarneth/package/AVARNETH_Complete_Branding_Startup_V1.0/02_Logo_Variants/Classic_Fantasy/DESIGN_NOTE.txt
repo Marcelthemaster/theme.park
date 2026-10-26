@@ -1,0 +1,3 @@
+Classic fantasy MMORPG - heraldic royal-blue steel with bright gold, warm stone.
+
+Same geometry as the production standard; materials are swapped by exact palette remapping (see 07_Documentation/BRAND_GUIDELINES.md).

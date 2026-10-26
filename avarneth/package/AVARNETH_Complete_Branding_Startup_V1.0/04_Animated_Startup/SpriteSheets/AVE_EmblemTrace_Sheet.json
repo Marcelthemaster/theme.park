@@ -1,0 +1,118 @@
+{
+  "image": "AVE_EmblemTrace_Sheet.png",
+  "frameWidth": 67,
+  "frameHeight": 76,
+  "frameCount": 14,
+  "columns": 7,
+  "rows": 2,
+  "origin": "top-left, y down",
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 1,
+      "x": 67,
+      "y": 0,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 2,
+      "x": 134,
+      "y": 0,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 3,
+      "x": 201,
+      "y": 0,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 4,
+      "x": 268,
+      "y": 0,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 5,
+      "x": 335,
+      "y": 0,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 6,
+      "x": 402,
+      "y": 0,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 7,
+      "x": 0,
+      "y": 76,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 8,
+      "x": 67,
+      "y": 76,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 9,
+      "x": 134,
+      "y": 76,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 10,
+      "x": 201,
+      "y": 76,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 11,
+      "x": 268,
+      "y": 76,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 12,
+      "x": 335,
+      "y": 76,
+      "w": 67,
+      "h": 76
+    },
+    {
+      "index": 13,
+      "x": 402,
+      "y": 76,
+      "w": 67,
+      "h": 76
+    }
+  ],
+  "layerId": "emblemTrace",
+  "timelineStart": 0.0,
+  "timelineEnd": 0.34,
+  "afterFrames": "hide",
+  "positionArtPx": [
+    206,
+    71
+  ],
+  "note": "Frames are evenly distributed over [timelineStart, timelineEnd) - see Animation_Timeline.json."
+}

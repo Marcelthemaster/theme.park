@@ -1,0 +1,132 @@
+{
+  "image": "AVE_WordmarkShine_Sheet.png",
+  "frameWidth": 228,
+  "frameHeight": 43,
+  "frameCount": 16,
+  "columns": 1,
+  "rows": 16,
+  "origin": "top-left, y down",
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 1,
+      "x": 0,
+      "y": 43,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 2,
+      "x": 0,
+      "y": 86,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 3,
+      "x": 0,
+      "y": 129,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 4,
+      "x": 0,
+      "y": 172,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 5,
+      "x": 0,
+      "y": 215,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 6,
+      "x": 0,
+      "y": 258,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 7,
+      "x": 0,
+      "y": 301,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 8,
+      "x": 0,
+      "y": 344,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 9,
+      "x": 0,
+      "y": 387,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 10,
+      "x": 0,
+      "y": 430,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 11,
+      "x": 0,
+      "y": 473,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 12,
+      "x": 0,
+      "y": 516,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 13,
+      "x": 0,
+      "y": 559,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 14,
+      "x": 0,
+      "y": 602,
+      "w": 228,
+      "h": 43
+    },
+    {
+      "index": 15,
+      "x": 0,
+      "y": 645,
+      "w": 228,
+      "h": 43
+    }
+  ],
+  "layerId": "wordmarkShine",
+  "timelineStart": 0.64,
+  "timelineEnd": 1.12,
+  "afterFrames": "hide",
+  "positionArtPx": [
+    126,
+    149
+  ],
+  "note": "Frames are evenly distributed over [timelineStart, timelineEnd) - see Animation_Timeline.json."
+}

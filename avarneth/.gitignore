@@ -1,0 +1,5 @@
+work/iter/
+work/review/
+work/preview_tmp/
+__pycache__/
+*.pyc
