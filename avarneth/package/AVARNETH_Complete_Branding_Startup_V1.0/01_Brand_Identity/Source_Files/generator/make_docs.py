@@ -71,7 +71,7 @@ Entwickler & Publisher: **Eckertengineering** · Spielmarke: **AVARNETH: VEIL OF
 
 | Ebene | Element | Rolle |
 |---|---|---|
-| Studio | **ECKERTENGINEERING** / „ECKERTENGINEERING PRESENTS“ | dezent, Stahlgrau, eigene 7-px-Pixel-Versalien; konkurriert nie mit dem Titel |
+| Studio | **ECKERTENGINEERING** / „ECKERTENGINEERING PRESENTS“ | dezent, flaches Stahlgrau, eigene 5-px-Versalien mit Schlagschatten; konkurriert nie mit dem Titel |
 | Spielmarke | **AVARNETH** | dominante Wortmarke, Altgold mit Eisen-Extrusion |
 | Untertitel | **VEIL OF EMBERS** | deutlich kleiner (9-px-Versalien), Gold, flankiert von Glut-Rauten; eigener Layer |
 | Bildmarke | **Wappen „Das Glut-Tor“** | eigenständig verwendbar (Icon, Favicon, Siegel, Ladeindikator-Deko) |
@@ -177,7 +177,8 @@ Vorschauen verwendet. Die beiden anderen Richtungen liegen als statische Alterna
 
 `03_Windows_Icons/AVARNETH.ico` enthält **22 Größen**: 16, 20, 24, 28, 30, 32, 36, 40, 42, 48, 56, 60, 64, 72, 80, 84, 96,
 120, 128, 144, 192, 256 px (bis 96 px als 32-bit-DIB mit Alpha und AND-Maske, ab 120 px PNG-komprimiert). Damit muss
-Windows bei 100/125/150/175/200 % Skalierung und in den „Große Symbole“-Ansichten nicht weichzeichnen.
+Windows bei 100/125/150/175/200 % Skalierung und in den „Große Symbole“-Ansichten keine Zwischengröße
+weichzeichnend errechnen müssen (Windows-Verhalten in dieser Umgebung nicht getestet, siehe QA-Bericht).
 
 * 16, 20, 24, 28, 30, 32, 36, 40, 42 px: pro Größe auf dem Pixelraster gezeichnete Kleinst-Fassung – ein geschlossener
   Schild mit mittelgrauer Eisenplatte (bleibt auf dunkler Taskleiste sichtbar), beide A-Schenkel klar golden, Rune im
@@ -233,14 +234,15 @@ kein Ladebildschirm – nur Sprites, die per Code animiert werden.
   über den ganzen Bildschirm gestreckt (auch 16:10 und 21:9) und mit Bilinear-Filter importiert (weicher Verlauf).
 * Unity-Skalierungsmodi (`AvarnethStartupAnimation`): **IntegerNearest** (Standard: round(Screen.height/270), reduziert
   bis der Inhaltsbereich passt, min. 1), IntegerFloor, Continuous (stufenlos, nicht pixel-perfekt).
-  Beispiele IntegerNearest: 1280×720 → 3 (Inhalt 720×510 px), 1920×1080 → 4, 2560×1440 → 5, 3840×2160 → 8.
+  Beispiele IntegerNearest: 1280×720 → 3 (Inhaltsbereich {cb['width'] * 3}×{cb['height'] * 3} px), 1920×1080 → 4, 2560×1440 → 5,
+  3840×2160 → 8 (vollständige Tabelle in `UNITY_INSTALLATION.md`).
 
 ## 2. Phasen
 
 | Zeit | Phase | Inhalt |
 |---|---|---|
 | 0.00–0.35 s | 1 – Wappen | Eine goldene Lichtlinie zeichnet in 12 Frames (je 1/60 s) die Wappen-Silhouette von der Turmspitze beidseitig bis zur Schildspitze, danach in 4 Frames die A-Schenkel und den Querbalken; das letzte Bild bleibt stehen und löst sich bis 0.36 s weich auf. Die Füllung blendet erst ab 0.16 s ein; kurzes Aufleuchten (helle Flächen 2 Rampenstufen heller), warmes Kontur-Glühen außerhalb der Kontur, 8 Goldfunken lösen sich vom Rand. |
-| 0.35–1.15 s | 2 – Wortmarke | Licht führt: Die Goldflächen leuchten 0.38–0.60 s über ihren Endzustand hinaus, während AVARNETH in einer einzigen weichen Kurve einblendet (keine Positionssprünge). Goldener Lichtstreif 0.63–1.10 s (28 Frames à 1/60 s, hebt die Goldflächen um 1–2 Rampenstufen an, nie dunkler). Publisher-Zeile blendet dezent auf 65 % ein (0.30–0.60 s). |
+| 0.35–1.15 s | 2 – Wortmarke | Licht führt: Die Goldflächen leuchten 0.38–0.60 s über ihren Endzustand hinaus, während AVARNETH in einer einzigen weichen Kurve einblendet (keine Positionssprünge). Goldener Lichtstreif 0.63–1.10 s (28 Frames à 1/60 s, jeder Frame trifft die Schrift; hebt die Goldflächen um 1–2 Rampenstufen an, nie dunkler). Publisher-Zeile blendet dezent auf 65 % ein (0.30–0.60 s). |
 | 1.15–1.60 s | 3 – Untertitel | VEIL OF EMBERS blendet in einer weichen Kurve ein; 12 Glutpartikel lösen sich von den Enden der Ornament-Linien bzw. glimmen unter der Grundlinie – kein Partikel kreuzt Schrift oder Wappen. |
 | 1.60–2.00 s | 4 – Akzent & Ausblendung | Gestaffelter Lichtakzent mit Höhepunkt vor dem Ausblenden: Glint an der Turmspitze (1.60–1.73 s), Kontur-Glühen (Spitze 1.68 s), Wappen- und Wortmarken-Glanz (Spitze 1.70 s). Ab 1.76 s blenden die Logo-Ebenen mit inCubic aus (bleiben lange satt und durchlaufen die halbtransparenten Zwischenstufen schnell), die Abdunkelung ab 1.74 s. Der Login-Bootstrap bleibt die ganze Zeit sichtbar. |
 
@@ -285,8 +287,9 @@ geprüft: kein Partikel überdeckt Wappen, Wortmarke, Untertitel oder Publisher-
 
 Texture Type **Sprite (2D and UI)**, Sprite Mode **Single**, Pixels Per Unit 100, Mesh Type **Full Rect**,
 Filter **Point (no filter)**, Compression **None**, Generate Mip Maps **aus**, Wrap **Clamp**, Non-Power-of-2 **None**,
-sRGB **an**, Alpha Is Transparency **an**, Max Size 2048. Ausnahme: Vollbild-Ebenen (`AVE_Veil`) mit **Bilinear**.
-Icons (`Icons/`): Texture Type Default, sonst identisch.
+sRGB **an**, Alpha Is Transparency **an**, Max Size **≥ 2048**. Ausnahme: Vollbild-Ebenen (`AVE_Veil`) mit **Bilinear**.
+Icons (`Icons/`): Texture Type **Default**, Filter **Point**, Mip Maps **aus**, Compression **None**, Non-Power-of-2 **None**,
+Max Size **≥ 2048** (Wrap/sRGB/Alpha Is Transparency werden für Icons nicht verändert).
 
 ## 8. Laufzeitbudget
 
@@ -334,7 +337,7 @@ Alle Grafiken sind echte Pixel-Art auf nativem Raster (keine Fotos, keine Filter
 ## Bewusst nicht enthalten / Abweichungen von der Zielstruktur
 
 * **`05_Unity_Integration/Prefabs/AvarnethStartup.prefab`** – wird **in Unity** vom Editor-Werkzeug erzeugt
-  (*Tools ▸ AVARNETH ▸ Startup ▸ Create / Update Startup Prefab*). Ohne Unity-Editor lässt sich kein verlässlich
+  (*Tools ▸ AVARNETH ▸ Startup ▸ Create or Update Startup Prefab*). Ohne Unity-Editor lässt sich kein verlässlich
   serialisiertes Prefab erzeugen; eine handgeschriebene Prefab-YAML wird absichtlich **nicht** geliefert.
 * **`05_Unity_Integration/Materials/`** – nicht benötigt: Die Animation nutzt das Standardmaterial `UI/Default`
   (reines Alpha-Blending, keine eigenen Shader).
@@ -352,7 +355,9 @@ Details und alle tatsächlich durchgeführten Prüfungen: `QA_REPORT.md`.
 ## Reproduzierbarkeit
 
 Alle Assets werden deterministisch von `01_Brand_Identity/Source_Files/generator/build_all.py` erzeugt
-(Python 3, numpy, Pillow, SciPy; ffmpeg für die Vorschauen).
+(Python 3, numpy, Pillow, SciPy; ffmpeg für die Vorschauen). Ausgabeordner per Umgebungsvariable
+`AVARNETH_PACKAGE_DIR` wählen (Standard: `../package/AVARNETH_Complete_Branding_Startup_V1.0` relativ zum
+Generator-Ordner) – sonst entsteht beim Aufruf direkt in `Source_Files/generator/` eine verschachtelte Kopie.
 """
 
 

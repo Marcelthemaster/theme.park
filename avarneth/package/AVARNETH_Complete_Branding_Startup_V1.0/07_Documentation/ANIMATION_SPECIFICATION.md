@@ -14,14 +14,15 @@ kein Ladebildschirm – nur Sprites, die per Code animiert werden.
   über den ganzen Bildschirm gestreckt (auch 16:10 und 21:9) und mit Bilinear-Filter importiert (weicher Verlauf).
 * Unity-Skalierungsmodi (`AvarnethStartupAnimation`): **IntegerNearest** (Standard: round(Screen.height/270), reduziert
   bis der Inhaltsbereich passt, min. 1), IntegerFloor, Continuous (stufenlos, nicht pixel-perfekt).
-  Beispiele IntegerNearest: 1280×720 → 3 (Inhalt 720×510 px), 1920×1080 → 4, 2560×1440 → 5, 3840×2160 → 8.
+  Beispiele IntegerNearest: 1280×720 → 3 (Inhaltsbereich 675×495 px), 1920×1080 → 4, 2560×1440 → 5,
+  3840×2160 → 8 (vollständige Tabelle in `UNITY_INSTALLATION.md`).
 
 ## 2. Phasen
 
 | Zeit | Phase | Inhalt |
 |---|---|---|
 | 0.00–0.35 s | 1 – Wappen | Eine goldene Lichtlinie zeichnet in 12 Frames (je 1/60 s) die Wappen-Silhouette von der Turmspitze beidseitig bis zur Schildspitze, danach in 4 Frames die A-Schenkel und den Querbalken; das letzte Bild bleibt stehen und löst sich bis 0.36 s weich auf. Die Füllung blendet erst ab 0.16 s ein; kurzes Aufleuchten (helle Flächen 2 Rampenstufen heller), warmes Kontur-Glühen außerhalb der Kontur, 8 Goldfunken lösen sich vom Rand. |
-| 0.35–1.15 s | 2 – Wortmarke | Licht führt: Die Goldflächen leuchten 0.38–0.60 s über ihren Endzustand hinaus, während AVARNETH in einer einzigen weichen Kurve einblendet (keine Positionssprünge). Goldener Lichtstreif 0.63–1.10 s (28 Frames à 1/60 s, hebt die Goldflächen um 1–2 Rampenstufen an, nie dunkler). Publisher-Zeile blendet dezent auf 65 % ein (0.30–0.60 s). |
+| 0.35–1.15 s | 2 – Wortmarke | Licht führt: Die Goldflächen leuchten 0.38–0.60 s über ihren Endzustand hinaus, während AVARNETH in einer einzigen weichen Kurve einblendet (keine Positionssprünge). Goldener Lichtstreif 0.63–1.10 s (28 Frames à 1/60 s, jeder Frame trifft die Schrift; hebt die Goldflächen um 1–2 Rampenstufen an, nie dunkler). Publisher-Zeile blendet dezent auf 65 % ein (0.30–0.60 s). |
 | 1.15–1.60 s | 3 – Untertitel | VEIL OF EMBERS blendet in einer weichen Kurve ein; 12 Glutpartikel lösen sich von den Enden der Ornament-Linien bzw. glimmen unter der Grundlinie – kein Partikel kreuzt Schrift oder Wappen. |
 | 1.60–2.00 s | 4 – Akzent & Ausblendung | Gestaffelter Lichtakzent mit Höhepunkt vor dem Ausblenden: Glint an der Turmspitze (1.60–1.73 s), Kontur-Glühen (Spitze 1.68 s), Wappen- und Wortmarken-Glanz (Spitze 1.70 s). Ab 1.76 s blenden die Logo-Ebenen mit inCubic aus (bleiben lange satt und durchlaufen die halbtransparenten Zwischenstufen schnell), die Abdunkelung ab 1.74 s. Der Login-Bootstrap bleibt die ganze Zeit sichtbar. |
 
@@ -79,8 +80,9 @@ geprüft: kein Partikel überdeckt Wappen, Wortmarke, Untertitel oder Publisher-
 
 Texture Type **Sprite (2D and UI)**, Sprite Mode **Single**, Pixels Per Unit 100, Mesh Type **Full Rect**,
 Filter **Point (no filter)**, Compression **None**, Generate Mip Maps **aus**, Wrap **Clamp**, Non-Power-of-2 **None**,
-sRGB **an**, Alpha Is Transparency **an**, Max Size 2048. Ausnahme: Vollbild-Ebenen (`AVE_Veil`) mit **Bilinear**.
-Icons (`Icons/`): Texture Type Default, sonst identisch.
+sRGB **an**, Alpha Is Transparency **an**, Max Size **≥ 2048**. Ausnahme: Vollbild-Ebenen (`AVE_Veil`) mit **Bilinear**.
+Icons (`Icons/`): Texture Type **Default**, Filter **Point**, Mip Maps **aus**, Compression **None**, Non-Power-of-2 **None**,
+Max Size **≥ 2048** (Wrap/sRGB/Alpha Is Transparency werden für Icons nicht verändert).
 
 ## 8. Laufzeitbudget
 

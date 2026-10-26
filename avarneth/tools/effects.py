@@ -195,22 +195,23 @@ def veil(w=480, h=270, cx=240.0, cy=135.0, rx=300.0, ry=170.0, center=140, edge=
     return c
 
 
-def shine_frames(layer: Canvas, face_mask, n=28, slope=0.5, margin=26, min_lum=95):
+def shine_frames(layer: Canvas, face_mask, n=28, slope=0.5, min_lum=95):
     """Slanted band of light sweeping left -> right over the gold faces: core +2 ramp steps,
-    flanks +1 step, computed from the pixel below (never darker); outline/extrusion excluded."""
+    flanks +1 step, computed from the pixel below (never darker); outline/extrusion excluded.
+    The sweep range is fitted to the letters, so every one of the n frames lights some pixels."""
     H, W = face_mask.shape
     Y, X = np.mgrid[0:H, 0:W]
+    v = X - (H - Y) * slope
+    lit = face_mask & (np.array([[_lum(layer.a[y, x, :3]) for x in range(W)] for y in range(H)]) >= min_lum)
+    start, end = v[lit].min() - 3, v[lit].max() + 3
     frames = []
-    start, end = -margin, W + margin
     for f in range(n):
         p = f / (n - 1)
         x0 = start + (end - start) * p
-        u = np.abs((X - (H - Y) * slope) - x0)
+        u = np.abs(v - x0)
         c = Canvas(W, H)
-        for y, x in zip(*np.where((u <= 7) & face_mask)):
+        for y, x in zip(*np.where((u <= 7) & lit)):
             rgb = layer.a[y, x, :3]
-            if _lum(rgb) < min_lum:
-                continue
             steps = 2 if u[y, x] <= 2.5 else 1
             nc = ramp_shift(rgb, steps)
             if nc is None:

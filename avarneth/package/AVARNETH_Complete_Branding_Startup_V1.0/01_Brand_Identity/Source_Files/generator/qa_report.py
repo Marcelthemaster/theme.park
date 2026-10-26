@@ -94,7 +94,7 @@ def render(ev):
         return f"{'Build OK' if ok else 'Build FEHLER'}, {len(e)} Fehler, {len(w)} Warnungen" + (f" ({'; '.join(w)[:300]})" if w else '')
     u.append({'status': status(rt and rt[0] and not rt[1]), 'check': 'C#-Runtime kompiliert ohne UnityEditor-Referenz (C# 9, netstandard2.1)',
               'evidence': 'dotnet build gegen echte Unity-Referenzassemblies UnityEngine 2021.3.33 (Module) + UnityEngine.UI 2020.3.21: ' + cres(rt)})
-    u.append({'status': status(ed and ed[0] and not ed[1]), 'check': 'Editor + Runtime kompilieren gemeinsam',
+    u.append({'status': status(ed and ed[0] and not ed[1]), 'check': 'Editor + Runtime kompilieren gemeinsam (Prüfaufbau mit Stubs – kein Unity-Compile)',
               'evidence': 'zusätzlich UnityEditor.dll 2021.1 + Harness-Stubs (nur im Prüfaufbau, nicht im Paket) für die dort fehlenden '
               'Unity-6-APIs NamedBuildTarget (Unknown/Standalone/TargetName), PlayerSettings.SetIcons/GetIcons/GetIconSizes(NamedBuildTarget, IconKind), '
               'PlayerSettings.SplashScreen.show/showUnityLogo, TextureImporter.GetSourceTextureWidthAndHeight – Signaturen aus dem '
@@ -110,9 +110,11 @@ def render(ev):
               'evidence': f'{total} CSV-Zeilen (Layer + Partikel je Frame) bei ' + ', '.join(f'{f} fps' for f, _, _ in ev['crosscheck'])
               + f' verglichen: {bad} Abweichungen (Sichtbarkeit, Flipbook-Index, Pixelposition, Alpha ±0.002)'})
     api_ok, api_n, api_missing = ev['apicheck']
-    u.append({'status': status(api_ok), 'check': 'Verwendete Unity-APIs gegen den Unity-6000.6.0f1-Quellcode geprüft (Existenz, Signatur, [Obsolete])',
-              'evidence': f'apicheck_6000_6.py gegen Unity-C#-Reference-Source (Tag 6000.6.0f1): {api_n} Einträge OK, {api_missing} fehlend; '
-              'kein verwendetes Member ist [Obsolete]. Datei:Zeile-Liste in UNITY_COMPILE_EVIDENCE.md'})
+    u.append({'status': status(api_ok), 'check': 'Verwendete UnityEngine-/UnityEditor-Member gegen den Unity-6000.6.0f1-Quellcode geprüft (Existenz, Signatur, [Obsolete])',
+              'evidence': f'apicheck_6000_6.py: kuratierte Liste von {api_n} im Code verwendeten UnityEngine/UnityEditor-Membern gegen die '
+              f'Unity-C#-Reference-Source (Tag 6000.6.0f1): alle gefunden, {api_missing} fehlend, keines [Obsolete]. '
+              'Ausnahme: uGUI (Image, CanvasScaler, GraphicRaycaster, EventSystem, IPointerClickHandler) ist nicht Teil dieser '
+              'Quelle und wurde nur gegen uGUI 2020.3.21 kompiliert. Datei:Zeile-Liste in UNITY_COMPILE_EVIDENCE.md'})
     u.extend(r for r in rows.get('Unity-Integration', []))
 
     pk = []
@@ -144,7 +146,9 @@ def render(ev):
         'kein Unity-Editor, kein Windows, kein Zugriff auf das Produktivprojekt.', '',
         'Statuswerte: **PASS** = tatsächlich geprüft und bestanden · **FAIL** = tatsächlich geprüft und fehlgeschlagen · '
         '**NOT TESTED** = nicht geprüft bzw. erforderliche Umgebung nicht vorhanden. Grundsatz: *No evidence = no pass.*', '',
-        'Alle automatisierten Prüfungen sind reproduzierbar: `Source_Files/generator/qa.py`, `qa_report.py`, `crosscheck.py`.', '',
+        'Die Grafik-, Icon-, Animations- und Paketprüfungen sind mit `Source_Files/generator/qa.py` reproduzierbar. Die C#-Prüfungen '
+        '(Abschnitt 4) liefen in einem Prüfaufbau außerhalb des Pakets (Unity-Referenz-DLLs von NuGet, Harness-Stubs, '
+        'Konsolen-Harness); er ist in `UNITY_COMPILE_EVIDENCE.md` vollständig beschrieben, wird aber nicht mitgeliefert.', '',
         '## 1. Grafikprüfung', '', table(rows.get('Grafik', [])), '',
         '## 2. Windows-Icon-Prüfung', '', table(rows.get('Windows-Icon', [])), '',
         '## 3. Animationsprüfung', '', table(rows.get('Animation', [])), '',
@@ -161,11 +165,14 @@ def render(ev):
         lines.append(f'| **NOT TESTED** | {c} | {why} |')
     lines += ['', '## 7. Lokale Abnahme-Checkliste (auf dem Unity-Rechner)', '',
               '1. Ordner `05_Unity_Integration` nach `Assets/…` kopieren → Console ohne Fehler.',
-              '2. *Tools ▸ AVARNETH ▸ Startup ▸ Validate Installation* → keine Fehler.',
-              '3. *Configure Sprite Import Settings*, dann *Create / Update Startup Prefab* → Prefab entsteht ohne Fehlermeldung.',
-              '4. Bestehende Bootstrap-/Login-Szene öffnen, *Add Startup Overlay To Open Scene…*, Login-CanvasGroup zuweisen, Szene speichern.',
-              '5. Play: Animation ca. 2 s, danach Overlay deaktiviert, Login bedienbar, keine Fehler/Warnungen; bei 1280×720, 1920×1080 und 2560×1440 prüfen.',
-              '6. Windows-Build mit gesetzten Icons: EXE-, Taskleisten- und Alt-Tab-Symbol prüfen; Splash-Einstellungen gemäß PLAYER_SETTINGS.md.',
+              '2. *Tools ▸ AVARNETH ▸ Startup ▸ Configure Sprite Import Settings* (Bestätigungsdialog), dann '
+              '*Create or Update Startup Prefab* → Prefab entsteht ohne Fehlermeldung.',
+              '3. *Tools ▸ AVARNETH ▸ Startup ▸ Validate Installation* → keine Fehler.',
+              '4. Bestehende Bootstrap-/Login-Szene öffnen, *Add Startup Overlay To Open Scene...*, Login-CanvasGroup zuweisen, Szene speichern.',
+              '5. Play: Animation ca. 2 s, danach Overlay deaktiviert, Login bedienbar, keine Fehler/Warnungen; bei 1280×720, 1920×1080, '
+              '2560×1440 und einer 21:9-Auflösung prüfen (Abdunklung muss den ganzen Bildschirm decken).',
+              '6. Windows-Build mit gesetzten Icons: EXE-, Taskleisten- und Alt-Tab-Symbol prüfen; optional ICO per rcedit ins EXE '
+              'schreiben (PLAYER_SETTINGS.md); Splash-Einstellungen gemäß PLAYER_SETTINGS.md.',
               '7. Ergebnisse in diesem Bericht von NOT TESTED auf PASS/FAIL setzen.', '']
     lines += ['## 8. Anhang', '',
               'Vollständiges Compile-/API-Protokoll (englisch, mit allen Befehlen, Datei:Zeile-Nachweisen gegen den '

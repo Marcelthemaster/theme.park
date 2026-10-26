@@ -10,7 +10,7 @@ Entwickler & Publisher: **Eckertengineering** · Spielmarke: **AVARNETH: VEIL OF
 
 | Ebene | Element | Rolle |
 |---|---|---|
-| Studio | **ECKERTENGINEERING** / „ECKERTENGINEERING PRESENTS“ | dezent, Stahlgrau, eigene 7-px-Pixel-Versalien; konkurriert nie mit dem Titel |
+| Studio | **ECKERTENGINEERING** / „ECKERTENGINEERING PRESENTS“ | dezent, flaches Stahlgrau, eigene 5-px-Versalien mit Schlagschatten; konkurriert nie mit dem Titel |
 | Spielmarke | **AVARNETH** | dominante Wortmarke, Altgold mit Eisen-Extrusion |
 | Untertitel | **VEIL OF EMBERS** | deutlich kleiner (9-px-Versalien), Gold, flankiert von Glut-Rauten; eigener Layer |
 | Bildmarke | **Wappen „Das Glut-Tor“** | eigenständig verwendbar (Icon, Favicon, Siegel, Ladeindikator-Deko) |
@@ -128,7 +128,8 @@ Vorschauen verwendet. Die beiden anderen Richtungen liegen als statische Alterna
 
 `03_Windows_Icons/AVARNETH.ico` enthält **22 Größen**: 16, 20, 24, 28, 30, 32, 36, 40, 42, 48, 56, 60, 64, 72, 80, 84, 96,
 120, 128, 144, 192, 256 px (bis 96 px als 32-bit-DIB mit Alpha und AND-Maske, ab 120 px PNG-komprimiert). Damit muss
-Windows bei 100/125/150/175/200 % Skalierung und in den „Große Symbole“-Ansichten nicht weichzeichnen.
+Windows bei 100/125/150/175/200 % Skalierung und in den „Große Symbole“-Ansichten keine Zwischengröße
+weichzeichnend errechnen müssen (Windows-Verhalten in dieser Umgebung nicht getestet, siehe QA-Bericht).
 
 * 16, 20, 24, 28, 30, 32, 36, 40, 42 px: pro Größe auf dem Pixelraster gezeichnete Kleinst-Fassung – ein geschlossener
   Schild mit mittelgrauer Eisenplatte (bleibt auf dunkler Taskleiste sichtbar), beide A-Schenkel klar golden, Rune im

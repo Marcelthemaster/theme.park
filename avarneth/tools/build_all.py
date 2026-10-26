@@ -34,7 +34,7 @@ from fonts import STEEL7, text_mask, styled  # noqa: E402
 import pxmap  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HERE, '..'))
-PKG = os.path.join(ROOT, 'package', 'AVARNETH_Complete_Branding_Startup_V1.0')
+PKG = os.environ.get('AVARNETH_PACKAGE_DIR') or os.path.join(ROOT, 'package', 'AVARNETH_Complete_Branding_Startup_V1.0')
 P = lambda *a: os.path.join(PKG, *a)  # noqa: E731
 
 
@@ -220,7 +220,7 @@ def stage_sheets(tl, sprites):
     d = P('04_Animated_Startup', 'SpriteSheets')
     by_id = {L['id']: L for L in tl['layers']}
     for lid, name, cols in (('emblemTrace', 'AVE_EmblemTrace_Sheet', 7), ('wordmarkShine', 'AVE_WordmarkShine_Sheet', 1),
-                            ('glint', 'AVE_Glint_Sheet', 10)):
+                            ('glint', 'AVE_Glint_Sheet', 8)):
         L = by_id[lid]
         frames = [sprites[p] for p in L['frames']]
         sheet(frames, cols, os.path.join(d, name + '.png'),
@@ -452,14 +452,23 @@ def stage_sources():
         f.write(
             'AVARNETH source data\n'
             '====================\n'
-            'native_1x/   Master pixel art at native resolution (1 art pixel = 1 image pixel). Edit these.\n'
+            'native_1x/   Master pixel art at native resolution (1 art pixel = 1 image pixel), as generated.\n'
+            '             Use these as the reference for any manual retouching; note that re-running the generator\n'
+            '             recreates all files from code (edit generator/*.py to change the art permanently).\n'
             'exports_2x/  Integer nearest-neighbour upscales x2.\n'
             'exports_8x/  Integer nearest-neighbour upscales x8 (4K / print).\n'
             '             (The x4 exports - 1080p - are in the parent folder.)\n'
             'palette/     Master palette (GIMP .gpl, .hex, code table, swatch). All brand pixels use only these colours.\n'
-            'pixelmaps/   Hand-specified 16/24/32 px icons as editable palette-code text grids.\n'
+            'pixelmaps/   Generated text dumps (palette cell codes) of the per-size icon drawings 16-42 px and the\n'
+            '             48/64 px icon masters - for review and manual pixel edits; they are output, not input.\n'
             'generator/   Python 3 sources that generate every asset deterministically\n'
-            '             (requires numpy, pillow, scipy, ffmpeg for previews):  python3 build_all.py\n'
+            '             (numpy, pillow, scipy; ffmpeg for previews):\n'
+            '               AVARNETH_PACKAGE_DIR=/path/to/output python3 build_all.py\n'
+            '             Without AVARNETH_PACKAGE_DIR the output goes to ../package/AVARNETH_Complete_Branding_Startup_V1.0\n'
+            '             relative to the generator folder (copy generator/ to a work folder first).\n'
+            '             qa.py / crosscheck.py / qa_report.py / finalize.py are the QA tools used for this delivery; the C#\n'
+            '             checks additionally need the compile harness described in 07_Documentation/UNITY_COMPILE_EVIDENCE.md\n'
+            '             (not shipped: it contains signatures copied from Unity\'s reference-only source).\n'
             'Never scale these images with bilinear/bicubic filtering - integer nearest-neighbour only.\n')
 
 

@@ -1,8 +1,8 @@
-AVARNETH_Complete_Branding_Startup_V1.0.zip - package verification (2026-10-26T17:37:07+00:00)
-zip size: 6556932 bytes
-zip sha256: 2d4bd4ce7b83466d5714468b1d982dc7eb632876379b49592037bc2f7a542c34
+AVARNETH_Complete_Branding_Startup_V1.0.zip - package verification (2026-10-26T17:57:23+00:00)
+zip size: 6572344 bytes
+zip sha256: db6dbf10c03fd2c277aeab431f1bfc81791075ab6327960206992f9450f132a5
 
-PASS  zip_test: No errors detected in compressed data of /home/user/theme.park/avarneth/package/AVARNETH_Complete_Branding_Startup_V1.0.zip.
+PASS  zip_test: No errors detected in compressed data of AVARNETH_Complete_Branding_Startup_V1.0.zip.
 PASS  complete: 512 Dateien im ZIP, 512 im Quellordner
 PASS  readable: alle 512 Dateien nach dem Entpacken geöffnet/geparst; Fehler: keine
 PASS  no_zero_bytes: Nullbyte-Dateien: keine

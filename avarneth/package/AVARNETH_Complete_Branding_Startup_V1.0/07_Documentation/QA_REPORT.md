@@ -4,7 +4,7 @@ Erstellt: 2026-10-26 · Umgebung: Linux-Container (Python 3, Pillow, NumPy, SciP
 
 Statuswerte: **PASS** = tatsächlich geprüft und bestanden · **FAIL** = tatsächlich geprüft und fehlgeschlagen · **NOT TESTED** = nicht geprüft bzw. erforderliche Umgebung nicht vorhanden. Grundsatz: *No evidence = no pass.*
 
-Alle automatisierten Prüfungen sind reproduzierbar: `Source_Files/generator/qa.py`, `qa_report.py`, `crosscheck.py`.
+Die Grafik-, Icon-, Animations- und Paketprüfungen sind mit `Source_Files/generator/qa.py` reproduzierbar. Die C#-Prüfungen (Abschnitt 4) liefen in einem Prüfaufbau außerhalb des Pakets (Unity-Referenz-DLLs von NuGet, Harness-Stubs, Konsolen-Harness); er ist in `UNITY_COMPILE_EVIDENCE.md` vollständig beschrieben, wird aber nicht mitgeliefert.
 
 ## 1. Grafikprüfung
 
@@ -51,11 +51,11 @@ Alle automatisierten Prüfungen sind reproduzierbar: `Source_Files/generator/qa.
 | Status | Prüfung | Nachweis |
 |---|---|---|
 | **PASS** | C#-Runtime kompiliert ohne UnityEditor-Referenz (C# 9, netstandard2.1) | dotnet build gegen echte Unity-Referenzassemblies UnityEngine 2021.3.33 (Module) + UnityEngine.UI 2020.3.21: Build OK, 0 Fehler, 0 Warnungen |
-| **PASS** | Editor + Runtime kompilieren gemeinsam | zusätzlich UnityEditor.dll 2021.1 + Harness-Stubs (nur im Prüfaufbau, nicht im Paket) für die dort fehlenden Unity-6-APIs NamedBuildTarget (Unknown/Standalone/TargetName), PlayerSettings.SetIcons/GetIcons/GetIconSizes(NamedBuildTarget, IconKind), PlayerSettings.SplashScreen.show/showUnityLogo, TextureImporter.GetSourceTextureWidthAndHeight – Signaturen aus dem 6000.6-Quellcode kopiert (Datei:Zeile in UNITY_COMPILE_EVIDENCE.md §5) – Build OK, 0 Fehler, 0 Warnungen |
+| **PASS** | Editor + Runtime kompilieren gemeinsam (Prüfaufbau mit Stubs – kein Unity-Compile) | zusätzlich UnityEditor.dll 2021.1 + Harness-Stubs (nur im Prüfaufbau, nicht im Paket) für die dort fehlenden Unity-6-APIs NamedBuildTarget (Unknown/Standalone/TargetName), PlayerSettings.SetIcons/GetIcons/GetIconSizes(NamedBuildTarget, IconKind), PlayerSettings.SplashScreen.show/showUnityLogo, TextureImporter.GetSourceTextureWidthAndHeight – Signaturen aus dem 6000.6-Quellcode kopiert (Datei:Zeile in UNITY_COMPILE_EVIDENCE.md §5) – Build OK, 0 Fehler, 0 Warnungen |
 | **PASS** | Editor-Assembly separat gegen die Runtime-Assembly (asmdef-Aufteilung nachgestellt) | Build OK, 0 Fehler, 0 Warnungen |
 | **PASS** | Zeitleisten-Mathematik (Unity-frei) – Selbsttest | Konsolen-Harness net8.0: Build OK, 0 Fehler, 0 Warnungen; --selftest: selftest: 97 passed, 0 failed |
 | **PASS** | C#-Laufzeitmathematik = Python-Referenz (Vorschau-Renderer) für die echte Animation_Timeline.json | 16956 CSV-Zeilen (Layer + Partikel je Frame) bei 30 fps, 60 fps, 144 fps verglichen: 0 Abweichungen (Sichtbarkeit, Flipbook-Index, Pixelposition, Alpha ±0.002) |
-| **PASS** | Verwendete Unity-APIs gegen den Unity-6000.6.0f1-Quellcode geprüft (Existenz, Signatur, [Obsolete]) | apicheck_6000_6.py gegen Unity-C#-Reference-Source (Tag 6000.6.0f1): 185 Einträge OK, 0 fehlend; kein verwendetes Member ist [Obsolete]. Datei:Zeile-Liste in UNITY_COMPILE_EVIDENCE.md |
+| **PASS** | Verwendete UnityEngine-/UnityEditor-Member gegen den Unity-6000.6.0f1-Quellcode geprüft (Existenz, Signatur, [Obsolete]) | apicheck_6000_6.py: kuratierte Liste von 185 im Code verwendeten UnityEngine/UnityEditor-Membern gegen die Unity-C#-Reference-Source (Tag 6000.6.0f1): alle gefunden, 0 fehlend, keines [Obsolete]. Ausnahme: uGUI (Image, CanvasScaler, GraphicRaycaster, EventSystem, IPointerClickHandler) ist nicht Teil dieser Quelle und wurde nur gegen uGUI 2020.3.21 kompiliert. Datei:Zeile-Liste in UNITY_COMPILE_EVIDENCE.md |
 | **PASS** | Editor- und Runtime-Code sauber getrennt | Runtime: ['AvarnethStartupAnimation.cs', 'AvarnethStartupTimelineMath.cs'], Editor: ['AvarnethStartupInstaller.cs']; UnityEditor-Verweise im Runtime-Code: keine; Editor-asmdef includePlatforms=Editor |
 | **PASS** | Keine Abhängigkeit von Nakama / Netzwerk / Authentifizierung | grep nakama\|Socket\|HttpClient\|UnityWebRequest in allen .cs: keine Treffer |
 | **PASS** | Keine erfundenen Projektpfade (keine fest verdrahteten Assets/...-Pfade) | keine fest verdrahteten Assets/-Pfade; Asset-Wurzel wird über Animation_Timeline.json (schema) gesucht |
@@ -67,7 +67,7 @@ Alle automatisierten Prüfungen sind reproduzierbar: `Source_Files/generator/qa.
 
 | Status | Prüfung | Nachweis |
 |---|---|---|
-| **PASS** | ZIP-Datei vollständig und unbeschädigt (unzip -t) | No errors detected in compressed data of /home/user/theme.park/avarneth/package/AVARNETH_Complete_Branding_Startup_V1.0.zip. |
+| **PASS** | ZIP-Datei vollständig und unbeschädigt (unzip -t) | No errors detected in compressed data of AVARNETH_Complete_Branding_Startup_V1.0.zip. |
 | **PASS** | ZIP enthält exakt alle Paketdateien | 512 Dateien im ZIP, 512 im Quellordner |
 | **PASS** | Dateien nach dem Entpacken lesbar | alle 512 Dateien nach dem Entpacken geöffnet/geparst; Fehler: keine |
 | **PASS** | Keine Nullbyte-Platzhalter | Nullbyte-Dateien: keine |
@@ -93,11 +93,11 @@ Die Paketprüfung wurde am fertig gepackten ZIP ausgeführt (entpacken, `sha256s
 ## 7. Lokale Abnahme-Checkliste (auf dem Unity-Rechner)
 
 1. Ordner `05_Unity_Integration` nach `Assets/…` kopieren → Console ohne Fehler.
-2. *Tools ▸ AVARNETH ▸ Startup ▸ Validate Installation* → keine Fehler.
-3. *Configure Sprite Import Settings*, dann *Create / Update Startup Prefab* → Prefab entsteht ohne Fehlermeldung.
-4. Bestehende Bootstrap-/Login-Szene öffnen, *Add Startup Overlay To Open Scene…*, Login-CanvasGroup zuweisen, Szene speichern.
-5. Play: Animation ca. 2 s, danach Overlay deaktiviert, Login bedienbar, keine Fehler/Warnungen; bei 1280×720, 1920×1080 und 2560×1440 prüfen.
-6. Windows-Build mit gesetzten Icons: EXE-, Taskleisten- und Alt-Tab-Symbol prüfen; Splash-Einstellungen gemäß PLAYER_SETTINGS.md.
+2. *Tools ▸ AVARNETH ▸ Startup ▸ Configure Sprite Import Settings* (Bestätigungsdialog), dann *Create or Update Startup Prefab* → Prefab entsteht ohne Fehlermeldung.
+3. *Tools ▸ AVARNETH ▸ Startup ▸ Validate Installation* → keine Fehler.
+4. Bestehende Bootstrap-/Login-Szene öffnen, *Add Startup Overlay To Open Scene...*, Login-CanvasGroup zuweisen, Szene speichern.
+5. Play: Animation ca. 2 s, danach Overlay deaktiviert, Login bedienbar, keine Fehler/Warnungen; bei 1280×720, 1920×1080, 2560×1440 und einer 21:9-Auflösung prüfen (Abdunklung muss den ganzen Bildschirm decken).
+6. Windows-Build mit gesetzten Icons: EXE-, Taskleisten- und Alt-Tab-Symbol prüfen; optional ICO per rcedit ins EXE schreiben (PLAYER_SETTINGS.md); Splash-Einstellungen gemäß PLAYER_SETTINGS.md.
 7. Ergebnisse in diesem Bericht von NOT TESTED auf PASS/FAIL setzen.
 
 ## 8. Anhang

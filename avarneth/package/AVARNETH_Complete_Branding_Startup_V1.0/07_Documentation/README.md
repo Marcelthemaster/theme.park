@@ -32,7 +32,7 @@ Alle Grafiken sind echte Pixel-Art auf nativem Raster (keine Fotos, keine Filter
 ## Bewusst nicht enthalten / Abweichungen von der Zielstruktur
 
 * **`05_Unity_Integration/Prefabs/AvarnethStartup.prefab`** – wird **in Unity** vom Editor-Werkzeug erzeugt
-  (*Tools ▸ AVARNETH ▸ Startup ▸ Create / Update Startup Prefab*). Ohne Unity-Editor lässt sich kein verlässlich
+  (*Tools ▸ AVARNETH ▸ Startup ▸ Create or Update Startup Prefab*). Ohne Unity-Editor lässt sich kein verlässlich
   serialisiertes Prefab erzeugen; eine handgeschriebene Prefab-YAML wird absichtlich **nicht** geliefert.
 * **`05_Unity_Integration/Materials/`** – nicht benötigt: Die Animation nutzt das Standardmaterial `UI/Default`
   (reines Alpha-Blending, keine eigenen Shader).
@@ -50,4 +50,6 @@ Details und alle tatsächlich durchgeführten Prüfungen: `QA_REPORT.md`.
 ## Reproduzierbarkeit
 
 Alle Assets werden deterministisch von `01_Brand_Identity/Source_Files/generator/build_all.py` erzeugt
-(Python 3, numpy, Pillow, SciPy; ffmpeg für die Vorschauen).
+(Python 3, numpy, Pillow, SciPy; ffmpeg für die Vorschauen). Ausgabeordner per Umgebungsvariable
+`AVARNETH_PACKAGE_DIR` wählen (Standard: `../package/AVARNETH_Complete_Branding_Startup_V1.0` relativ zum
+Generator-Ordner) – sonst entsteht beim Aufruf direkt in `Source_Files/generator/` eine verschachtelte Kopie.

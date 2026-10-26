@@ -451,7 +451,7 @@ def verify_package():
     out = {}
     zp = os.path.join(ROOT, 'package', NAME + '.zip')
     t = subprocess.run(['unzip', '-tq', zp], capture_output=True, text=True)
-    out['zip_test'] = (t.returncode == 0, t.stdout.strip() or t.stderr.strip())
+    out['zip_test'] = (t.returncode == 0, (t.stdout.strip() or t.stderr.strip()).replace(os.path.dirname(zp) + os.sep, ''))
     tmp = tempfile.mkdtemp()
     subprocess.run(['unzip', '-q', zp, '-d', tmp], check=True)
     root = os.path.join(tmp, NAME)
