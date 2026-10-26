@@ -95,8 +95,10 @@ def render(ev):
     u.append({'status': status(rt and rt[0] and not rt[1]), 'check': 'C#-Runtime kompiliert ohne UnityEditor-Referenz (C# 9, netstandard2.1)',
               'evidence': 'dotnet build gegen echte Unity-Referenzassemblies UnityEngine 2021.3.33 (Module) + UnityEngine.UI 2020.3.21: ' + cres(rt)})
     u.append({'status': status(ed and ed[0] and not ed[1]), 'check': 'Editor + Runtime kompilieren gemeinsam',
-              'evidence': 'zusätzlich UnityEditor.dll 2021.1 + Harness-Stubs (nur im Prüfaufbau, nicht im Paket) für Unity-6-APIs: '
-              + ', '.join(sorted(set(ev['stubs'])))[:400] + ' – ' + cres(ed)})
+              'evidence': 'zusätzlich UnityEditor.dll 2021.1 + Harness-Stubs (nur im Prüfaufbau, nicht im Paket) für die dort fehlenden '
+              'Unity-6-APIs NamedBuildTarget (Unknown/Standalone/TargetName), PlayerSettings.SetIcons/GetIcons/GetIconSizes(NamedBuildTarget, IconKind), '
+              'PlayerSettings.SplashScreen.show/showUnityLogo, TextureImporter.GetSourceTextureWidthAndHeight – Signaturen aus dem '
+              '6000.6-Quellcode kopiert (Datei:Zeile in UNITY_COMPILE_EVIDENCE.md §5) – ' + cres(ed)})
     if es is not None:
         u.append({'status': status(es[0] and not es[1]), 'check': 'Editor-Assembly separat gegen die Runtime-Assembly (asmdef-Aufteilung nachgestellt)',
                   'evidence': cres(es)})

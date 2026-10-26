@@ -1,0 +1,69 @@
+{
+ "runtime": [
+  true,
+  [],
+  []
+ ],
+ "editor": [
+  true,
+  [],
+  []
+ ],
+ "editor_split": [
+  true,
+  [],
+  []
+ ],
+ "mathtest": [
+  true,
+  [],
+  []
+ ],
+ "selftest": [
+  true,
+  [
+   "selftest: 97 passed, 0 failed"
+  ]
+ ],
+ "crosscheck": [
+  [
+   30,
+   2196,
+   0
+  ],
+  [
+   60,
+   4356,
+   0
+  ],
+  [
+   144,
+   10404,
+   0
+  ]
+ ],
+ "apicheck": [
+  true,
+  185,
+  0
+ ],
+ "stubs": [
+  "Unknown",
+  "Standalone",
+  "TargetName",
+  "Equals",
+  "CompareTo",
+  "operator",
+  "GetSourceTextureWidthAndHeight",
+  "HarnessOnlyTextureImporterStubs",
+  "GetSourceTextureWidthAndHeight",
+  "SetIcons",
+  "SetIcons",
+  "GetIcons",
+  "GetIcons",
+  "GetIconSizes",
+  "GetIconSizes",
+  "show",
+  "showUnityLogo"
+ ]
+}

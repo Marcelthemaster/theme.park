@@ -137,6 +137,7 @@ def stage_variants():
     H = max(c.shape[0] for c in cards)
     W = sum(c.shape[1] for c in cards)
     ov = np.zeros((H, W, 4), np.uint8)
+    ov[..., :3] = (14, 15, 21)
     ov[..., 3] = 255
     x = 0
     for c in cards:

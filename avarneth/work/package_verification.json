@@ -1,0 +1,28 @@
+{
+ "zip_test": [
+  true,
+  "No errors detected in compressed data of /home/user/theme.park/avarneth/package/AVARNETH_Complete_Branding_Startup_V1.0.zip."
+ ],
+ "sha256_check": [
+  true,
+  "499 Einträge, sha256sum -c: alle OK"
+ ],
+ "complete": [
+  true,
+  "500 Dateien im ZIP, 500 im Quellordner"
+ ],
+ "no_zero_bytes": [
+  true,
+  "Nullbyte-Dateien: keine"
+ ],
+ "readable": [
+  true,
+  "alle 500 Dateien nach dem Entpacken geöffnet/geparst; Fehler: keine"
+ ],
+ "docs": [
+  true,
+  "vorhanden: ['README.md', 'BRAND_GUIDELINES.md', 'UNITY_INSTALLATION.md', 'PLAYER_SETTINGS.md', 'ANIMATION_SPECIFICATION.md', 'QA_REPORT.md', 'UNITY_COMPILE_EVIDENCE.md']"
+ ],
+ "zip_size": 6790817,
+ "zip_sha256": "00f4187d74fb22f9a179c54693980fe991a04de3d5e5c1611dd92f3f4139dc53"
+}

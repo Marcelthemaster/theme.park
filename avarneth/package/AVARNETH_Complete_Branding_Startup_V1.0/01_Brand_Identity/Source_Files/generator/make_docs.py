@@ -81,15 +81,17 @@ werden; der Untertitel ist separat ein- und ausblendbar.
 
 ## 2. Konzept – „Das Glut-Tor“
 
-* **Schild:** geschmiedeter Wappenschild – Außenrahmen aus dunklem Eisen, Innenrand aus Altgold mit Nieten.
-* **Gipfel = Buchstabe A:** Der Berg der Festung durchbricht den Schildrand nach oben. Seine goldenen
-  Flanken bilden zugleich das **A** von AVARNETH; der goldene Querbalken ist der Sturz über dem Tor.
-* **Monumentales Tor mit Glutkern:** Das Tor im Fels glüht von innen (Fallgitter, Glutverlauf) – „Embers“.
-* **Arkanes Fenster:** ein kleines blaues Rautenfenster als einziger kühler Magie-Akzent.
-* **Mauern & Türme:** Bergfestung mit Zinnen vor dunklem Eisenhimmel mit aufsteigenden Glutfunken – „Veil of Embers“.
-* **Glutstein:** in der Schildspitze, gefasst in Gold – das Siegel der Marke.
+* **Schild:** geschmiedeter Wappenschild – Außenrahmen aus dunklem Eisen, Innenrand aus Altgold mit Nieten,
+  das Feld eine genietete Eisenplatte mit Plattenfuge und dezent eingeprägtem Gebirgsrelief.
+* **Das A als Festung:** Zwei goldene Flanken bilden das **A** von AVARNETH; ihr Gipfel durchbricht den
+  Schildrand nach oben. Im oberen Innenraum steht ein **Bergfried mit Zinnen und zwei arkanen Lanzettfenstern**
+  (der einzige kühle Magie-Akzent), der goldene Querbalken ist der **Sturz** über dem Tor.
+* **Monumentales Tor:** im Quadermauerwerk unter dem Sturz – ein **eisernes Fallgitter vor glühender Glut**
+  (sauberer 4-stufiger Glutverlauf, kein Dithering).
+* **Glutstein:** klein und bündig in die Schildspitze gesetzt – das Siegel der Marke.
 
 Industrielle Fantasy (Schmiede, Eisen, Nieten, Glut) ohne Science-Fiction-Anmutung; keine Neonfarben.
+Licht kommt immer von oben links; alle Flächen sind regionsweise monoton schattiert (kein Pixelrauschen).
 
 ## 3. Logo-Varianten
 
@@ -98,9 +100,14 @@ Industrielle Fantasy (Schmiede, Eisen, Nieten, Glut) ohne Science-Fiction-Anmutu
 {chr(10).join(rows)}
 
 * `Source_Files/native_1x/` = Pixel-Master (1 Kunst-Pixel = 1 Bildpixel), `exports_2x/`, `exports_8x/` für andere Zielgrößen.
-* Die Wortmarke ist **keine Schrift**: alle Buchstaben sind eigens konstruiert (3:1-Diagonalen, Sporn-Serifen,
-  Turmspitzen-A, facettierte Gold-Oberfläche mit 1-px-Fase, 3-px-Eisen-Extrusion, glühende Unterkante).
-* Untertitel und Publisher-Zeile verwenden eigene, handgezeichnete Pixel-Versalien (9 px bzw. 7 px Versalhöhe).
+* Die Wortmarke ist **keine Schrift**: alle Buchstaben sind eigens konstruiert (3:1-Diagonalen bei A/V, 2:1 bei N/R,
+  spitze Sporn-Serifen, Turmspitzen-A als Echo des Wappens). A, V, T und H sind pixelgenau spiegelsymmetrisch;
+  die Abstände sind optisch ausgeglichen (mittlerer Buchstabenabstand ≈ 7 Kunst-Pixel). Oberfläche: gemeißelte
+  Gold-Facetten, Kantenfarben nach echter Kantennormale (durchgehende Lichtkante links, Schattenkante rechts),
+  2-px-Extrusion aus dunklem Eisen, 1-px-Kontur.
+* Untertitel: eigene 9-px-Kapitälchen in der Konstruktionslogik der Wortmarke, eine Tonstufe ruhiger als AVARNETH,
+  flankiert von einer geschmiedeten Linie mit Glut-Raute.
+* Publisher: eigene 5-px-Versalien mit 1-px-Strich in einem einzigen flachen Stahlton – bewusst zurückhaltend.
 
 ## 4. Schutzzone und Mindestgrößen
 
@@ -109,8 +116,8 @@ Industrielle Fantasy (Schmiede, Eisen, Nieten, Glut) ohne Science-Fiction-Anmutu
 * **Maßeinheit X** = Versalhöhe der Wortmarke = 32 Kunst-Pixel (1×).
 * **Schutzzone:** mindestens ½ X (16 Kunst-Pixel) rund um jede Logo-Variante frei von anderen Elementen.
 * **Wortmarke:** nie kleiner als nativ 1× ({wm[0]}×{wm[1]} px). Für kleinere Flächen das Wappen bzw. die Icons verwenden.
-* **Wappen:** nativ {em[0]}×{em[1]} px; ≥ 48 px Kantenlänge → vereinfachtes Wappen (`03_Windows_Icons/AVARNETH_48/64.png`),
-  darunter ausschließlich die von Hand gesetzten Icons 32 / 24 / 16 px.
+* **Wappen:** nativ {em[0]}×{em[1]} px; für 48/64 px die Icon-Fassung (`03_Windows_Icons/AVARNETH_48/64.png`),
+  darunter ausschließlich die pro Größe gezeichneten Kleinst-Fassungen (40, 36, 32, 30, 24, 20, 16 px).
 * **Untertitel** nie ohne Wortmarke als Spieltitel verwenden; immer unterhalb und kleiner als AVARNETH.
 
 ## 5. Farben
@@ -162,10 +169,16 @@ Vorschauen verwendet. Die beiden anderen Richtungen liegen als statische Alterna
 
 ## 9. Windows-Icon
 
-`03_Windows_Icons/AVARNETH.ico` enthält 16, 24, 32, 48, 64, 128 und 256 px (16–128 als 32-bit-DIB mit Alpha und
-AND-Maske, 256 als PNG). 16/24/32 px sind von Hand gesetzt (vereinfachter Schild, A-Gipfel, glühendes Tor),
-48/64 px eine reduzierte Wappen-Fassung, 128/256/512 (und `Extra/AVARNETH_1024.png`) exakte Ganzzahl-Vergrößerungen
-des 64-px-Masters.
+`03_Windows_Icons/AVARNETH.ico` enthält **15 Größen**: 16, 20, 24, 30, 32, 36, 40, 48, 60, 64, 72, 80, 96, 128, 256 px
+(bis 128 als 32-bit-DIB mit Alpha und AND-Maske, 256 als PNG). Damit muss Windows auch bei 125 %/150 %-Skalierung
+(20/30/36/40/60/72 px) nicht weichzeichnen.
+
+* 16, 20, 24, 30, 32, 36, 40 px: pro Größe auf dem Pixelraster gezeichnete Kleinst-Fassung – ein geschlossener Schild
+  mit mittelgrauer Eisenplatte (bleibt auf dunkler Taskleiste sichtbar), beide A-Schenkel klar golden, dunkler
+  Innenraum mit arkanem Fenster, Tor mit Glutkern; keine Funken, kein Anhänger.
+* 48/64 px: Icon-Fassung des Wappens (hellere Platte und rechte Seite).
+* Alle übrigen Größen sind exakte Ganzzahl-Vielfache: 60 = 20×3, 72 = 24×3, 80 = 40×2, 96 = 48×2, 128/256/512/1024 = 64×2/4/8/16.
+* PNG-Einzeldateien: 16/24/32/48/64/128/256/512 im Hauptordner, alle Zwischengrößen und 1024 in `Extra/`.
 """
 
 
@@ -207,6 +220,8 @@ kein Ladebildschirm – nur Sprites, die per Code animiert werden.
 * Koordinaten: Ursprung oben links, x nach rechts, y nach unten, ganze Kunst-Pixel. Positionen werden mit
   `floor(v + 0.5)` auf ganze Kunst-Pixel gerastet (kein Sub-Pixel-Zittern zwischen Ebenen).
 * Inhaltsbereich (für die Passend-Prüfung bei kleinen Auflösungen): x={cb['x']}, y={cb['y']}, {cb['width']}×{cb['height']}.
+* **Vollbild-Ebene:** `veil` hat `"fullscreen": true` – sie liegt nicht auf dem Pixelraster, sondern wird in Unity
+  über den ganzen Bildschirm gestreckt (auch 16:10 und 21:9) und mit Bilinear-Filter importiert (weicher Verlauf).
 * Unity-Skalierungsmodi (`AvarnethStartupAnimation`): **IntegerNearest** (Standard: round(Screen.height/270), reduziert
   bis der Inhaltsbereich passt, min. 1), IntegerFloor, Continuous (stufenlos, nicht pixel-perfekt).
   Beispiele IntegerNearest: 1280×720 → 3 (Inhalt 720×510 px), 1920×1080 → 4, 2560×1440 → 5, 3840×2160 → 8.
@@ -215,10 +230,10 @@ kein Ladebildschirm – nur Sprites, die per Code animiert werden.
 
 | Zeit | Phase | Inhalt |
 |---|---|---|
-| 0.00–0.35 s | 1 – Wappen | Goldene Lichtlinie zeichnet die Wappen-Silhouette von der Turmspitze beidseitig bis zur Schildspitze (14 Frames), Wappen blendet ein, kurzes Schmiede-Aufleuchten, Kontur-Glühen, Goldfunken, warmer Glow dahinter. Publisher-Zeile blendet dezent ein. |
-| 0.35–1.15 s | 2 – Wortmarke | AVARNETH blendet ein und steigt 3 Kunst-Pixel (12 px @1080p) auf; goldener Lichtstreif läuft 0.64–1.12 s über die Buchstaben (16 Frames, auf die Goldfläche maskiert). |
-| 1.15–1.60 s | 3 – Untertitel | VEIL OF EMBERS blendet ein (2 Kunst-Pixel Aufstieg), 24 Glutpartikel steigen auf. |
-| 1.60–2.00 s | 4 – Akzent & Ausblendung | Glint an der Turmspitze, kurzes Aufleuchten von Wappen-Kontur, Wappen und Wortmarke; ab 1.72 s weiches Ausblenden aller Ebenen bis 2.00 s. Der Login-Bootstrap bleibt die ganze Zeit sichtbar (nur abgedunkelt durch `AVE_Veil`). |
+| 0.00–0.35 s | 1 – Wappen | Eine goldene Lichtlinie zeichnet in 12 Frames (je 1/60 s) die Wappen-Silhouette von der Turmspitze beidseitig bis zur Schildspitze, danach in 4 Frames die beiden A-Schenkel und den Querbalken. Erst wenn die Linie geschlossen ist, blendet die Füllung ein (0.16–0.34 s); kurzes Aufleuchten nur der hellen Flächen, Kontur-Glühen außerhalb der Kontur, 8 Goldfunken lösen sich vom Rand. |
+| 0.35–1.15 s | 2 – Wortmarke | Licht führt: Glanzlicht auf den Goldflächen (0.36–0.62 s) während AVARNETH einblendet; ein einziger 1-Kunst-Pixel-Setzschritt bei geringer Deckkraft (0.445 s); goldener Lichtstreif 0.63–1.10 s (28 Frames à 1/60 s, auf die Goldflächen maskiert). Publisher-Zeile blendet dezent auf 65 % ein (0.30–0.60 s). |
+| 1.15–1.60 s | 3 – Untertitel | VEIL OF EMBERS blendet ein (1-px-Setzschritt bei geringer Deckkraft), 12 Glutpartikel steigen seitlich der Schrift auf bzw. glimmen unter dem Untertitel – kein Partikel kreuzt Schrift oder Wappen. |
+| 1.60–2.00 s | 4 – Akzent & Ausblendung | Gestaffelter Lichtakzent: Glint an der Turmspitze (1.58 s), Kontur-Glühen (1.62 s), Wappen-Glanz (1.64 s), Wortmarken-Glanz (1.66 s), je ≥ 0.10 s weich an- und abschwellend; ab 1.74 s weiches Ausblenden aller Ebenen bis 2.00 s. Der Login-Bootstrap bleibt die ganze Zeit sichtbar (nur abgedunkelt durch `AVE_Veil`). |
 
 ## 3. Ebenen (Render-Reihenfolge aufsteigend; Partikel liegen zwischen order < 100 und ≥ 100)
 
@@ -233,7 +248,9 @@ kein Ladebildschirm – nur Sprites, die per Code animiert werden.
 {chr(10).join(prow)}
 
 Je Partikel: `sprite, t0, life, x, y, vx, vy, ay, alpha, fadeIn, fadeOut` (Zentrum in Kunst-Pixeln).
-Position `x + vx·τ`, `y + vy·τ + ½·ay·τ²`; Alpha `alpha · fadeIn-Rampe · fadeOut-Rampe`. 7 Partikel-Sprites (1×1 bis 3×3).
+Position `x + vx·τ`, `y + vy·τ + ½·ay·τ²`; Alpha `alpha · fadeIn-Rampe · fadeOut-Rampe`. {len(tl['particleSprites'])} Partikel-Sprites
+(1×1 bis 1×3 Glut-/Goldpunkte mit kurzer Schweif-Spur). Die Bahnen wurden beim Erzeugen gegen die Logo-Ebenen
+geprüft: kein Partikel überdeckt Wappen, Wortmarke, Untertitel oder Publisher-Zeile (deterministischer Seed).
 
 ## 5. Interpolation (verbindlich für Vorschau und Unity)
 
@@ -259,12 +276,14 @@ Position `x + vx·τ`, `y + vy·τ + ½·ay·τ²`; Alpha `alpha · fadeIn-Rampe
 
 Texture Type **Sprite (2D and UI)**, Sprite Mode **Single**, Pixels Per Unit 100, Mesh Type **Full Rect**,
 Filter **Point (no filter)**, Compression **None**, Generate Mip Maps **aus**, Wrap **Clamp**, Non-Power-of-2 **None**,
-sRGB **an**, Alpha Is Transparency **an**, Max Size 2048. Icons (`Icons/`): Texture Type Default, sonst identisch.
+sRGB **an**, Alpha Is Transparency **an**, Max Size 2048. Ausnahme: Vollbild-Ebenen (`AVE_Veil`) mit **Bilinear**.
+Icons (`Icons/`): Texture Type Default, sonst identisch.
 
 ## 8. Laufzeitbudget
 
 * {nsp} kleine Texturen, unkomprimiert zusammen ca. **{total / 1024:.0f} KiB** RGBA32 (größte: Veil 480×270).
 * Standard-Material `UI/Default`, reines Alpha-Blending, keine Shader, kein Post-Processing, kein VideoPlayer.
+  Lichteffekte sind deshalb als „nur helle Flächen aufhellen“-Masken gezeichnet (kein additiver Shader nötig).
 * Nach Ende: Komponente deaktiviert, Root-GameObject deaktiviert (oder zerstört, konfigurierbar) – kein Update läuft weiter.
 * Hinweis Farbraum: Die Vorschau mischt Alpha im sRGB-Raum. In einem Projekt mit **Linear**-Farbraum wirken
   halbtransparente Übergänge (Veil, Glows, Fades) in Unity minimal anders; die Pixel der deckenden Logo-Ebenen sind identisch.
@@ -296,11 +315,11 @@ Alle Grafiken sind echte Pixel-Art auf nativem Raster (keine Fotos, keine Filter
 |---|---|
 | `01_Brand_Identity/` | Wortmarke, vollständiger Titel, Publisher-Präsentation, Wappen, Untertitel, Publisher (×4) · `Source_Files/` mit 1×/2×/8×, Palette, Pixelmaps, Generator-Quellcode |
 | `02_Logo_Variants/` | 3 Designrichtungen (Classic Fantasy, Dark Fantasy, **Magic & Iron = Produktionsstandard**) inkl. Übersicht |
-| `03_Windows_Icons/` | `AVARNETH.ico` (16–256), PNG 16/24/32/48/64/128/256/512, `Extra/AVARNETH_1024.png` |
+| `03_Windows_Icons/` | `AVARNETH.ico` (15 Größen 16–256 inkl. Windows-Zwischengrößen), PNG 16/24/32/48/64/128/256/512, `Extra/` (20/30/36/40/60/72/80/96/1024) |
 | `04_Animated_Startup/` | Logo- und Effekt-Layer, Partikel, Sprite-Sheets (+JSON), transparente Animationsframes, `Animation_Timeline.json` |
 | `05_Unity_Integration/` | `Runtime/AvarnethStartupAnimation.cs` (+ `AvarnethStartupTimelineMath.cs`, asmdef), `Editor/AvarnethStartupInstaller.cs` (+ asmdef), `Importable_Assets/` |
 | `06_Previews/` | MP4 (1920×1080, 60 fps), GIF, Logo-Standbilder, Icon-Vorschau, Kontaktbogen |
-| `07_Documentation/` | README, Brand Guidelines, Unity-Installation, Player Settings, Animationsspezifikation, QA-Bericht |
+| `07_Documentation/` | README, Brand Guidelines, Unity-Installation, Player Settings, Animationsspezifikation, QA-Bericht, Compile-/API-Nachweis |
 | `SHA256SUMS.txt` | SHA-256 jeder Datei im Paket (`sha256sum -c SHA256SUMS.txt`) |
 
 ## Bewusst nicht enthalten / Abweichungen von der Zielstruktur

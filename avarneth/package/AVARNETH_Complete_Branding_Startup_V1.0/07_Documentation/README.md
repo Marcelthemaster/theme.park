@@ -26,7 +26,7 @@ Alle Grafiken sind echte Pixel-Art auf nativem Raster (keine Fotos, keine Filter
 | `04_Animated_Startup/` | Logo- und Effekt-Layer, Partikel, Sprite-Sheets (+JSON), transparente Animationsframes, `Animation_Timeline.json` |
 | `05_Unity_Integration/` | `Runtime/AvarnethStartupAnimation.cs` (+ `AvarnethStartupTimelineMath.cs`, asmdef), `Editor/AvarnethStartupInstaller.cs` (+ asmdef), `Importable_Assets/` |
 | `06_Previews/` | MP4 (1920×1080, 60 fps), GIF, Logo-Standbilder, Icon-Vorschau, Kontaktbogen |
-| `07_Documentation/` | README, Brand Guidelines, Unity-Installation, Player Settings, Animationsspezifikation, QA-Bericht |
+| `07_Documentation/` | README, Brand Guidelines, Unity-Installation, Player Settings, Animationsspezifikation, QA-Bericht, Compile-/API-Nachweis |
 | `SHA256SUMS.txt` | SHA-256 jeder Datei im Paket (`sha256sum -c SHA256SUMS.txt`) |
 
 ## Bewusst nicht enthalten / Abweichungen von der Zielstruktur

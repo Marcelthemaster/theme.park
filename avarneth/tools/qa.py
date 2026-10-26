@@ -447,7 +447,8 @@ def verify_package():
         except Exception as e:  # noqa: BLE001
             bad.append(f'{f}: {e}')
     out['readable'] = (not bad, f'alle {len(files)} Dateien nach dem Entpacken geöffnet/geparst; Fehler: {bad or "keine"}')
-    docs = ['README.md', 'BRAND_GUIDELINES.md', 'UNITY_INSTALLATION.md', 'PLAYER_SETTINGS.md', 'ANIMATION_SPECIFICATION.md', 'QA_REPORT.md']
+    docs = ['README.md', 'BRAND_GUIDELINES.md', 'UNITY_INSTALLATION.md', 'PLAYER_SETTINGS.md', 'ANIMATION_SPECIFICATION.md', 'QA_REPORT.md',
+            'UNITY_COMPILE_EVIDENCE.md']
     have = [d for d in docs if os.path.isfile(os.path.join(root, '07_Documentation', d))]
     out['docs'] = (len(have) == len(docs), f'vorhanden: {have}')
     out['zip_size'] = os.path.getsize(zp)
