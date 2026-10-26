@@ -1364,19 +1364,23 @@ namespace Eckertengineering.Avarneth.Branding.Editor
             var errors = new List<string>();
             var warnings = new List<string>();
             var info = new List<string>();
+            var details = new List<string>(); // Console only
 
-            List<string> candidates = FindTimelineCandidates();
+            var rejected = new List<string>();
+            List<string> candidates = FindTimelineCandidates(rejected);
             info.Add("Timelines found: " + candidates.Count + (candidates.Count > 0 ? " (" + string.Join(", ", candidates) + ")" : string.Empty));
+            if (rejected.Count > 0) warnings.Add("Ignored timeline(s) outside a subfolder of Assets/: " + string.Join(", ", rejected));
 
             if (!TryResolveRoot(out InstallRoot root, out string rootError, out bool _))
             {
                 errors.Add("The importable asset root could not be located: " + rootError);
-                Report(interactive, errors, warnings, info);
+                Report(interactive, errors, warnings, info, details);
                 return;
             }
 
             info.Add("Root: " + root.RootFolder);
             info.Add("Prefab path: " + root.PrefabPath);
+            if (!HasStandardRootName(root)) warnings.Add("The root folder is not named " + StandardRootName + ": " + root.RootFolder);
 
             foreach (string sub in SpriteFolders)
                 if (!AssetDatabase.IsValidFolder(root.RootFolder + "/" + sub)) errors.Add("Folder missing: " + root.RootFolder + "/" + sub);
@@ -1400,25 +1404,35 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                 warnings.AddRange(sprites.Warnings);
             }
 
+            // Import settings: one summary line per group for the dialog, one line per file for the Console.
             var problems = new List<string>();
-            foreach (string sub in SpriteFolders)
+            List<string> spritePaths = CollectSpritePngs(root, parsed.IsValid ? parsed.Data : null);
+            int wrongSprites = 0;
+            foreach (string path in spritePaths)
             {
-                foreach (string path in CollectPngs(root, sub))
-                {
-                    if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
-                    problems.Clear();
-                    CheckSpriteSettings(ti, problems);
-                    if (problems.Count > 0) warnings.Add("Import settings " + path + ": " + string.Join("; ", problems));
-                }
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
+                problems.Clear();
+                CheckSpriteSettings(ti, problems);
+                if (problems.Count == 0) continue;
+                wrongSprites++;
+                details.Add("Import settings " + RelativeToRoot(root, path) + ": " + string.Join("; ", problems));
             }
 
-            foreach (string path in CollectPngs(root, IconFolder))
+            List<string> iconPaths = CollectIconPngs(root);
+            int wrongIcons = 0;
+            foreach (string path in iconPaths)
             {
                 if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) continue;
                 problems.Clear();
                 CheckIconSettings(ti, problems);
-                if (problems.Count > 0) warnings.Add("Import settings " + path + ": " + string.Join("; ", problems));
+                if (problems.Count == 0) continue;
+                wrongIcons++;
+                details.Add("Import settings " + RelativeToRoot(root, path) + ": " + string.Join("; ", problems));
             }
+
+            info.Add("Contract PNGs: " + spritePaths.Count + " sprite(s), " + iconPaths.Count + " icon(s).");
+            if (wrongSprites > 0) warnings.Add(wrongSprites + " of " + spritePaths.Count + " sprite PNG(s) have wrong import settings - run Configure Sprite Import Settings.");
+            if (wrongIcons > 0) warnings.Add(wrongIcons + " of " + iconPaths.Count + " icon PNG(s) have wrong import settings - run Configure Sprite Import Settings.");
 
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(root.PrefabPath);
             if (prefab == null)
@@ -1462,16 +1476,17 @@ namespace Eckertengineering.Avarneth.Branding.Editor
                 if (a.LoginCanvasGroup == null) info.Add("Overlay '" + a.name + "': no Login Canvas Group assigned (optional).");
             }
 
-            Report(interactive, errors, warnings, info);
+            Report(interactive, errors, warnings, info, details);
         }
 
-        private static void Report(bool interactive, List<string> errors, List<string> warnings, List<string> info)
+        private static void Report(bool interactive, List<string> errors, List<string> warnings, List<string> info, List<string> details)
         {
             var sb = new StringBuilder();
             sb.AppendLine("AVARNETH startup installation: " + errors.Count + " error(s), " + warnings.Count + " warning(s).");
             foreach (string line in info) sb.AppendLine("  " + line);
             foreach (string line in errors) sb.AppendLine("ERROR: " + line);
             foreach (string line in warnings) sb.AppendLine("WARNING: " + line);
+            foreach (string line in details) sb.AppendLine("  " + line);
 
             if (errors.Count > 0) Debug.LogError("[AVARNETH Startup] " + sb);
             else if (warnings.Count > 0) Debug.LogWarning("[AVARNETH Startup] " + sb);
@@ -1479,17 +1494,13 @@ namespace Eckertengineering.Avarneth.Branding.Editor
 
             if (!interactive) return;
 
-            var dialog = new StringBuilder();
-            dialog.AppendLine(errors.Count + " error(s), " + warnings.Count + " warning(s).");
-            dialog.AppendLine();
             var lines = new List<string>();
             foreach (string line in errors) lines.Add("ERROR: " + line);
             foreach (string line in warnings) lines.Add("WARNING: " + line);
             if (lines.Count == 0) lines.Add("Everything looks fine.");
-            dialog.AppendLine(JoinLimited(lines));
-            dialog.AppendLine();
-            dialog.Append("The full report is in the Console.");
-            EditorUtility.DisplayDialog(DialogTitle + " - Validation", dialog.ToString(), "OK");
+            string message = ComposeListDialog(errors.Count + " error(s), " + warnings.Count + " warning(s).\n\n", lines,
+                "\n\nThe full report is in the Console.");
+            Alert(DialogTitle + " - Validation", message);
         }
 
         // ------------------------------------------------------------------ icons
