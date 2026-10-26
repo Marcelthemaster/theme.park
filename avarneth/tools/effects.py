@@ -179,8 +179,8 @@ def radial_glow(w, h, rx, ry, ramp='gold', idx=(7, 6, 6, 5, 5, 4), alphas=(110, 
     return c
 
 
-def veil(w=480, h=270, cx=240.0, cy=135.0, rx=300.0, ry=170.0, center=140, edge=64):
-    """Smooth full-screen radial dim (dark iron). Not pixel art: stretched to the screen in Unity."""
+def veil(w=480, h=270, cx=240.0, cy=135.0, rx=300.0, ry=170.0, center=140, edge=64, rgb=None):
+    """Smooth full-screen radial dim (dark iron; V1.1: login-panel navy). Not pixel art: stretched in Unity."""
     c = Canvas(w, h)
     Y, X = np.mgrid[0:h, 0:w]
     r = np.clip(np.hypot((X + 0.5 - cx) / rx, (Y + 0.5 - cy) / ry), 0, 1)
@@ -189,13 +189,13 @@ def veil(w=480, h=270, cx=240.0, cy=135.0, rx=300.0, ry=170.0, center=140, edge=
     a = edge + (center - edge) * t
     # constant outermost rows/columns so a clamped bilinear edge is invisible
     a[0, :], a[-1, :], a[:, 0], a[:, -1] = edge, edge, edge, edge
-    rgb = RAMPS['iron'][0]
+    rgb = RAMPS['iron'][0] if rgb is None else rgb
     c.a[..., 0], c.a[..., 1], c.a[..., 2] = rgb
     c.a[..., 3] = np.clip(np.round(a), 0, 255).astype(np.uint8)
     return c
 
 
-def shine_frames(layer: Canvas, face_mask, n=28, slope=0.5, min_lum=95):
+def shine_frames(layer: Canvas, face_mask, n=28, slope=0.5, min_lum=95, d=1):
     """Slanted band of light sweeping left -> right over the gold faces: core +2 ramp steps,
     flanks +1 step, computed from the pixel below (never darker); outline/extrusion excluded.
     The sweep range is fitted to the letters, so every one of the n frames lights some pixels."""
@@ -203,28 +203,30 @@ def shine_frames(layer: Canvas, face_mask, n=28, slope=0.5, min_lum=95):
     Y, X = np.mgrid[0:H, 0:W]
     v = X - (H - Y) * slope
     lit = face_mask & (np.array([[_lum(layer.a[y, x, :3]) for x in range(W)] for y in range(H)]) >= min_lum)
-    start, end = v[lit].min() - 3, v[lit].max() + 3
+    start, end = v[lit].min() - 3 * d, v[lit].max() + 3 * d
     frames = []
     for f in range(n):
         p = f / (n - 1)
         x0 = start + (end - start) * p
         u = np.abs(v - x0)
         c = Canvas(W, H)
-        for y, x in zip(*np.where((u <= 7) & lit)):
+        for y, x in zip(*np.where((u <= 7 * d) & lit)):
             rgb = layer.a[y, x, :3]
-            steps = 2 if u[y, x] <= 2.5 else 1
+            steps = 2 if u[y, x] <= 2.5 * d else 1
             nc = ramp_shift(rgb, steps)
             if nc is None:
                 continue
-            alpha = 255 if u[y, x] <= 4.5 else 150
+            alpha = 255 if u[y, x] <= 4.5 * d else 150
             c.a[y, x] = (nc[0], nc[1], nc[2], alpha)
         frames.append(c)
     return frames
 
 
-def glint_frames(n=8, size=17):
+def glint_frames(n=8, size=17, dd=1):
+    """Four-point star glint; dd = pixel density (V1.1: 2 -> same on-screen size on the 2x finer grid)."""
+    size = (size - 1) * dd + 1
     c0 = size // 2
-    sizes = [1, 3, 5, 8, 7, 5, 3, 1][:n]
+    sizes = [k * dd for k in [1, 3, 5, 8, 7, 5, 3, 1][:n]]
     frames = []
     for k in sizes:
         c = Canvas(size, size)
@@ -233,7 +235,7 @@ def glint_frames(n=8, size=17):
             rgba = _rgba('gold', 9, a) if abs(d) <= 1 else _rgba('gold', 8, a)
             c.px(c0 + d, c0, rgba)
             c.px(c0, c0 + d, rgba)
-        if k >= 3:
+        if k >= 3 * dd:
             for dx, dy in ((1, 1), (-1, 1), (1, -1), (-1, -1)):
                 c.px(c0 + dx, c0 + dy, _rgba('gold', 8, 140))
         c.px(c0, c0, _rgba('gold', 9, 255))

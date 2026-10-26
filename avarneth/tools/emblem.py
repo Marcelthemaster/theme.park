@@ -58,7 +58,8 @@ class Emblem:
         so the silhouette survives a dark Windows taskbar)."""
         W, H, X, Y, cx = self.W, self.H, self.X, self.Y, self.cx
         s, r = self.s, self.r
-        full = detail == 'full'
+        fine = detail == 'fine'          # V1.1: 'full' + extra surface detail for the 2x bootstrap-matched density
+        full = detail in ('full', 'fine')
         icon = detail == 'icon'
         c = Canvas(W, H)
 
@@ -114,6 +115,8 @@ class Emblem:
                     c.px(px_, py_, col('iron', 6))
                     c.px(px_ + 1, py_ + 1, col('iron', 2))
                     c.px(px_ - 1, py_, col('iron', 5))
+        if fine:
+            self._fine_plate(c, field, fe)
 
         self._keep(c, field, outer, detail)
 
@@ -135,10 +138,29 @@ class Emblem:
         return c
 
     # ------------------------------------------------------------------
+    def _fine_plate(self, c, field, fe):
+        """V1.1 (fine grid only): heraldic diaper lattice and a lit upper-left sheen on the plate, one ramp step
+        each, so the field reads as worked metal/cloth like the banners of the bootstrap fortress."""
+        W, H, X, Y, cx = self.W, self.H, self.X, self.Y, self.cx
+        r = self.r
+        inner = field & ~fe & ~dilate(fe, 1.0)
+        seam_y = r(31)
+        inner &= np.abs(Y - seam_y - 0.5) > 2
+        p = max(8, r(7))                                   # lattice period
+        u = (X - cx) + (Y - r(12))
+        v = -(X - cx) + (Y - r(12))
+        lattice = inner & ((u % p == 0) | (v % p == 0))
+        sheen = inner & ((X - cx) * 0.55 + (Y - r(12)) < r(14))
+        c.put(sheen, col('iron', 4))
+        c.put(lattice, col('iron', 4))
+        c.put(lattice & sheen, col('iron', 5))
+        knots = inner & (u % p == 0) & (v % p == 0)
+        c.put(knots, col('iron', 6))
+
     def _keep(self, c, field, outer, detail):
         W, H, X, Y, cx = self.W, self.H, self.X, self.Y, self.cx
         s, r = self.s, self.r
-        full = detail == 'full'
+        full = detail in ('full', 'fine')
         leg = max(2, r(3))
         peak = self.peak()
         inner = self.peak(inset=leg)
@@ -165,6 +187,11 @@ class Emblem:
         c.put(tower & (X == cx - tw), col('stone', 6))
         c.put(tower & (X == cx + tw), col('stone', 3))
         tops = tower & ~np.roll(tower, 1, axis=0)
+        if detail == 'fine':                   # V1.1: sunlit keep like the fortress towers (light left, cool right)
+            c.put(tower, col('stone', 5))
+            c.put(tower & (X < cx), col('stone', 6))
+            c.put(tower & (X <= cx - tw + 1), col('stone', 7))
+            c.put(tower & (X >= cx + tw - 1), col('stone', 3))
         c.put(tops, col('stone', 7))
         c.put(outline(tower) & upper, col('iron', 0))
         if self.S >= 0.6:

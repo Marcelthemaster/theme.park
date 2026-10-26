@@ -27,7 +27,7 @@ EMBER_GATES = False
 
 
 def _P(w, h, pts, k=1, oy=0):
-    return poly_mask(w * k, h * k, [(x * k, (y + oy) * k) for x, y in pts])
+    return poly_mask(int(round(w * k)), int(round(h * k)), [(x * k, (y + oy) * k) for x, y in pts])
 
 
 def _flare_foot(x0, x1, y=CAP, ext=3, h=5):
@@ -130,7 +130,7 @@ def glyph_mask(ch, k=1):
     w = g['w']
     Ht = CAP + UP + DOWN + 2 * PAD
     oy = UP + PAD
-    m = np.zeros((Ht * k, w * k), bool)
+    m = np.zeros((int(round(Ht * k)), int(round(w * k))), bool)
     if 'outer' in g:
         o = _P(w, Ht, g['outer'], k, oy)
         if g.get('clip_bottom'):
@@ -162,18 +162,23 @@ def _gaps(prev, cur, rows):
     return out
 
 
-def layout(text, target=7.0, min_gap=2):
-    """Optical spacing: mean gap over the cap band ~= target, never closer than min_gap."""
-    Ht = CAP + UP + DOWN + 2 * PAD
-    Wt = 40 * len(text) + 40
+def layout(text, target=7.0, min_gap=2, kd=1):
+    """Optical spacing: mean gap over the cap band ~= target, never closer than min_gap.
+
+    kd = pixel density (1 = V1.0 art, 2 = V1.1 bootstrap match: same glyph polygons sampled on a 2x finer grid;
+    all distances are given at kd=1 and scaled)."""
+    Ht = (CAP + UP + DOWN + 2 * PAD) * kd
+    Wt = (40 * len(text) + 40) * kd
     full = np.zeros((Ht, Wt), bool)
     letters = []
-    oy = UP + PAD
-    cap_rows = range(oy + 1, oy + CAP - 1)
+    oy = (UP + PAD) * kd
+    cap_rows = range(oy + kd, oy + (CAP - 1) * kd)
     all_rows = range(0, Ht)
-    x = PAD + 3
+    target, min_gap, clamp = target * kd, min_gap * kd, 11 * kd
+    x = (PAD + 3) * kd
     for i, ch in enumerate(text):
-        g, w, _ = glyph_mask(ch)
+        g, _, _ = glyph_mask(ch, kd)
+        w = g.shape[1]
         if i:
             best = None
             prev_only = full.copy()
@@ -185,7 +190,7 @@ def layout(text, target=7.0, min_gap=2):
                 gp = _gaps(prev_only, cand, all_rows)
                 if not gp or min(gp) < min_gap:
                     continue
-                mean = np.mean(np.minimum(_gaps(prev_only, cand, cap_rows), 11) if _gaps(prev_only, cand, cap_rows) else [99])
+                mean = np.mean(np.minimum(_gaps(prev_only, cand, cap_rows), clamp) if _gaps(prev_only, cand, cap_rows) else [99])
                 if mean >= target:
                     best = off
                     break
@@ -197,15 +202,15 @@ def layout(text, target=7.0, min_gap=2):
     return full, letters
 
 
-def normals(letters, H, W, k=4):
+def normals(letters, H, W, k=4, kd=1):
     """Per-pixel mean outward normal (nx, ny) from a k-x supersampled distance field."""
     nx = np.zeros((H, W))
     ny = np.zeros((H, W))
     cnt = np.zeros((H, W))
     for ch, x, w in letters:
-        big, _, _ = glyph_mask(ch, k)
+        big, _, _ = glyph_mask(ch, k * kd)
         d = ndimage.distance_transform_edt(np.pad(big, 1))[1:-1, 1:-1]
-        d = ndimage.gaussian_filter(d, 1.0)
+        d = ndimage.gaussian_filter(d, 1.0 * kd)
         gy, gx = np.gradient(d)
         n = np.hypot(gx, gy) + 1e-6
         ox, oy_ = -gx / n, -gy / n
@@ -216,10 +221,10 @@ def normals(letters, H, W, k=4):
     return nx / cnt, ny / cnt
 
 
-def shade(mask, letters, ember_gates=EMBER_GATES, ext_depth=2):
+def shade(mask, letters, ember_gates=EMBER_GATES, ext_depth=2, kd=1):
     H, W = mask.shape
     c = Canvas(W, H)
-    Y = np.arange(H)[:, None].repeat(W, 1) - (UP + PAD)
+    Y = np.arange(H)[:, None].repeat(W, 1) - (UP + PAD) * kd
 
     # dark-iron extrusion (production: 2 px). It is cast only from downward-facing horizontal runs of
     # at least 2 px, so the 1:3 diagonals do not get a 'tooth' on every stair step.
@@ -246,11 +251,15 @@ def shade(mask, letters, ember_gates=EMBER_GATES, ext_depth=2):
         src = e
     e1, e2 = ext, np.zeros_like(ext)
 
-    nx, ny = normals(letters, H, W)
+    nx, ny = normals(letters, H, W, kd=kd)
     lx, ly = LIGHT
     ndl = nx * lx + ny * ly
     idx = np.where(ndl > 0.28, 7, np.where(ndl > -0.22, 6, 4))
     idx = np.where(Y < 0, np.minimum(idx + 1, 8), idx)
+    if kd > 1:
+        # finer grid: metallic vertical falloff on the flat facets (light upper band, darker foot)
+        idx = np.where((idx == 6) & (Y < CAP * kd * 0.30), 7, idx)
+        idx = np.where((idx == 6) & (Y >= CAP * kd * 0.78), 5, idx)
     c.put_index(mask, 'gold', idx)
     edge = mask & ~ndimage.binary_erosion(mask, ndimage.generate_binary_structure(2, 1))
     top = edge & (ny < -0.8)
@@ -291,10 +300,11 @@ def _ember_gates(c, mask, letters):
                 c.px(cx, y, col('ember', 7))
 
 
-def build(text='AVARNETH', return_face=False, ember_gates=EMBER_GATES, ext_depth=2):
-    """Returns the wordmark canvas trimmed to its pixels (and optionally the face mask)."""
-    m, letters = layout(text)
-    c, _ext = shade(m, letters, ember_gates=ember_gates, ext_depth=ext_depth)
+def build(text='AVARNETH', return_face=False, ember_gates=EMBER_GATES, ext_depth=2, kd=1):
+    """Returns the wordmark canvas trimmed to its pixels (and optionally the face mask).
+    kd: pixel density (1 = V1.0, 2 = V1.1 bootstrap match)."""
+    m, letters = layout(text, kd=kd)
+    c, _ext = shade(m, letters, ember_gates=ember_gates, ext_depth=ext_depth, kd=kd)
     a = c.a
     ys, xs = np.where(a[..., 3] > 0)
     x0, x1, y0, y1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1

@@ -1,0 +1,122 @@
+[
+  {
+    "area": "Grafik",
+    "check": "Alle deckenden Pixel aus Master-Palette + V1.1-Rampen (Heraldik-Navy, Festungsstein)",
+    "status": "PASS",
+    "evidence": "17 Dateien geprüft (ohne weichen Schleier); Abweichungen: keine"
+  },
+  {
+    "area": "Grafik",
+    "check": "Logo-/Header-Pixel ohne Halbtransparenz (keine AA-Säume)",
+    "status": "PASS",
+    "evidence": "Alpha nur 0/255 in Logo, Header und Logo-Ebenen (Glow-Ebenen bewusst gestuft); Abweichungen: keine"
+  },
+  {
+    "area": "Grafik",
+    "check": "@2x-Exporte = exakte Nearest-Neighbour-Verdopplung",
+    "status": "PASS",
+    "evidence": "pixelweiser Vergleich aller @2x-Dateien"
+  },
+  {
+    "area": "Header",
+    "check": "Header-Größe = LogoText-Rect (408 x 104 bei 1080p-Referenz)",
+    "status": "PASS",
+    "evidence": "@2x: 408 x 104, nativ 204 x 52 (2 Bildschirmpixel pro Kunstpixel)"
+  },
+  {
+    "area": "Animation",
+    "check": "Alle in der Timeline referenzierten Sprites vorhanden",
+    "status": "PASS",
+    "evidence": "67 Referenzen, fehlend: keine"
+  },
+  {
+    "area": "Animation",
+    "check": "Dauer 2,0 s, Canvas 960 x 540, pixelScaleAt1080p 2",
+    "status": "PASS",
+    "evidence": "duration 2.0, canvas 960x540, contentBounds {'x': 256, 'y': 101, 'width': 447, 'height': 321}"
+  },
+  {
+    "area": "Animation",
+    "check": "Jedes Lichtstreif-Frame enthält Licht",
+    "status": "PASS",
+    "evidence": "28 Frames, leer: keine"
+  },
+  {
+    "area": "Animation",
+    "check": "Timing/Phasen wie V1.0: gleiche Ebenen-Keys/Easing; Partikel je Phase gleiche Anzahl und Zeitfenster",
+    "status": "PASS",
+    "evidence": "Layer-Keys gleich: True; Partikel je Phase V1.0/V1.1: motes 0.08-0.28 s: 8/8, embers 1.13-1.57 s: 12/12, accent 1.62-1.70 s: 4/4; alle t0 im V1.0-Fenster: True. Hinweis: die einzelnen Zufallsstichproben (t0/Lebensdauer/Sprite) sind NICHT identisch (abweichend), weil die Bahnprüfung gegen die neue Geometrie andere Versuche verwirft - gleiches Skript, gleicher Seed."
+  },
+  {
+    "area": "Regression",
+    "check": "V1.0-Generator unverändert reproduzierbar (Dichte 1)",
+    "status": "PASS",
+    "evidence": "Hashes vor/nach den V1.1-Änderungen: Wortmarke 60ee1e1f36ee807d (Soll 60ee1e1f36ee807d), Timeline 107d85d68d7ee0ff (Soll 107d85d68d7ee0ff), Sprites 0479ce805f56f0e9 (Soll 0479ce805f56f0e9); regenerierte Timeline = ausgelieferte V1.0-Timeline: True; Emblem = ausgeliefertes AVE_Emblem.png: True"
+  },
+  {
+    "area": "Unity-Mathematik",
+    "check": "C#-Timeline-Mathematik (V1.0-Runtime, unverändert) = Python-Vorschau auf V1.1-Timeline",
+    "status": "PASS",
+    "evidence": "30 fps: 2196 Zeilen, 0 Abweichungen; 60 fps: 4356 Zeilen, 0 Abweichungen; 144 fps: 10404 Zeilen, 0 Abweichungen (Konsolen-Harness mit AvarnethStartupTimelineMath.cs, kein Unity)"
+  },
+  {
+    "area": "Unity-Mathematik",
+    "check": "Pixel-Skalierung je Auflösung (C# ComputePixelScale, IntegerNearest)",
+    "status": "PASS",
+    "evidence": "canvas 960x540, contentBounds 256,101 447x321 | screen,scale,art_w,art_h,margin_x,margin_y | 1920x1080,2,1920,1080,0,0 | 2560x1440,3,2880,1620,-160,-90 | 3840x2160,4,3840,2160,0,0 | 1600x900,2,1920,1080,-160,-90 | 1366x768,1,960,540,203,114 | 1280x720,1,960,540,160,90 | 1280x800,1,960,540,160,130 | 1680x1050,2,1920,1080,-120,-15 | 1920x1200,2,1920,1080,0,60 | 1440x900,2,1920,1080,-240,-90 | 1536x864,2,1920,1080,-192,-108 | 2560x1080,2,1920,1080,320,0 | 3440x1440,3,2880,1620,280,-90"
+  },
+  {
+    "area": "Referenzpaket",
+    "check": "Originale Referenzdateien unverändert",
+    "status": "PASS",
+    "evidence": "sha256sum -c über 151 Einträge der Referenz-SHA256SUMS: alle OK"
+  },
+  {
+    "area": "Vorschau",
+    "check": "MP4 1920 x 1080, >= 30 fps, ca. 4,5 s, als Mockup gekennzeichnet",
+    "status": "PASS",
+    "evidence": "h264 1920x1080 @ 60/1 fps, 4.50 s, Label im Bild + Metadaten-Titel; Hintergrund-Capture selbst nur 12 fps"
+  },
+  {
+    "area": "Branding",
+    "check": "Kein WOE-/„World of Eckertengineering“-Text in den V1.1-Grafiken",
+    "status": "PASS",
+    "evidence": "Logo, Header und Animationsebenen bestehen nur aus eigenen Pixel-Glyphen (AVARNETH, VEIL OF EMBERS, ECKERTENGINEERING [PRESENTS]); im Mockup sind alle sichtbaren WOE-Texte ersetzt (Liste: TEXT_CHANGES.md)"
+  },
+  {
+    "area": "Nicht geprüft",
+    "check": "Import der V1.1-Assets in Unity 6000.6 / Prefab-Update mit dem V1.0-Installer",
+    "status": "NOT TESTED",
+    "evidence": "kein Unity-Editor in dieser Umgebung"
+  },
+  {
+    "area": "Nicht geprüft",
+    "check": "Header-Image im echten LogoAreaTopLeft (Darstellung, CanvasScaler, Filter)",
+    "status": "NOT TESTED",
+    "evidence": "Szene nicht im Referenzpaket (Sicherheitsausschluss), kein Unity"
+  },
+  {
+    "area": "Nicht geprüft",
+    "check": "CanvasGroup auf LogoAreaTopLeft + „Reveal Login During Fade Out“ zur Laufzeit",
+    "status": "NOT TESTED",
+    "evidence": "kein Unity; nur aus dem Runtime-Code abgeleitet"
+  },
+  {
+    "area": "Nicht geprüft",
+    "check": "Tastatureingaben ins Login-Formular während der 2 s",
+    "status": "NOT TESTED",
+    "evidence": "Formular ist mit dieser Einrichtung nicht per CanvasGroup gesperrt (Maus: Raycast-Blocker); nicht geprüft"
+  },
+  {
+    "area": "Nicht geprüft",
+    "check": "Textänderungen in Szene/Skripten (Begrüßung, Hinweis, Footer)",
+    "status": "NOT TESTED",
+    "evidence": "Quelle der Texte nicht im Referenzpaket enthalten"
+  },
+  {
+    "area": "Nicht geprüft",
+    "check": "Vorschau = echtes Laufzeitbild",
+    "status": "NOT TESTED",
+    "evidence": "Mockup: Capture + Compositing; Retusche der alten Texte per Diffusionsfüllung"
+  }
+]

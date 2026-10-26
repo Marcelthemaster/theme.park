@@ -1,0 +1,5 @@
+AVARNETH_Bootstrap_Visual_Match_V1.1.zip  size 22833223 bytes  sha256 cb5c61973c3d0681f40e701c34d6e95785c5fdea11c43b4e767cdad839dc8cf3
+PASS  zip_test: No errors detected in compressed data of AVARNETH_Bootstrap_Visual_Match_V1.1.zip.
+PASS  sha256_check: 111 Einträge, sha256sum -c: alle OK
+PASS  complete: 112 Dateien im ZIP, 112 im Quellordner
+PASS  no_zero_bytes: Nullbyte-Dateien: keine

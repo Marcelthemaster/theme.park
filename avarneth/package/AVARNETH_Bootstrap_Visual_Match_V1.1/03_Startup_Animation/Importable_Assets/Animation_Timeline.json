@@ -1,0 +1,894 @@
+{
+  "schema": "avarneth.startup.timeline/1",
+  "name": "AVARNETH: VEIL OF EMBERS - startup branding",
+  "version": "1.1",
+  "duration": 2.0,
+  "canvasWidth": 960,
+  "canvasHeight": 540,
+  "pixelScaleAt1080p": 2,
+  "contentBounds": {
+    "x": 256,
+    "y": 101,
+    "width": 447,
+    "height": 321
+  },
+  "layers": [
+    {
+      "id": "veil",
+      "sprite": "Layers/AVE_Veil.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 0,
+      "y": 0,
+      "order": 0,
+      "keys": [
+        {
+          "t": 0.0,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.3,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.74,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 2.0,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        }
+      ],
+      "fullscreen": true
+    },
+    {
+      "id": "emblemGlow",
+      "sprite": "Layers/AVE_EmblemGlow.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 383,
+      "y": 114,
+      "order": 10,
+      "keys": [
+        {
+          "t": 0.16,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.34,
+          "alpha": 0.35,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.6,
+          "alpha": 0.35,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 1.7,
+          "alpha": 0.55,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 2.0,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        }
+      ]
+    },
+    {
+      "id": "publisher",
+      "sprite": "Layers/AVE_Publisher.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 364,
+      "y": 113,
+      "order": 20,
+      "keys": [
+        {
+          "t": 0.3,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.6,
+          "alpha": 0.65,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.76,
+          "alpha": 0.65,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 2.0,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "inCubic"
+        }
+      ]
+    },
+    {
+      "id": "emblem",
+      "sprite": "Layers/AVE_Emblem.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 416,
+      "y": 148,
+      "order": 30,
+      "keys": [
+        {
+          "t": 0.16,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.34,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.76,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 2.0,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "inCubic"
+        }
+      ]
+    },
+    {
+      "id": "emblemFlash",
+      "sprite": "Layers/AVE_EmblemFlash.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 416,
+      "y": 148,
+      "order": 32,
+      "keys": [
+        {
+          "t": 0.22,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.3,
+          "alpha": 0.6,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 0.46,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.62,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 1.7,
+          "alpha": 0.55,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.8,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        }
+      ]
+    },
+    {
+      "id": "emblemOutlineGlow",
+      "sprite": "Layers/AVE_EmblemOutlineGlow.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 414,
+      "y": 146,
+      "order": 33,
+      "keys": [
+        {
+          "t": 0.24,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.34,
+          "alpha": 0.7,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 0.6,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.6,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 1.68,
+          "alpha": 0.6,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.78,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        }
+      ]
+    },
+    {
+      "id": "emblemTrace",
+      "sprite": "",
+      "frames": [
+        "Frames/AVE_EmblemTrace_00.png",
+        "Frames/AVE_EmblemTrace_01.png",
+        "Frames/AVE_EmblemTrace_02.png",
+        "Frames/AVE_EmblemTrace_03.png",
+        "Frames/AVE_EmblemTrace_04.png",
+        "Frames/AVE_EmblemTrace_05.png",
+        "Frames/AVE_EmblemTrace_06.png",
+        "Frames/AVE_EmblemTrace_07.png",
+        "Frames/AVE_EmblemTrace_08.png",
+        "Frames/AVE_EmblemTrace_09.png",
+        "Frames/AVE_EmblemTrace_10.png",
+        "Frames/AVE_EmblemTrace_11.png",
+        "Frames/AVE_EmblemTrace_12.png",
+        "Frames/AVE_EmblemTrace_13.png",
+        "Frames/AVE_EmblemTrace_14.png",
+        "Frames/AVE_EmblemTrace_15.png"
+      ],
+      "frameStart": 0.0,
+      "frameEnd": 0.2667,
+      "afterFrames": "hold",
+      "x": 414,
+      "y": 146,
+      "order": 34,
+      "keys": [
+        {
+          "t": 0.0,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.05,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "outCubic"
+        },
+        {
+          "t": 0.2667,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.36,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        }
+      ]
+    },
+    {
+      "id": "wordmark",
+      "sprite": "Layers/AVE_Wordmark.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 268,
+      "y": 302,
+      "order": 40,
+      "keys": [
+        {
+          "t": 0.35,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.8,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "outCubic"
+        },
+        {
+          "t": 1.76,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 2.0,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "inCubic"
+        }
+      ]
+    },
+    {
+      "id": "wordmarkFlash",
+      "sprite": "Layers/AVE_WordmarkFlash.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 268,
+      "y": 302,
+      "order": 41,
+      "keys": [
+        {
+          "t": 0.38,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 0.45,
+          "alpha": 0.65,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 0.6,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.62,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 1.7,
+          "alpha": 0.6,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        },
+        {
+          "t": 1.8,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "smooth"
+        }
+      ]
+    },
+    {
+      "id": "wordmarkShine",
+      "sprite": "",
+      "frames": [
+        "Frames/AVE_WordmarkShine_00.png",
+        "Frames/AVE_WordmarkShine_01.png",
+        "Frames/AVE_WordmarkShine_02.png",
+        "Frames/AVE_WordmarkShine_03.png",
+        "Frames/AVE_WordmarkShine_04.png",
+        "Frames/AVE_WordmarkShine_05.png",
+        "Frames/AVE_WordmarkShine_06.png",
+        "Frames/AVE_WordmarkShine_07.png",
+        "Frames/AVE_WordmarkShine_08.png",
+        "Frames/AVE_WordmarkShine_09.png",
+        "Frames/AVE_WordmarkShine_10.png",
+        "Frames/AVE_WordmarkShine_11.png",
+        "Frames/AVE_WordmarkShine_12.png",
+        "Frames/AVE_WordmarkShine_13.png",
+        "Frames/AVE_WordmarkShine_14.png",
+        "Frames/AVE_WordmarkShine_15.png",
+        "Frames/AVE_WordmarkShine_16.png",
+        "Frames/AVE_WordmarkShine_17.png",
+        "Frames/AVE_WordmarkShine_18.png",
+        "Frames/AVE_WordmarkShine_19.png",
+        "Frames/AVE_WordmarkShine_20.png",
+        "Frames/AVE_WordmarkShine_21.png",
+        "Frames/AVE_WordmarkShine_22.png",
+        "Frames/AVE_WordmarkShine_23.png",
+        "Frames/AVE_WordmarkShine_24.png",
+        "Frames/AVE_WordmarkShine_25.png",
+        "Frames/AVE_WordmarkShine_26.png",
+        "Frames/AVE_WordmarkShine_27.png"
+      ],
+      "frameStart": 0.6333,
+      "frameEnd": 1.1,
+      "afterFrames": "hide",
+      "x": 268,
+      "y": 302,
+      "order": 42,
+      "keys": [
+        {
+          "t": 0.0,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        }
+      ]
+    },
+    {
+      "id": "subtitle",
+      "sprite": "Layers/AVE_Subtitle.png",
+      "frames": [],
+      "frameStart": 0.0,
+      "frameEnd": 0.0,
+      "afterFrames": "hold",
+      "x": 295,
+      "y": 387,
+      "order": 50,
+      "keys": [
+        {
+          "t": 1.15,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 1.45,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "outCubic"
+        },
+        {
+          "t": 1.76,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        },
+        {
+          "t": 2.0,
+          "alpha": 0.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "inCubic"
+        }
+      ]
+    },
+    {
+      "id": "glint",
+      "sprite": "",
+      "frames": [
+        "Frames/AVE_Glint_00.png",
+        "Frames/AVE_Glint_01.png",
+        "Frames/AVE_Glint_02.png",
+        "Frames/AVE_Glint_03.png",
+        "Frames/AVE_Glint_04.png",
+        "Frames/AVE_Glint_05.png",
+        "Frames/AVE_Glint_06.png",
+        "Frames/AVE_Glint_07.png"
+      ],
+      "frameStart": 1.6,
+      "frameEnd": 1.7333,
+      "afterFrames": "hide",
+      "x": 463,
+      "y": 141,
+      "order": 110,
+      "keys": [
+        {
+          "t": 0.0,
+          "alpha": 1.0,
+          "dx": 0.0,
+          "dy": 0.0,
+          "ease": "linear"
+        }
+      ]
+    }
+  ],
+  "particleSprites": [
+    "Particles/AVE_Particle_00.png",
+    "Particles/AVE_Particle_01.png",
+    "Particles/AVE_Particle_02.png",
+    "Particles/AVE_Particle_03.png",
+    "Particles/AVE_Particle_04.png",
+    "Particles/AVE_Particle_05.png"
+  ],
+  "particles": [
+    {
+      "sprite": 5,
+      "t0": 0.08,
+      "life": 0.447,
+      "x": 437.261,
+      "y": 162.555,
+      "vx": -9.38,
+      "vy": -30.286,
+      "ay": 12.0,
+      "alpha": 0.9,
+      "fadeIn": 0.15,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 5,
+      "t0": 0.109,
+      "life": 0.443,
+      "x": 499.173,
+      "y": 289.699,
+      "vx": 3.988,
+      "vy": 1.921,
+      "ay": 12.0,
+      "alpha": 0.9,
+      "fadeIn": 0.15,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 5,
+      "t0": 0.137,
+      "life": 0.466,
+      "x": 543.541,
+      "y": 242.67,
+      "vx": 17.509,
+      "vy": -6.711,
+      "ay": 12.0,
+      "alpha": 0.9,
+      "fadeIn": 0.15,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 4,
+      "t0": 0.166,
+      "life": 0.35,
+      "x": 520.717,
+      "y": 276.461,
+      "vx": 11.225,
+      "vy": 6.57,
+      "ay": 12.0,
+      "alpha": 0.9,
+      "fadeIn": 0.15,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 4,
+      "t0": 0.194,
+      "life": 0.352,
+      "x": 415.963,
+      "y": 164.751,
+      "vx": -16.451,
+      "vy": -31.215,
+      "ay": 12.0,
+      "alpha": 0.9,
+      "fadeIn": 0.15,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 4,
+      "t0": 0.223,
+      "life": 0.41,
+      "x": 544.999,
+      "y": 221.139,
+      "vx": 20.15,
+      "vy": -11.126,
+      "ay": 12.0,
+      "alpha": 0.9,
+      "fadeIn": 0.15,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 4,
+      "t0": 0.251,
+      "life": 0.5,
+      "x": 490.14,
+      "y": 293.918,
+      "vx": 2.319,
+      "vy": 2.978,
+      "ay": 12.0,
+      "alpha": 0.9,
+      "fadeIn": 0.15,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 4,
+      "t0": 0.28,
+      "life": 0.434,
+      "x": 484.69,
+      "y": 160.03,
+      "vx": 1.783,
+      "vy": -31.522,
+      "ay": 12.0,
+      "alpha": 0.9,
+      "fadeIn": 0.15,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 2,
+      "t0": 1.131,
+      "life": 0.441,
+      "x": 292.745,
+      "y": 400.259,
+      "vx": -16.736,
+      "vy": -12.226,
+      "ay": 12.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 3,
+      "t0": 1.2,
+      "life": 0.582,
+      "x": 668.201,
+      "y": 400.253,
+      "vx": 18.37,
+      "vy": -12.753,
+      "ay": 12.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 0,
+      "t0": 1.208,
+      "life": 0.591,
+      "x": 474.298,
+      "y": 415.108,
+      "vx": -9.492,
+      "vy": -6.653,
+      "ay": 0.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 1,
+      "t0": 1.245,
+      "life": 0.562,
+      "x": 293.139,
+      "y": 399.023,
+      "vx": -16.523,
+      "vy": -13.706,
+      "ay": 12.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 2,
+      "t0": 1.303,
+      "life": 0.458,
+      "x": 665.412,
+      "y": 400.989,
+      "vx": 20.77,
+      "vy": -11.531,
+      "ay": 12.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 2,
+      "t0": 1.33,
+      "life": 0.552,
+      "x": 596.986,
+      "y": 414.16,
+      "vx": -6.003,
+      "vy": -3.844,
+      "ay": 0.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 0,
+      "t0": 1.385,
+      "life": 0.46,
+      "x": 293.347,
+      "y": 400.444,
+      "vx": -14.698,
+      "vy": -14.833,
+      "ay": 12.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 2,
+      "t0": 1.392,
+      "life": 0.558,
+      "x": 667.299,
+      "y": 400.773,
+      "vx": 16.141,
+      "vy": -8.78,
+      "ay": 12.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 2,
+      "t0": 1.425,
+      "life": 0.387,
+      "x": 474.286,
+      "y": 412.386,
+      "vx": -4.671,
+      "vy": -5.009,
+      "ay": 0.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 2,
+      "t0": 1.484,
+      "life": 0.389,
+      "x": 291.487,
+      "y": 398.726,
+      "vx": -15.97,
+      "vy": -8.436,
+      "ay": 12.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 2,
+      "t0": 1.505,
+      "life": 0.445,
+      "x": 665.838,
+      "y": 395.787,
+      "vx": 21.57,
+      "vy": -11.075,
+      "ay": 12.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 1,
+      "t0": 1.546,
+      "life": 0.404,
+      "x": 599.205,
+      "y": 416.701,
+      "vx": 8.3,
+      "vy": -6.164,
+      "ay": 0.0,
+      "alpha": 1.0,
+      "fadeIn": 0.15,
+      "fadeOut": 0.55
+    },
+    {
+      "sprite": 4,
+      "t0": 1.62,
+      "life": 0.251,
+      "x": 407.246,
+      "y": 181.131,
+      "vx": -4.587,
+      "vy": -9.994,
+      "ay": 0.0,
+      "alpha": 0.85,
+      "fadeIn": 0.2,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 4,
+      "t0": 1.647,
+      "life": 0.222,
+      "x": 558.048,
+      "y": 254.763,
+      "vx": 7.808,
+      "vy": -11.806,
+      "ay": 0.0,
+      "alpha": 0.85,
+      "fadeIn": 0.2,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 5,
+      "t0": 1.673,
+      "life": 0.296,
+      "x": 403.698,
+      "y": 253.117,
+      "vx": -8.573,
+      "vy": -10.341,
+      "ay": 0.0,
+      "alpha": 0.85,
+      "fadeIn": 0.2,
+      "fadeOut": 0.6
+    },
+    {
+      "sprite": 5,
+      "t0": 1.7,
+      "life": 0.27,
+      "x": 551.154,
+      "y": 221.569,
+      "vx": 7.671,
+      "vy": -17.2,
+      "ay": 0.0,
+      "alpha": 0.85,
+      "fadeIn": 0.2,
+      "fadeOut": 0.6
+    }
+  ]
+}

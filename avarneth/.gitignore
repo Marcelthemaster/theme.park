@@ -3,3 +3,7 @@ work/review/
 work/preview_tmp/
 __pycache__/
 *.pyc
+work/v11/*.png
+work/v11/*.npy
+work/v11/cap/
+work/v11/unzip_test/

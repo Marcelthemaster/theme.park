@@ -42,20 +42,35 @@ def layer(id_, sprite, x, y, order, keys, frames=None, frame_start=0.0, frame_en
     return d
 
 
-def build(seed=2026):
+def build(seed=2026, density=1):
+    """density 1 = V1.0 (480x270, 4 screen px per art px at 1080p); density 2 = V1.1 bootstrap match
+    (960x540, 2 screen px per art px - the pixel size of the login fortress artwork). Same designs, timing
+    and particle script; all distances are authored at density 1 and scaled."""
+    d = density
+    CANVAS_W, CANVAS_H = globals()['CANVAS_W'] * d, globals()['CANVAS_H'] * d
     sprites = {}
 
     # ---------------- art layers
-    emb = emblem_mod.build(1.0, 'full')
-    amask = emblem_mod.a_mask(1.0)
-    wm, face = wordmark_mod.build(return_face=True)
-    sub = brand.build_subtitle()
-    pub = brand.build_presents_line()
+    if d == 1:
+        emb = emblem_mod.build(1.0, 'full')
+        amask = emblem_mod.a_mask(1.0)
+        wm, face = wordmark_mod.build(return_face=True)
+        sub = brand.build_subtitle()
+        pub = brand.build_presents_line()
+        veil_rgb = None
+    else:
+        import match_v11 as mv
+        emb = mv.emblem(float(d))
+        amask = mv.a_mask(float(d))
+        wm, face = mv.wordmark(kd=d, return_face=True)
+        sub = mv.subtitle()
+        pub = mv.publisher_line()
+        veil_rgb = mv.HERALDIC[1]
 
     # ---------------- layout (vertical lockup, optically centred)
-    gap_pub, gap_emb, gap_sub = 10, 5, 5
+    gap_pub, gap_emb, gap_sub = 10 * d, 5 * d, 5 * d
     total = pub.h + gap_pub + emb.h + gap_emb + wm.h + gap_sub + sub.h
-    top = (CANVAS_H - total) // 2 - 4
+    top = (CANVAS_H - total) // 2 - 4 * d
     px_, py_ = (CANVAS_W - pub.w) // 2, top
     ex, ey = (CANVAS_W - emb.w) // 2, py_ + pub.h + gap_pub
     wx, wy = (CANVAS_W - wm.w) // 2, ey + emb.h + gap_emb
@@ -67,9 +82,10 @@ def build(seed=2026):
     sprites['Layers/AVE_Publisher.png'] = pub
 
     # ---------------- effect layers
-    sprites['Layers/AVE_Veil.png'] = fx.veil(CANVAS_W, CANVAS_H, cx=CANVAS_W / 2, cy=ey + 66, rx=330, ry=190)
-    gw, gh = 96, 106
-    sprites['Layers/AVE_EmblemGlow.png'] = fx.radial_glow(gw, gh, 46, 51)
+    sprites['Layers/AVE_Veil.png'] = fx.veil(CANVAS_W, CANVAS_H, cx=CANVAS_W / 2, cy=ey + 66 * d, rx=330 * d, ry=190 * d,
+                                             rgb=veil_rgb)
+    gw, gh = 96 * d, 106 * d
+    sprites['Layers/AVE_EmblemGlow.png'] = fx.radial_glow(gw, gh, 46 * d, 51 * d)
     gx, gy = ex + emb.w // 2 - gw // 2, ey + emb.h // 2 - gh // 2
     sprites['Layers/AVE_EmblemFlash.png'] = fx.highlight_flash(emb, steps=2)
     sprites['Layers/AVE_EmblemOutlineGlow.png'] = fx.emblem_outline_glow(emb, margin=2)
@@ -84,10 +100,11 @@ def build(seed=2026):
         return paths
 
     trace_paths = seq('EmblemTrace', fx.emblem_trace_frames(emb, amask, 12, 4, margin=2))
-    shine_paths = seq('WordmarkShine', fx.shine_frames(wm, face, n=28))
-    glint_paths = seq('Glint', fx.glint_frames(8))
+    shine_paths = seq('WordmarkShine', fx.shine_frames(wm, face, n=28, d=d))
+    glint_paths = seq('Glint', fx.glint_frames(8, dd=d))
+    glint_half = (sprites[glint_paths[0]].w - 1) // 2
     apex_x = ex + emb.w // 2
-    apex_y = ey + int(np.where(emb.alpha_mask()[:, emb.w // 2])[0].min()) + 2
+    apex_y = ey + int(np.where(emb.alpha_mask()[:, emb.w // 2])[0].min()) + 2 * d
 
     parts = fx.particle_sprites()
     part_paths = []
@@ -132,7 +149,7 @@ def build(seed=2026):
               frames=shine_paths, frame_start=sh0, frame_end=sh0 + n_sh * F, after='hide'),
         layer('subtitle', 'Layers/AVE_Subtitle.png', sx, sy, 50,
               [key(1.15, 0.0), key(1.45, 1.0, ease='outCubic'), key(FADE0, 1.0), key(FADE1, 0.0, ease=out)]),
-        layer('glint', '', apex_x - 8, apex_y - 8, 110, [key(0.0, 1.0)],
+        layer('glint', '', apex_x - glint_half, apex_y - glint_half, 110, [key(0.0, 1.0)],
               frames=glint_paths, frame_start=gl0, frame_end=gl0 + n_gl * F, after='hide'),
     ]
 
@@ -141,10 +158,12 @@ def build(seed=2026):
     for (cv, x0, y0) in ((emb, ex, ey), (wm, wx, wy), (sub, sx, sy), (pub, px_, py_)):
         occ[y0:y0 + cv.h, x0:x0 + cv.w] |= cv.alpha_mask()
     occ_d = occ.copy()
-    occ_d[1:] |= occ[:-1]
-    occ_d[:-1] |= occ[1:]
-    occ_d[:, 1:] |= occ[:, :-1]
-    occ_d[:, :-1] |= occ[:, 1:]
+    for _ in range(d):
+        o = occ_d.copy()
+        occ_d[1:] |= o[:-1]
+        occ_d[:-1] |= o[1:]
+        occ_d[:, 1:] |= o[:, :-1]
+        occ_d[:, :-1] |= o[:, 1:]
 
     def clear_path(p, spr):
         h, w = spr.h, spr.w
@@ -186,35 +205,43 @@ def build(seed=2026):
         dx_, dy_ = x0 - emb.w / 2, y0 - emb.h / 2
         nrm = max(1e-6, (dx_ * dx_ + dy_ * dy_) ** 0.5)
         ux, uy = dx_ / nrm, dy_ / nrm
-        sp = rnd.uniform(6, 12)
+        sp = rnd.uniform(6, 12) * d
         return _p(sprite=rnd.choice([4, 4, 5]), t0=0.08 + 0.20 * i / max(1, n - 1), life=rnd.uniform(0.35, 0.5),
-                  x=ex + x0 + ux * 4, y=ey + y0 + uy * 4, vx=ux * sp, vy=uy * sp - rnd.uniform(4, 9), ay=6.0,
-                  alpha=0.9, fadeIn=0.15, fadeOut=0.6)
+                  x=ex + x0 + ux * 4 * d, y=ey + y0 + uy * 4 * d, vx=ux * sp, vy=uy * sp - rnd.uniform(4, 9) * d,
+                  ay=6.0 * d, alpha=0.9, fadeIn=0.15, fadeOut=0.6)
 
-    tip_l = (sx + 1, sy + 7)                  # outer end of the left ornament rule
-    tip_r = (sx + sub.w - 2, sy + 7)          # outer end of the right ornament rule
+    if d == 1:
+        tip_l = (sx + 1, sy + 7)                  # outer end of the left ornament rule
+        tip_r = (sx + sub.w - 2, sy + 7)          # outer end of the right ornament rule
+    else:
+        sm = sub.alpha_mask()
+        cols = np.where(sm.any(axis=0))[0]
+        yl = int(np.median(np.where(sm[:, cols[0] + 1])[0]))
+        yr = int(np.median(np.where(sm[:, cols[-1] - 1])[0]))
+        tip_l = (sx + int(cols[0]) + 1, sy + yl)
+        tip_r = (sx + int(cols[-1]) - 1, sy + yr)
 
     def ember(i, n):  # phase 3: embers thrown off the ornament tips and smouldering under the baseline
         mode = i % 3
         if mode == 0:
-            x0, y0 = tip_l[0] + rnd.uniform(-3, 0), tip_l[1] + rnd.uniform(-1, 2)
-            vx, vy, ay = rnd.uniform(-14, -6), rnd.uniform(-9, -4), 6.0
+            x0, y0 = tip_l[0] + rnd.uniform(-3, 0) * d, tip_l[1] + rnd.uniform(-1, 2) * d
+            vx, vy, ay = rnd.uniform(-14, -6) * d, rnd.uniform(-9, -4) * d, 6.0 * d
         elif mode == 1:
-            x0, y0 = tip_r[0] + rnd.uniform(0, 3), tip_r[1] + rnd.uniform(-1, 2)
-            vx, vy, ay = rnd.uniform(6, 14), rnd.uniform(-9, -4), 6.0
+            x0, y0 = tip_r[0] + rnd.uniform(0, 3) * d, tip_r[1] + rnd.uniform(-1, 2) * d
+            vx, vy, ay = rnd.uniform(6, 14) * d, rnd.uniform(-9, -4) * d, 6.0 * d
         else:
-            x0, y0 = rnd.uniform(sx + 24, sx + sub.w - 24), sy + sub.h + rnd.uniform(1, 4)
-            vx, vy, ay = rnd.uniform(-5, 5), rnd.uniform(-4, -1), 0.0
+            x0, y0 = rnd.uniform(sx + 24 * d, sx + sub.w - 24 * d), sy + sub.h + rnd.uniform(1, 4) * d
+            vx, vy, ay = rnd.uniform(-5, 5) * d, rnd.uniform(-4, -1) * d, 0.0
         t0 = 1.15 + 0.40 * i / max(1, n - 1) + rnd.uniform(-0.02, 0.02)
         return _p(sprite=rnd.choice([0, 1, 2, 2, 3]), t0=t0, life=min(rnd.uniform(0.35, 0.60), 1.95 - t0),
                   x=x0, y=y0, vx=vx, vy=vy, ay=ay, alpha=1.0, fadeIn=0.15, fadeOut=0.55)
 
     def accent(i, n):  # phase 4: a few gold motes released beside the emblem as the accent passes
         side = -1 if i % 2 == 0 else 1
-        x0 = ex + emb.w / 2 + side * rnd.uniform(emb.w / 2 + 3, emb.w / 2 + 10)
-        y0 = ey + rnd.uniform(16, emb.h - 16)
+        x0 = ex + emb.w / 2 + side * rnd.uniform(emb.w / 2 + 3 * d, emb.w / 2 + 10 * d)
+        y0 = ey + rnd.uniform(16 * d, emb.h - 16 * d)
         return _p(sprite=rnd.choice([4, 5]), t0=1.62 + 0.08 * i / max(1, n - 1), life=rnd.uniform(0.22, 0.30),
-                  x=x0, y=y0, vx=side * rnd.uniform(2, 6), vy=rnd.uniform(-10, -4), ay=0.0, alpha=0.85,
+                  x=x0, y=y0, vx=side * rnd.uniform(2, 6) * d, vy=rnd.uniform(-10, -4) * d, ay=0.0, alpha=0.85,
                   fadeIn=0.2, fadeOut=0.6)
 
     emit(8, mote)
@@ -224,12 +251,12 @@ def build(seed=2026):
     timeline = {
         'schema': 'avarneth.startup.timeline/1',
         'name': 'AVARNETH: VEIL OF EMBERS - startup branding',
-        'version': '1.0',
+        'version': '1.0' if d == 1 else '1.1',
         'duration': DURATION,
         'canvasWidth': CANVAS_W,
         'canvasHeight': CANVAS_H,
-        'pixelScaleAt1080p': 4,
-        'contentBounds': _content_bounds([(px_, py_, pub), (ex, ey, emb), (wx, wy, wm), (sx, sy, sub)], pad=6),
+        'pixelScaleAt1080p': 4 // d,
+        'contentBounds': _content_bounds([(px_, py_, pub), (ex, ey, emb), (wx, wy, wm), (sx, sy, sub)], pad=6 * d),
         'layers': layers,
         'particleSprites': part_paths,
         'particles': particles,
